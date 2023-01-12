@@ -1,0 +1,47 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Node",
+"class": "Print",
+"language": "GDScript",
+"path": "res://addons/katuiche-colorful-console/class/print.gd"
+} ]
+_global_script_class_icons={
+"Print": "res://addons/katuiche-colorful-console/class/icons/class.svg"
+}
+
+[application]
+
+config/name="Arcadia-Server"
+run/main_scene="res://Scenes/Server.tscn"
+config/icon="res://icon.png"
+
+[autoload]
+
+Logging="*res://Scripts/timestamp.gd"
+ServerData="*res://Scripts/ServerData.gd"
+ServerNexus="*res://Scripts/ServerNexus.gd"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/katuiche-colorful-console/plugin.cfg" )
+
+[gui]
+
+common/drop_mouse_on_gui_input_disabled=true
+
+[physics]
+
+common/enable_pause_aware_picking=true
+
+[rendering]
+
+environment/default_environment="res://default_env.tres"
