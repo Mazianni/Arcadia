@@ -10,12 +10,30 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Node",
+"class": "ActiveCharacter",
+"language": "GDScript",
+"path": "res://Scripts/ActiveCharacter.gd"
+}, {
+"base": "Node",
 "class": "Print",
 "language": "GDScript",
 "path": "res://addons/katuiche-colorful-console/class/print.gd"
+}, {
+"base": "Reference",
+"class": "SQLiteWrapper",
+"language": "GDScript",
+"path": "res://addons/godot-sqlite/godot-sqlite-wrapper.gd"
+}, {
+"base": "Resource",
+"class": "SpeciesBase",
+"language": "GDScript",
+"path": "res://Scripts/classes/race_base.gd"
 } ]
 _global_script_class_icons={
-"Print": "res://addons/katuiche-colorful-console/class/icons/class.svg"
+"ActiveCharacter": "",
+"Print": "res://addons/katuiche-colorful-console/class/icons/class.svg",
+"SQLiteWrapper": "",
+"SpeciesBase": ""
 }
 
 [application]
@@ -28,11 +46,11 @@ config/icon="res://icon.png"
 
 Logging="*res://Scripts/timestamp.gd"
 ServerData="*res://Scripts/ServerData.gd"
-ServerNexus="*res://Scripts/ServerNexus.gd"
+DataRepository="*res://Scripts/singletons/DataRepository.gd"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/katuiche-colorful-console/plugin.cfg" )
+enabled=PoolStringArray( "res://addons/Todo_Manager/plugin.cfg", "res://addons/katuiche-colorful-console/plugin.cfg" )
 
 [gui]
 
@@ -40,6 +58,7 @@ common/drop_mouse_on_gui_input_disabled=true
 
 [physics]
 
+common/physics_fps=20
 common/enable_pause_aware_picking=true
 
 [rendering]

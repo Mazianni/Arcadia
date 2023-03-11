@@ -1,23 +1,18 @@
-extends Node
+extends ParallaxBackground
 
 onready var viewport = get_viewport()
 onready var game_size = Vector2(
-    ProjectSettings.get_setting("display/window/size/width"),
-    ProjectSettings.get_setting("display/window/size/height"))
+	ProjectSettings.get_setting("display/window/size/width"),
+	ProjectSettings.get_setting("display/window/size/height"))
 
 func _ready():
-    viewport.connect("size_changed", self, "resize_viewport")
-    resize_viewport()
+	viewport.connect("size_changed", self, "resize_viewport")
+	resize_viewport()
 
 func resize_viewport():
-    var new_size = OS.get_window_size()
-    var scale_factor
+	var new_size = OS.get_window_size()
+	var scale_factor = round(new_size.y / 640)
+	print(scale_factor)
 
-    if new_size.x < game_size.x:
-        scale_factor = game_size.x/new_size.x
-        new_size = Vector2(new_size.x*scale_factor, new_size.y*scale_factor)
-    if new_size.y < game_size.y:
-        scale_factor = game_size.y/new_size.y
-        new_size = Vector2(new_size.x*scale_factor, new_size.y*scale_factor)
+	set_scale(Vector2(scale_factor, scale_factor))
 
-    viewport.set_size_override(true, new_size)

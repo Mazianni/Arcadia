@@ -3,8 +3,13 @@ extends KinematicBody2D
 var velocity = Vector2()
 var direction = Vector2()
 
+var player_state
+
 func on_movement():
 	velocity = Vector2()
+	
+	if Globals.MouseOnUi:
+		return
 
 	if Input.is_action_pressed("up"):
 		velocity.y -= 1
@@ -31,3 +36,9 @@ func on_movement():
 
 func _physics_process(delta):
 	on_movement()
+	UpdatePlayerState()
+	
+func UpdatePlayerState():
+	player_state = {"T:": Server.client_clock, "P:": get_global_position(), "M:":null, "D":null}
+	print(player_state)
+	Server.SendPlayerState(player_state)

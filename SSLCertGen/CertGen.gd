@@ -14,10 +14,10 @@ var not_after = "20231201000000"
 
 func _ready():
 	var directory = Directory.new()
-	if directory.dir_exists("user://Certificate"):
+	if directory.dir_exists("user://Certificate/"):
 		pass
 	else:
-		directory.make_dir("user://Certificate")
+		directory.make_dir("user://Certificate/")
 	CreateX509Cert()
 	print("Certificate Created.")
 	
@@ -26,5 +26,7 @@ func CreateX509Cert():
 	var crypto = Crypto.new()
 	var crypto_key = crypto.generate_rsa(4096)
 	var X509_cert = crypto.generate_self_signed_certificate(crypto_key, CNOC, not_before, not_after)
-	X509_cert.save(X509_cert_path)
-	crypto_key.save(X509_cert_path)
+	X509_cert.save(X509_cert_path+X509_cert_filename)
+	crypto_key.save(X509_cert_path+X509_key_filename)
+
+	

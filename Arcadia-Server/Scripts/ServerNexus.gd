@@ -36,3 +36,7 @@ func _OnConnectionFailed():
 remote func RecieveLoginToken(token):
 	gameserver.expected_tokens.append(token)
 	Logging.log_notice("[AUTH] Token " + str(token) + "Recieved.")
+	
+remote func RecievePlayerPIDUsernameAssoc(player_id, username):
+	Logging.log_notice("Recieving PID-Username Assoc for " + username + " PID" + str(player_id))
+
