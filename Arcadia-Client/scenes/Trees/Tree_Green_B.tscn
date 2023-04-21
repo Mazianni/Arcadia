@@ -1,6 +1,6 @@
 [gd_scene load_steps=13 format=2]
 
-[ext_resource path="res://scenes/Trees/tree3B_ss.png" type="Texture" id=1]
+[ext_resource path="res://sprites/tilemap/trees/tree3B_ss.png" type="Texture" id=1]
 
 [sub_resource type="AtlasTexture" id=12]
 atlas = ExtResource( 1 )
@@ -57,5 +57,10 @@ animations = [ {
 [node name="animated" type="AnimatedSprite" parent="Tree1"]
 frames = SubResource( 11 )
 animation = "tree1_summer"
-frame = 1
+frame = 4
 playing = true
+
+[node name="Area2D" type="Area2D" parent="Tree1"]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Tree1/Area2D"]
+polygon = PoolVector2Array( -11, 12, -2, 30, -8, 50, -9, 62, -5, 69, 12, 71, 26, 68, 33, 62, 29, 54, 26, 37, 28, 22, 31, 9, 14, 6 )

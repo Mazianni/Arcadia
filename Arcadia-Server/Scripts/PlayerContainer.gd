@@ -9,9 +9,12 @@ var associated_uuid
 var ActiveCharacter : ActiveCharacter
 
 func _ready():
+	connect("tree_exiting", self, "OnDeleted")
 	yield(get_tree().create_timer(0.1), "timeout") # wait for a little while for username to populate.
 	CheckSaveDataExists()
-	LoadSaveData()
+	
+func OnDeleted():
+	WriteSaveData()
 
 func CheckSaveDataExists(): #Verify that the directory and JSON file for this player exists; if not, create it with defaults.
 	var save_dir = DataRepository.saves_directory + "/" + str(PlayerData["username"])
@@ -29,6 +32,7 @@ func CheckSaveDataExists(): #Verify that the directory and JSON file for this pl
 		newsave.store_line(to_json(PlayerData))
 		Logging.log_notice("Creating save JSON for " + str(PlayerData["username"]))
 		newsave.close()
+	LoadSaveData()
 		
 func LoadSaveData():
 	var save_dir = DataRepository.saves_directory + "/" + str(PlayerData["username"])
@@ -47,9 +51,12 @@ func WriteSaveData():
 	var save_dir = DataRepository.saves_directory + "/" + str(PlayerData["username"])
 	var save_file = save_dir+"/"+str(PlayerData["username"])+".json"
 	var file = File.new()
-	file.open(save_file, File.WRITE)
+	var err = file.open(save_file, File.WRITE)
 	file.store_line(to_json(PlayerData))
-	Logging.log_notice("Data for " + str(PlayerData["username"]) + " saved.")
+	if !err:
+		Logging.log_notice("Data for " + str(PlayerData["username"]) + " saved.")
+	else:
+		Logging.log_error("[FILE] Error encountered during save for "+str(PlayerData["username"])+" with code "+str(err))
 	
 func DeleteSaveData(charname):
 	Logging.log_notice("Deleting character "+charname+" for "+PlayerData["username"])
@@ -60,8 +67,9 @@ func DeleteSaveData(charname):
 	dir.remove(save_file)
 	
 func DeleteCharacter(char_name):
-	PlayerData.erase(char_name)
+	PlayerData["character_dict"].erase(char_name)
 	DeleteSaveData(char_name)
+	WriteSaveData()
 	
 func CreateActiveCharacter(character_name, player_id):
 	ActiveCharacter = ActiveCharacterPath.instance()
@@ -77,9 +85,12 @@ func CreateNewActiveCharacter(cuuid, species_name, character_name, age, hair_col
 	ActiveCharacter.name = cuuid
 	ActiveCharacter.ActiveController = self
 	ActiveCharacter.CreateNewCharacter(cuuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height)
+	ActiveCharacter.CurrentMap = DataRepository.spawns[DataRepository.races[species_name].valid_spawns[0]]["MapName"]
+	ActiveCharacter.CurrentPosition = DataRepository.spawns[DataRepository.races[species_name].valid_spawns[0]]["pos"]
 	PlayerData["character_dict"][cuuid] = character_name
 	self.add_child(ActiveCharacter)
 	WriteSaveData()
+	ActiveCharacter.WriteJSON(cuuid)
 	
 	
 	

@@ -1,5 +1,12 @@
 extends Node
 
+var current_loaded_GUI
+var GUI_Scenes : Dictionary = {
+	"LoginScreen":"res://scenes/LoginScreen.tscn",
+	"CharacterSelect":"res://scenes/CharacterSelect.tscn",
+	"CharacterCreation":"res://scenes/CharacterCreation.tscn",
+	"MainGameUI":"res://scenes/MainGUI.tscn",
+}
 
 var floating_box_instance = preload("res://scenes/FloatingMessageBox.tscn")
 
@@ -12,3 +19,14 @@ func CreateFloatingMessage(message, type):
 	fbi.type = type
 	fbi.message = message
 	GUI.add_child(fbi)
+	
+func ChangeGUIScene(newscenename):
+	if current_loaded_GUI:
+		current_loaded_GUI.queue_free()
+	var newguisceneresource = load(GUI_Scenes[newscenename])
+	var newguisceneinstance = newguisceneresource.instance()
+	current_loaded_GUI = newguisceneinstance
+	GlobalGUI.add_child(newguisceneinstance)
+	
+func RemoveActiveGUI():
+	current_loaded_GUI.queue_free()

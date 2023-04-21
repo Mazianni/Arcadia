@@ -47,6 +47,12 @@ config/icon="res://icon.png"
 Logging="*res://Scripts/timestamp.gd"
 ServerData="*res://Scripts/ServerData.gd"
 DataRepository="*res://Scripts/singletons/DataRepository.gd"
+Helpers="*res://Scripts/singletons/helpers.gd"
+ChatHandler="*res://Scripts/singletons/ChatHandler.gd"
+
+[debug]
+
+gdscript/warnings/return_value_discarded=false
 
 [editor_plugins]
 
@@ -60,6 +66,7 @@ common/drop_mouse_on_gui_input_disabled=true
 
 common/physics_fps=20
 common/enable_pause_aware_picking=true
+common/physics_interpolation=true
 
 [rendering]
 

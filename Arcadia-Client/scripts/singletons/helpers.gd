@@ -8,3 +8,9 @@ func metric2imperial(input):
 		inconvert -= 11
 		ft += 1
 	return str(ft)+"'"+str(inconvert)
+	
+func IsServer(pid):
+	if pid != 1:
+		return false
+	else:
+		return true

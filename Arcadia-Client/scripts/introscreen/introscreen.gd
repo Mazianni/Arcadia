@@ -23,9 +23,6 @@ func resize_viewport():
 		
 func _on_Timer_timeout():
 	Globals.currentscene = Globals.CURRENT_SCENE.SCENE_LOGIN
-	var next_level_resource = load("res://scenes/LoginScreen.tscn")
-	var next_level = next_level_resource.instance()
-	get_parent().call_deferred("add_child", next_level)
-	set_physics_process(false)
+	Gui.ChangeGUIScene("LoginScreen")
 	yield(get_tree().create_timer(0.2),"timeout")
 	queue_free()

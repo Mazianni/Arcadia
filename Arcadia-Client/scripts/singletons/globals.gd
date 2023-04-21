@@ -19,6 +19,7 @@ var DirectionsList : Dictionary = {
 
 var uuid_generator = preload("res://uuid.gd")
 var uuid
+var character_uuid
 var client_state
 var serverconn
 var currentscene
@@ -28,7 +29,7 @@ var config_file
 enum CLIENT_STATE_LIST {CLIENT_UNAUTHENTICATED, CLIENT_PREGAME, CLIENT_INGAME}
 enum SERVER_CONNECTION_STATE {DISCONNECTED, CONNECTED}
 enum CURRENT_SCENE {SCENE_LOGIN, SCENE_SELECTION, SCENE_CREATION, SCENE_PLAYING}
-
+enum MESSAGE_CATEGORY {IC, OOC, LOOC, ADMIN, ETC}
 
 func _ready():
 	uuid = uuid_generator.v4()

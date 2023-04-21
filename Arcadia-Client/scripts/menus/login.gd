@@ -26,10 +26,7 @@ func _on_LoginButton_pressed():
 	if username_input.text == "" or userpassword_input.text == "":
 		Gui.CreateFloatingMessage("Please enter a valid username and password!", "bad")
 	else:
-		login_button.disabled = true
-		create_account_button.disabled = true
-		username_input.editable = false
-		userpassword_input.editable = false
+		DisableInputs()
 		var username = username_input.get_text()
 		var password = userpassword_input.get_text()
 		print("Attempting to Login...")
@@ -42,11 +39,20 @@ func _on_LoginButton_pressed():
 		
 func _OnConnectionFailed():
 	Gui.CreateFloatingMessage("Failed to connect to server.", "bad")
+	Server.network.disconnect("connection_failed", self, "_OnConnectionFailed")
+	EnableInputs()
+	
+func DisableInputs():
+	login_button.disabled = true
+	create_account_button.disabled = true
+	username_input.editable = false
+	userpassword_input.editable = false
+	
+func EnableInputs():
 	login_button.disabled = false
 	create_account_button.disabled = false
 	username_input.editable = true
 	userpassword_input.editable = true
-	Server.network.disconnect("connection_failed", self, "_OnConnectionFailed")
 	
 func _on_CreateAccount_pressed():
 	loginbox.hide()
@@ -70,8 +76,7 @@ func _on_Confirm_pressed():
 		Gui.CreateFloatingMessage("Valid passwords must contain: a capital/lowercase letter, a symbol, a number, and be six characters long.", "bad")
 	var username = create_username_input.get_text()
 	var password = create_userpassword_input.get_text()
-	create_back_button.disabled = true
-	create_confirm_button.disabled = true
+	DisableInputs()
 	Server.ConnectToServer()
 	Server.CreateAccount(username, password)
 	username = ""

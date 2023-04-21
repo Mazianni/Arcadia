@@ -1,0 +1,10 @@
+[gd_scene format=2]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Tree1" type="Node2D" parent="." groups=["trees"]]
+
+[node name="Area2D" type="Area2D" parent="Tree1"]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Tree1/Area2D"]
+polygon = PoolVector2Array( -5, 16, -2, 30, -8, 50, -9, 62, -5, 69, 12, 71, 26, 68, 33, 62, 29, 54, 26, 37, 28, 22, 25, 18, 14, 15 )

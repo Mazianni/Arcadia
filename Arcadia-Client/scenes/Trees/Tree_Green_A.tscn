@@ -67,5 +67,10 @@ animations = [ {
 [node name="animated" type="AnimatedSprite" parent="Tree1"]
 frames = SubResource( 11 )
 animation = "Tree"
-frame = 3
+frame = 4
 playing = true
+
+[node name="Area2D" type="Area2D" parent="Tree1"]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Tree1/Area2D"]
+polygon = PoolVector2Array( -22, 15, -15, 31, -20, 46, -24, 64, -11, 72, 12, 71, 26, 68, 33, 62, 43, 60, 32, 47, 31, 28, 31, 9, 14, 6 )

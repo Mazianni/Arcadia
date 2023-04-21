@@ -3,8 +3,8 @@ class_name SpeciesBase extends Resource
 # This is the base class for races; all others should extend this. (and preferably, only modify existing variables).
 
 export(String) var race_name = "Test"
-export(String) var race_description_short = "This is a test, and if you are seeing it, something is broken."
-export(String) var race_description_extended = "This is a test, and if you are seeing it, something is broken."
+export(String, MULTILINE) var race_description_short = "This is a test, and if you are seeing it, something is broken."
+export(String, MULTILINE) var race_description_extended = "This is a test, and if you are seeing it, something is broken."
 export(String) var race_icon
 export(String) var racial_spell_tree = "NONE"
 export(bool) var requires_approval = false

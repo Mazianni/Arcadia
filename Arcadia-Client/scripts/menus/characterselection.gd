@@ -43,6 +43,7 @@ func SelectCharacter(uuid, is_new):
 		self.queue_free()
 	else:
 		Server.SelectCharacter(uuid)
+		Globals.character_uuid = uuid
 		
 func DeleteCharacter(uuid):
 	Server.DeleteCharacter(uuid)
