@@ -33,9 +33,17 @@ func IsMsgOOC(msg:Dictionary):
 		return true	
 	return false
 	
+func FormatSimpleMessage(msg:String):
+	var outputdict : Dictionary
+	outputdict["is_emote"] = false
+	outputdict["T"] = Time.get_time_string_from_system(true)
+	outputdict["category"] = "ETC"
+	outputdict["text"] = msg
+	return outputdict
+	
 #Welcome to string concatenation hell.
 		
-func ParseChat(msg:Dictionary, originator:String, is_global:bool = false):
+func ParseChat(msg:Dictionary, originator:String, is_global:bool = false, player:Node = null):
 	var newdict : Dictionary = msg.duplicate(true)
 	var outputdict : Dictionary = {} #nested dictionary within newdict that is actually sent to the client.
 	var teststring : String = EscapeBBCode(newdict["text"])
@@ -46,6 +54,7 @@ func ParseChat(msg:Dictionary, originator:String, is_global:bool = false):
 	var special_type_end : String
 	var add_formatting : String
 	var end_formatting : String
+	var rank_text : String
 	var needs_formatting : bool = false
 	var all_caps : bool = false
 	
@@ -59,6 +68,10 @@ func ParseChat(msg:Dictionary, originator:String, is_global:bool = false):
 	
 	if newdict["is_emote"]:
 		outputdict["category"] = "IC"
+		
+	if Admin.HasRank(player):
+		if Admin.IsRankValid(player):
+			rank_text = "[color="+Admin.GetRankColor(player)+"]["+Admin.GetRankTitleShort(player)+"][/color] "
 	
 	if !is_global:
 		if not newdict["is_emote"]:
@@ -81,11 +94,11 @@ func ParseChat(msg:Dictionary, originator:String, is_global:bool = false):
 				end_formatting = "[/i][/color]"				
 				needs_formatting = true
 			"OOC":
-				add_formatting = "[color="+DataRepository.category_bbcode_colors[newdict["category"]]+"][b]"+str(newdict["category"])+"  - "+str(originator)+"[/b]: "
+				add_formatting = "[color="+DataRepository.category_bbcode_colors[newdict["category"]]+"][b]"+str(newdict["category"])+"  - "+rank_text+str(originator)+"[/b]: "
 				end_formatting = "[/color]"			
 				needs_formatting = true
 			"ADMIN":
-				add_formatting = "[color="+DataRepository.category_bbcode_colors[newdict["category"]]+"][b]"+str(newdict["category"])+" - "+str(originator)+"[/b]: "
+				add_formatting = "[color="+DataRepository.category_bbcode_colors[newdict["category"]]+"][b]"+str(newdict["category"])+" - "+rank_text+str(originator)+"[/b]: "
 				end_formatting = "[/color]"
 				needs_formatting = true
 		if !add_formatting && !end_formatting && needs_formatting:
@@ -116,34 +129,6 @@ func ParseChat(msg:Dictionary, originator:String, is_global:bool = false):
 	
 func ParseMarkdown(msg:String):
 	var mutated : String 
-	var all_markup_found : bool = false
-	var iterator : int = 0
-	var opened : bool = false
-	for i in msg:
-		var current_tag : String = i
-		var tag_found : bool = false
-		var offset : int = 0
-		if Helpers.Match3(msg, i, iterator): # find the opening tag.
-			current_tag = current_tag.repeat(2)
-			Logging.log_error(current_tag)
-			offset = 2
-		elif Helpers.Match2(msg, i, iterator):
-			current_tag = current_tag.repeat(1)
-			Logging.log_error(current_tag)
-			offset = 1
-		for m in DataRepository.markdown_dict.keys():
-			if current_tag == m:
-				msg.erase(iterator, offset)
-				iterator -= offset
-				tag_found = true
-				if not opened:
-					mutated += DataRepository.markdown_dict[current_tag]["opener_bbcode"]
-					opened = true
-				else:
-					mutated += DataRepository.markdown_dict[current_tag]["closer_bbcode"]
-					opened = false
-				break
-		if !tag_found:
-			mutated += i
-		iterator += 1
+	var test_string : String = msg
+	mutated = test_string.format(DataRepository.markdown_array, "|_|")
 	return mutated

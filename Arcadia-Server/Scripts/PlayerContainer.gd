@@ -4,14 +4,23 @@ var ActiveCharacterPath = preload("res://Scenes/Instances/ActiveCharacter.tscn")
 
 var PlayerStats 
 var HasLoaded = false
-var PlayerData : Dictionary =  {"username":"", "displayname":"", "rank":"", "ooc_color":"", "character_dict":{},"lastlogin":0}
+var PlayerData : Dictionary =  {"username":"", "displayname":"", "rank":"", "ooc_color":"", "character_dict":{},"lastlogin":0, "persistent_uuid":""}
 var associated_uuid
 var ActiveCharacter : ActiveCharacter
+
+signal loaded
 
 func _ready():
 	connect("tree_exiting", self, "OnDeleted")
 	yield(get_tree().create_timer(0.1), "timeout") # wait for a little while for username to populate.
 	CheckSaveDataExists()
+	MigrateSaveData()
+	
+func MigrateSaveData():
+	for I in DataRepository.DefaultPlayerDataPlayerData.keys():
+		if !I in PlayerData.keys():
+			PlayerData[I] = DataRepository.DefaultPlayerDataPlayerData[I]
+			Logging.log_warning("[SAVES] Key "+I+" not found in "+PlayerData["username"]+"'s save. Adding.")
 	
 func OnDeleted():
 	WriteSaveData()
@@ -46,6 +55,7 @@ func LoadSaveData():
 	PlayerData = load_dict.duplicate(true)
 	loadfile.close()
 	HasLoaded = true
+	emit_signal("loaded", self.name)
 	
 func WriteSaveData():
 	var save_dir = DataRepository.saves_directory + "/" + str(PlayerData["username"])

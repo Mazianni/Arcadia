@@ -26,7 +26,9 @@ func StartServer():
 	
 func _Peer_Connected(player_id):
 	Logging.log_notice("User "+str(player_id)+" Connected from IP "+str(network.get_peer_address(player_id)))
-
+	rpc_id(player_id, "SendVersion")
+	
+	
 func _Peer_Disconnected(player_id):
 	Logging.log_notice("User "+str(player_id)+" Disconnected")
 	if has_node(str(player_id)):
@@ -54,21 +56,29 @@ remote func DetermineLatency(client_time):
 #player state / synch end
 
 #character handling start
+
+remote func ReturnRequestedCharacterList():
+	SendPlayerCharacterList(get_tree().get_rpc_sender_id())
 	
-remote func SendPlayerCharacterList():
-	var player_id = get_tree().get_rpc_sender_id()
+func SendPlayerCharacterList(player_id):
+	player_id = get_tree().get_rpc_sender_id()
 	var CharacterList : Dictionary
 	var retryload = true
 	if has_node(str(player_id)):
 		if get_node(str(player_id)).HasLoaded:
-			retryload = false
-			CharacterList = get_node(str(player_id)).PlayerData.character_dict.duplicate(true)
+			CharacterList = get_node(str(player_id)).PlayerData["character_dict"].duplicate(true)
+			print("loaded player")
+			rpc_id(player_id, "RecieveCharacterList", CharacterList)
+			Logging.log_notice("Sending character list of "+str(player_id)+".")
+			print(get_node(str(player_id)).PlayerData["character_dict"])
 		else:
-			CharacterList = {}
-		rpc_id(player_id, "RecieveCharacterList", CharacterList, retryload)
-		Logging.log_notice("Sending character list of "+str(player_id)+".")
-		print(CharacterList)
-			
+			var check_pid = yield(get_node(str(player_id)), "loaded")
+			if check_pid == str(player_id):
+				CharacterList = get_node(str(player_id)).PlayerData["character_dict"].duplicate(true)
+				print("loaded player deferred")
+				rpc_id(player_id, "RecieveCharacterList", CharacterList)
+				Logging.log_notice("deferred Sending character list of "+str(player_id)+".")		
+	
 remote func CreateExistingCharacter(cuuid):
 	var player_id = get_tree().get_rpc_sender_id() 
 	if has_node(str(player_id)):
@@ -129,7 +139,7 @@ func CheckPlayerApprovedForRace(username, race):
 
 #login start
 
-remote func Login(username, password, uuid):
+remote func Login(username, password, uuid, puuid):
 	var player_id = get_tree().get_rpc_sender_id()
 	var message
 	Logging.log_notice("[AUTH] Login attempt from PID" + str(player_id) + " UUID " + str(uuid))
@@ -141,6 +151,17 @@ remote func Login(username, password, uuid):
 		DataRepository.SERVER_STATE.SERVER_SHUTTING_DOWN:
 			message = "Server shutting down. Connection refused."
 			status = false
+	var bancheck = Admin.CheckBanned(username, puuid, str(network.get_peer_address(player_id)))
+	if bancheck:
+		match bancheck:
+			FAILED:
+				message = "Connection Rejected: /nBanned User/IP"
+				Logging.log_notice("[AUTH] Connection from PID" + str(player_id) + " failed: Banned user.")
+			ERR_PARSE_ERROR:
+				Logging.log_error("[AUTH] Login attempt from PID" + str(player_id) + " failed: Malformed login information.")
+				message = "Connection Rejected: Malformed Request!"
+		status = false
+		network.disconnect_peer(player_id)
 	if AuthenticatePlayer(username, password, player_id, uuid):
 		status = true
 	ReportLoginStatus(player_id, status, message)
@@ -149,6 +170,7 @@ func ReportLoginStatus(player_id, status, message):
 	rpc_id(player_id, "ReturnLogin", status, message)
 	if(status == false):
 		rpc_id(player_id, "Disconnect", message)
+		network.disconnect_peer(player_id)
 
 func AuthenticatePlayer(username, password, player_id, player_uuid):
 	var token
@@ -169,6 +191,7 @@ func AuthenticatePlayer(username, password, player_id, player_uuid):
 			result = true
 			DataRepository.pid_to_username[str(player_id)] = {"username": str(username), "uuid": str(player_uuid)}
 			CreatePlayerContainer(player_id, player_uuid)
+			get_node(str(player_id)).connect("loaded", self, "SendPlayerCharacterList", player_id)
 			get_node(str(player_id)).PlayerData["lastlogin"] = OS.get_system_time_secs()
 	else:
 		Logging.log_notice("[AUTH] Running in editor. Authentication not done for "+str(player_id))
@@ -233,6 +256,14 @@ func CreatePlayerContainer(player_id, uuid):
 	
 func FillPlayerContainer(player_container, player_id, uuid):
 	player_container.PlayerData["username"] = DataRepository.pid_to_username[str(player_id)]["username"]
+	RequestPersistentUUID(player_id)
+	
+func RequestPersistentUUID(player_id):
+	rpc_id(player_id, "SendPersistentUUID")
+
+remote func RecievePersistentUUID(puuid):
+	if has_node(str(get_tree().get_rpc_sender_id())):
+		get_node(str(get_tree().get_rpc_sender_id())).PlayerData["persistent_uuid"] = puuid
 
 #login end
 
@@ -268,7 +299,7 @@ remote func RecieveChat(msg:Dictionary):
 		else:
 			originator = Helpers.GetMessageOriginator(true, playerid)
 			
-		NewMsg = ChatHandler.ParseChat(msg, originator, is_global)
+		NewMsg = ChatHandler.ParseChat(msg, originator, is_global, get_node(str(playerid)))
 		
 		if NewMsg["is_global"] != true:
 			SendLocalChat(NewMsg, originator, playerid)
@@ -296,5 +327,135 @@ func SendLocalChat(msg:Dictionary, originator, playerid):
 			rpc_id(int(reciever_id), "RecieveChat", msg["output"])
 			
 func SendSingleChat(msg:Dictionary, playerid):
-	rpc_id(playerid, "RecieveChat", msg)
+	rpc_id(int(playerid), "RecieveChat", msg)
 #chat end
+
+#version checking
+remote func RecieveVersion(clientversion):
+	var playerid = get_tree().get_rpc_sender_id()
+	CheckClientVersion(playerid, clientversion)
+
+func CheckClientVersion(player_id, clientversion):
+	if clientversion != DataRepository.serverversion:
+		Logging.log_warning("[CLIENT] Client version for PID "+ str(player_id)+ " does not match server version. Recieved:" + str(clientversion) + " Required:"+ str(DataRepository.serverversion))
+		rpc_id(player_id, "Disconnect", "Connection Rejected: Client Version Invalid! \n Current: "+str(clientversion)+"\n Required: "+ str(DataRepository.serverversion))
+		network.disconnect_peer(player_id)
+		
+#version checking end
+
+#permissions
+
+remote func SendPermissions():
+	var player_id = get_tree().get_rpc_sender_id()
+	if has_node(str(player_id)):
+		rpc_id(player_id, "RecievePermissions", Admin.RetrievePermissions(get_node(str(player_id))))
+
+#end permissions
+
+#tickets
+	
+func PushTicketsToClient(pid:int, tickets):
+	rpc_id(pid, "RecieveTickets", tickets, false)
+
+func UpdateTicket(pid:int, ticket_number:String, ticket:String):
+	rpc_id(pid, "UpdateTicket", ticket_number, ticket)
+	
+remote func UpdateSoloTicket(ticket_number:String):
+	var player_id = get_tree().get_rpc_sender_id()
+	Admin.UpdateTicketMessages(ticket_number)
+
+remote func GetTickets(for_staff:bool = false):
+	var player_id = get_tree().get_rpc_sender_id()
+	var return_dict
+	var all_tickets = false
+	if has_node(str(player_id)):
+		if for_staff:
+				if Admin.CheckPermissions("Manage Tickets", get_node(str(player_id))):
+					return_dict = Admin.GetAllTickets()
+					all_tickets = true
+					rpc_id(player_id, "RecieveAdminTickets", return_dict)
+				else:
+					Logging.log_warning("[ADMIN] User "+Helpers.PID2Username(player_id)+" attempted to retrieve all tickets without being staff.")
+		else:
+			return_dict = Admin.GetTicketsWithUser(Helpers.PID2Username(player_id))
+			rpc_id(player_id, "RecieveTickets", return_dict, all_tickets)
+	
+remote func OpenTicket(title:String, details:String, with_user:String, critical:bool = false):
+	var player_id = get_tree().get_rpc_sender_id()
+	if with_user:
+		if Admin.CheckPermissions("Manage Tickets", get_node(str(player_id))):
+			Admin.CreateTicket(Helpers.PID2Username(player_id), with_user, title, details, critical, true)
+	else:
+		Admin.CreateTicket(Helpers.PID2Username(player_id), "", title, details, critical, false)
+		
+remote func CloseTicket(ticket_number:String):
+	var player_id = get_tree().get_rpc_sender_id()
+	Admin.CloseTicket(ticket_number, player_id)
+		
+remote func SendMessageToTicket(message:String, ticket_number:String):
+	Admin.AddMessageToTicket(message, ticket_number, str(get_tree().get_rpc_sender_id()))
+	
+remote func ClaimTicket(ticket_number:String):
+	var player_id = get_tree().get_rpc_sender_id()
+	Admin.ClaimTicket(Helpers.PID2Username(player_id), ticket_number)
+	
+remote func AddUserToTicket(username:String, ticket_number:String):
+	var player_id = get_tree().get_rpc_sender_id()
+	if has_node(str(player_id)):
+		if Admin.CheckPermissions("Manage Tickets", get_node(str(player_id))):
+			Admin.AddUserToTicket(username, ticket_number)
+		else:
+			Logging.log_warning(Helpers.PID2Username(player_id)+" attempted to access admin functions while not authenticated.")
+#tickets end
+
+#notes begin
+
+remote func AddPlayerNote(username:String, title:String, note:String):
+	var player_id = get_tree().get_rpc_sender_id()
+	if has_node(str(player_id)):
+		if Admin.CheckPermissions("Player Notes", get_node(str(player_id))):
+			Admin.AddPlayerNote(username, title, note, player_id)
+		else:
+			Logging.log_notice("User "+Helpers.PID2Username(player_id)+" tried to edit a player's notes without permissions.")
+			
+remote func RemovePlayerNote(username:String, note_number:String):
+	var player_id = get_tree().get_rpc_sender_id()
+	if has_node(str(player_id)):
+		if Admin.CheckPermissions("Player Notes", get_node(str(player_id))):
+			Admin.RemovePlayerNote(username, note_number, player_id)
+		else:
+			Logging.log_notice("User "+Helpers.PID2Username(player_id)+" tried to edit a player's notes without permissions.")
+	
+remote func EditPlayerNote(username:String, note_number:String, new_note:String):
+	var player_id = get_tree().get_rpc_sender_id()
+	if has_node(str(player_id)):
+		if Admin.CheckPermissions("Player Notes", get_node(str(player_id))):
+			Admin.EditPlayerNote(username, note_number, new_note, player_id)
+		else:
+			Logging.log_notice("User "+Helpers.PID2Username(player_id)+" tried to edit a player's notes without permissions.")
+			
+func GetPlayerNotes():
+	var player_id = get_tree().get_rpc_sender_id()
+	if has_node(str(player_id)):
+		if Admin.CheckPermissions("Player Notes", get_node(str(player_id))):
+			rpc_id(player_id, "RecievePlayerNotes", Admin.GetPlayerNotes())
+		else:
+			Logging.log_notice("User "+Helpers.PID2Username(player_id)+" tried to view player notes without permissions.")
+
+#notes end
+
+#misc start
+
+remote func IsClientAdmin():
+	var player_id = get_tree().get_rpc_sender_id()
+	var decision = false
+	if has_node(str(player_id)):
+		if Admin.CheckPermissions("Is Staff", get_node(str(player_id))):
+			decision = true
+	rpc_id(player_id, "VerifyClientIsAdmin", decision)
+
+remote func GetCurrentPlayers():
+	var player_id = get_tree().get_rpc_sender_id()
+	rpc_id(player_id, "RecieveCurrentPlayers", Helpers.GetCurrentPlayerList())
+
+#misc end

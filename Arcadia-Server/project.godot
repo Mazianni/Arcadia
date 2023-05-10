@@ -49,6 +49,7 @@ ServerData="*res://Scripts/ServerData.gd"
 DataRepository="*res://Scripts/singletons/DataRepository.gd"
 Helpers="*res://Scripts/singletons/helpers.gd"
 ChatHandler="*res://Scripts/singletons/ChatHandler.gd"
+Admin="*res://Scripts/singletons/Admin.gd"
 
 [debug]
 
