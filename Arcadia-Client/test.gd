@@ -14,8 +14,8 @@ func benchmark():
   var index = 0
 
   while index < NUMBER_OF_TEST:
-    uuid_util.v4()
-    index += 1
+	uuid_util.v4()
+	index += 1
 
   var duration = 1.0 * OS.get_ticks_msec() - begin
 
@@ -30,15 +30,15 @@ func detect_collision():
   var generated_uuid = {}
 
   while index < NUMBER_OF_TEST:
-    var key = uuid_util.v4()
+	var key = uuid_util.v4()
 
-    if generated_uuid.has(key):
-      number_of_collision += 1
+	if generated_uuid.has(key):
+	  number_of_collision += 1
 
-    else:
-      generated_uuid[key] = true
+	else:
+	  generated_uuid[key] = true
 
-    index += 1
+	index += 1
 
   print('Number of collision: %s' % [ number_of_collision ])
   print('Collision detection done')  

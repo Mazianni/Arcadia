@@ -4,8 +4,10 @@ var CharacterBarResource = preload("res://scenes/CharacterSelectBar.tscn")
 var CharacterCreationScreenResource = preload("res://scenes/CharacterCreation.tscn")
 
 func _ready():
-	Server.GetCharacterList()
-	yield(get_tree().create_timer(0.3), "timeout")
+	Server.connect("character_list_recieved", self, "RenderSlots")
+	Server.RequestCharacterList()
+
+func RenderSlots():
 	var remaining_slots = 6
 	if Globals.CharacterList.size() > 0:
 		for i in Globals.CharacterList.keys():
@@ -15,7 +17,7 @@ func _ready():
 			newbarinstance.originator = self
 			newbarinstance.is_empty_slot = false
 			newbarinstance.assigned_uuid = i
-			get_node("NinePatchRect/GridContainer").add_child(newbarinstance)
+			$NinePatchRect/CenterContainer/GridContainer.add_child(newbarinstance)
 			remaining_slots -= 1
 		if remaining_slots > 0:
 			for i in remaining_slots:
@@ -25,7 +27,7 @@ func _ready():
 				newbarinstance.originator = self
 				newbarinstance.is_empty_slot = true
 				newbarinstance.assigned_uuid = null
-				get_node("NinePatchRect/GridContainer").add_child(newbarinstance)
+				$NinePatchRect/CenterContainer/GridContainer.add_child(newbarinstance)
 	else:
 		for i in 6:
 			var newbarinstance = CharacterBarResource.instance()
@@ -34,7 +36,8 @@ func _ready():
 			newbarinstance.originator = self
 			newbarinstance.is_empty_slot = true
 			newbarinstance.assigned_uuid = null
-			get_node("NinePatchRect/GridContainer").add_child(newbarinstance)
+			$NinePatchRect/CenterContainer/GridContainer.add_child(newbarinstance)
+	Server.disconnect("character_list_recieved", self, "RenderSlots")
 	
 func SelectCharacter(uuid, is_new):
 	if is_new:

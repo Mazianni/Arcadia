@@ -1,11 +1,10 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://scripts/onload.gd" type="Script" id=1]
 [ext_resource path="res://images/background/background2.png" type="Texture" id=2]
 [ext_resource path="res://images/background/background3.png" type="Texture" id=3]
 [ext_resource path="res://images/background/background1.png" type="Texture" id=4]
 [ext_resource path="res://scripts/singletons/autoresize.gd" type="Script" id=5]
-[ext_resource path="res://sounds/fromtheashes.ogg" type="AudioStream" id=6]
 [ext_resource path="res://scripts/maphandler/maphandler.gd" type="Script" id=7]
 
 [sub_resource type="Image" id=6]
@@ -62,8 +61,7 @@ region_rect = Rect2( 0, 0, 1280, 640 )
 
 [node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource( 6 )
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
 volume_db = -25.005
 
 [node name="Maphandler" type="Node" parent="."]
@@ -77,8 +75,11 @@ unique_name_in_owner = true
 layer = 2
 
 [node name="FloatingMessageContainer" type="GridContainer" parent="GUI/CanvasLayer"]
+margin_left = 5.0
+margin_top = 3.0
 margin_right = 40.0
 margin_bottom = 40.0
+custom_constants/vseparation = 6
 
 [node name="NinePatchRect" type="NinePatchRect" parent="GUI"]
 anchor_top = 0.933333

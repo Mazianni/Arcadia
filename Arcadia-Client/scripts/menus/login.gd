@@ -20,7 +20,11 @@ onready var create_userpassword_input = get_node("NinePatchRect/AccountBox/Passw
 onready var create_userpassword_confirm_input = get_node("NinePatchRect/AccountBox/RepeatPass")
 onready var create_confirm_button= get_node("NinePatchRect/AccountBox/Confirm")
 onready var create_back_button = get_node("NinePatchRect/AccountBox/Back")
-onready var create_error_text = get_node("NinePatchRect/AccountBox/ErrorMargin/ErrorOutput")
+
+
+func _ready():
+	Globals.currentscene = Globals.CURRENT_SCENE.SCENE_LOGIN
+	get_node("LoginAnimationPlayer").set_current_animation("fadein")
 
 func _on_LoginButton_pressed():
 	if username_input.text == "" or userpassword_input.text == "":
@@ -31,15 +35,21 @@ func _on_LoginButton_pressed():
 		var password = userpassword_input.get_text()
 		print("Attempting to Login...")
 		Server.ConnectToServer()
-		Server.Login(username, password, Globals.uuid)
+		Server.Login(username, password, Globals.uuid, Globals.persistent_uuid)
 		username = ""
 		password = ""
 		Server.network.connect("connection_failed", self, "_OnConnectionFailed")
+		Server.network.connect("server_disconnected", self, "_OnDisconnected")
 		Gui.CreateFloatingMessage("Attempting to connect to server...", "neutral")
 		
 func _OnConnectionFailed():
 	Gui.CreateFloatingMessage("Failed to connect to server.", "bad")
 	Server.network.disconnect("connection_failed", self, "_OnConnectionFailed")
+	EnableInputs()
+	
+func _OnDisconnected():
+	Server.network.disconnect("server_disconnected", self, "_OnDisconnected")
+	print("disconnected")
 	EnableInputs()
 	
 func DisableInputs():
@@ -63,7 +73,6 @@ func _on_Back_pressed():
 	accountbox.hide()
 
 func _on_Confirm_pressed():
-	create_error_text.set_text("")
 	if create_username_input.get_text() == "":
 		Gui.CreateFloatingMessage("Please enter a valid username!", "bad")
 	elif create_userpassword_input.get_text() =="":

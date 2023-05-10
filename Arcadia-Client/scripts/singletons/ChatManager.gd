@@ -4,6 +4,7 @@ var CurrentChatTab : String = ""
 var CurrentTextOutput
 var MaxChatlogLength = 50
 onready var ChatMsgContainer = load("res://scenes/ChatMsg/ChatMessage.tscn")
+onready var OOCChatMsgContainer = load("res://scenes/ChatMsg/ChatMessageOOC.tscn")
 
 func HookMainUI(node:Control):
 	CurrentTextOutput = node
@@ -27,15 +28,19 @@ func SendChat(msg, is_emote):
 func CreateNewChatMessage(msg:Dictionary):
 	CullChatLength()
 	print(str(msg))
-	var ncm = ChatMsgContainer.instance()
+	var ncm
+	if msg["category"] == "IC":
+		ncm = ChatMsgContainer.instance()
+	elif (msg["category"] == "OOC" || "LOOC" || "ADMIN"):
+		ncm = OOCChatMsgContainer.instance()
 	ncm.name = Globals.uuid_generator.v4()
 	CurrentTextOutput.add_child(ncm)
 	ncm.ParseMessage(msg)
 	if ncm.category != CurrentChatTab:
-		ncm.hide()
+		if ncm.category != "ETC":
+			ncm.hide()
 	
 func CullChatLength():
-	print("culling")
 	var cull_array : Array = CurrentTextOutput.get_children()
 	if cull_array.size() > MaxChatlogLength:
 		var n2r = cull_array[0]
@@ -47,7 +52,7 @@ func UpdateChatDisplay():
 		if I.category != CurrentChatTab && CurrentChatTab != "ALL":
 			if (I.category == "LOOC" || "IC") && CurrentChatTab == "IC":
 				continue
-			else:
+			elif I.category != "ETC":
 				I.hide()
 		elif I.category == CurrentChatTab:
 			I.show()

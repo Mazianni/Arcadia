@@ -72,6 +72,7 @@ func ChangeMap(mapname):
 	current_map = mapname
 
 func ClearScenes():
-	current_map_reference.queue_free()
-	current_map_reference = null
+	if current_map_reference:
+		current_map_reference.queue_free()
+		current_map_reference = null
 	current_map = ""

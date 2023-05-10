@@ -14,6 +14,15 @@ var client_clock = 0
 
 onready var maphandler = get_tree().get_root().get_node("RootNode/Maphandler")
 
+signal character_list_recieved
+signal permissions_recieved(permissions)
+signal tickets_recieved(tickets)
+signal ticket_update_recieved(ticket, ticket_number)
+signal admin_tickets_recieved(tickets)
+signal player_list_recieved(playerlist)
+signal player_notes_recieved(player_notes)
+signal admin_verified(verified)
+
 func _physics_process(delta):
 	client_clock += int(delta*1000) + delta_latency
 	delta_latency -= delta_latency
@@ -62,9 +71,10 @@ func _OnServerDisconnected(): #todo make this return to the login screen.
 	yield(get_tree().create_timer(1),"timeout")
 	get_tree().set_network_peer(null)
 	network = null
-	Gui.CreateFloatingMessage("Server disconnected! Please login again.", "bad")
-	Gui.ChangeGUIScene("LoginScreen")
-	maphandler.ClearScenes()
+	if Gui.current_loaded_GUI_name != "LoginScreen":
+		Gui.CreateFloatingMessage("Server disconnected! Please login again.", "bad")
+		Gui.ChangeGUIScene("LoginScreen")
+		maphandler.ClearScenes()
 	
 #End connection signals
 
@@ -74,7 +84,8 @@ func SendPlayerState(state):
 	pass
 	
 func DetermineLatency():
-	rpc_id(1, "DetermineLatency", OS.get_system_time_msecs())
+	if network:
+		rpc_id(1, "DetermineLatency", OS.get_system_time_msecs())
 	
 remote func ReturnLatency(client_time):
 	if not Helpers.IsServer(get_tree().get_rpc_sender_id()):
@@ -137,16 +148,14 @@ remote func RecieveRaceList(racelist : Dictionary):
 
 #character selection
 
-func GetCharacterList():
-	rpc_id(1, "SendPlayerCharacterList")
-	
-remote func RecieveCharacterList(characterlist, retryload):
+func RequestCharacterList():
+	rpc_id(1, "ReturnRequestedCharacterList")
+
+remote func RecieveCharacterList(characterlist):
 	if not Helpers.IsServer(get_tree().get_rpc_sender_id()):
 		return
-	if retryload:
-		call_deferred("GetCharacterList", 1)
-	else:
-		Globals.CharacterList = characterlist
+	Globals.CharacterList = characterlist
+	emit_signal("character_list_recieved")
 		
 func SelectCharacter(charname):
 	rpc_id(1, "CreateExistingCharacter", charname)
@@ -167,10 +176,11 @@ remote func LoadWorld(worldname):
 
 #login
 
-func Login(username, password, uuid):
+func Login(username, password, uuid, puuid):
 	Server.ConnectToServer()
 	yield(get_tree().create_timer(1), "timeout")
-	rpc_id(1,"Login", username, password, uuid)
+	if network:
+		rpc_id(1,"Login", username, password, uuid, Globals.persistent_uuid)
 
 func CreateAccount(username, password):
 	Server.ConnectToServer()
@@ -230,7 +240,113 @@ remote func RecieveChat(msg):
 
 #chat functions end
 
-remote func Disconnect():
+remote func Disconnect(reason : String = ""):
 	if not Helpers.IsServer(get_tree().get_rpc_sender_id()):
 		return
-	get_tree().network_peer = null
+	Globals.client_state = Globals.CLIENT_STATE_LIST.CLIENT_UNAUTHENTICATED
+	if(reason):
+		Gui.CreateFloatingMessage(reason, "bad")
+		
+#version checking start
+remote func SendVersion():
+	if not Helpers.IsServer(get_tree().get_rpc_sender_id()):
+		return
+	rpc_id(1, "RecieveVersion", Globals.client_version)
+	print(Globals.client_version)
+	
+remote func SendPersistentUUID():
+	if not Helpers.IsServer(get_tree().get_rpc_sender_id()):
+		return
+	rpc_id(1, "RecievePersistentUUID", Globals.persistent_uuid)
+#version checking end
+
+#permissions start
+func GetClientPermissions():
+	rpc_id(1, "SendPermissions")
+	
+func RecievePermissions(permissions_array:Array):
+	emit_signal("permissions_recieved", permissions_array)
+
+#permissions end
+
+#tickets start
+	
+func GetTickets(for_staff:bool = false):
+	rpc_id(1, "GetTickets", for_staff)
+	
+func GetUpdateOnTicket(ticket_number:String):
+	rpc_id(1, "UpdateSoloTicket", ticket_number)
+	
+remote func RecieveTicketsAdmin(ticket_dict:Dictionary):
+	if not Helpers.IsServer(get_tree().get_rpc_sender_id()):
+		return
+	emit_signal("admin_tickets_recieved", ticket_dict)
+	
+remote func RecieveTickets(ticket_dict:Dictionary, all_tickets:bool = false):
+	if not Helpers.IsServer(get_tree().get_rpc_sender_id()):
+		return
+	emit_signal("tickets_recieved", ticket_dict)
+	
+remote func UpdateTicket(ticket_number:String, ticket_dict:Dictionary):
+	if not Helpers.IsServer(get_tree().get_rpc_sender_id()):
+		return
+	emit_signal("ticket_update_recieved",ticket_number, ticket_dict)
+	
+func OpenTicket(title:String, details:String, with_user:String, critical:bool = false):
+	rpc_id(1, "OpenTicket", title, details, with_user, critical)
+	
+func CloseTicket(ticket_number:String):
+	rpc_id(1, "CloseTicket", ticket_number)
+	
+func ClaimTicket(ticket_number:String):
+	rpc_id(1, "ClaimTicket", ticket_number)
+	
+func SendMessageToTicket(message:String, ticket_number:String):
+	rpc_id(1, "SendMessageToTicket", message, ticket_number)
+	
+func AddUserToTicket(username:String, ticket_number:String):
+	rpc_id(1, "AddUserToTicket", username, ticket_number)
+#tickets end
+
+#player notes
+
+func RequestNotes():
+	rpc_id(1, "GetPlayerNotes")
+	
+func AddPlayerNote(username:String, title:String, note:String):
+	rpc_id(1, "AddPlayerNote", username, title, note)
+	
+func RemovePlayerNote(username:String, note_number:String):
+	rpc_id(1, "RemovePlayerNote", username, note_number)
+	
+func EditPlayerNote(username:String, note_number:String, new_note:String):
+	rpc_id(1, "EditPlayerNote", username, note_number, new_note)
+
+remote func RecievePlayerNotes(note_dict: Dictionary):
+	if not Helpers.IsServer(get_tree().get_rpc_sender_id()):
+		return
+	emit_signal("player_notes_recieved", note_dict)
+
+#player notes end
+
+#misc
+
+func GetPlayerList():
+	rpc_id(1, "GetCurrentPlayers")
+	
+remote func RecieveCurrentPlayers(player_list):
+	if not Helpers.IsServer(get_tree().get_rpc_sender_id()):
+		return
+	emit_signal("player_list_recieved", player_list)
+	
+func IsClientAdmin():
+	rpc_id(1, "IsClientAdmin")
+	
+remote func VerifyClientIsAdmin(decision:bool):
+	if not Helpers.IsServer(get_tree().get_rpc_sender_id()):
+		return
+	if decision:
+		Globals.is_client_admin = true
+		emit_signal("admin_verified", decision)
+
+#misc end
