@@ -31,7 +31,7 @@ var CharacterData : Dictionary = {
 }
 
 func _ready():
-	connect("tree_exiting", self, "OnDeleted")
+	connect("tree_exiting", Callable(self, "OnDeleted"))
 	if IsNewCharacter != true:
 		LoadJSON(self.name)
 	if not CheckJSONExists(self.name): #check if JSON exists, if not, create and store defaults.
@@ -46,11 +46,10 @@ func OnDeleted():
 func CheckJSONExists(character_name):
 	var save_dir = DataRepository.saves_directory + "/" + str(ActiveController.PlayerData["username"])
 	var save_file = save_dir+"/"+str(character_name)+".json"
-	var file = File.new()
+	var file = FileAccess.open(save_file, FileAccess.WRITE)
 	var json_exists = true
-	if not file.file_exists(save_file): # This is a new character, and thus loaded defaults as done in the init proc are standard.
-		file.open(save_file, File.WRITE)
-		file.store_line(to_json(CharacterData))
+	if not FileAccess.file_exists(save_file): # This is a new character, and thus loaded defaults as done in the init proc are standard.
+		file.store_line(JSON.new().stringify(CharacterData))
 		file.close()
 		json_exists = false
 	return json_exists
@@ -59,11 +58,13 @@ func LoadJSON(character_name):
 	var save_dir = DataRepository.saves_directory + "/" + str(ActiveController.PlayerData["username"])
 	var save_file = save_dir+"/"+str(character_name)+".json"
 	var load_dict = {}
-	var loadfile = File.new()
+	var loadfile
 	var temp
-	loadfile.open(save_file, File.READ)
+	loadfile = FileAccess.open(save_file, FileAccess.READ)
 	temp = loadfile.get_as_text()
-	load_dict = parse_json(temp)
+	var test_json_conv = JSON.new()
+	test_json_conv.parse(temp)
+	load_dict = test_json_conv.get_data()
 	CharacterData = load_dict.duplicate(true)
 	BaseSpecies = DataRepository.races[CharacterData["Species"]]
 	loadfile.close()	
@@ -71,16 +72,16 @@ func LoadJSON(character_name):
 func WriteJSON(character_name):
 	var save_dir = DataRepository.saves_directory + "/" + str(ActiveController.PlayerData["username"])
 	var save_file = save_dir+"/"+str(character_name)+".json"
-	var file = File.new()
+	var file = FileAccess.open(save_file, FileAccess.WRITE)
 	CharacterData["LastPosition"] = CurrentPosition
-	var err = file.open(save_file, File.WRITE)
-	file.store_line(to_json(CharacterData))
+	file.store_line(JSON.new().stringify(CharacterData))
+	var err = file.get_error()
 	file.close()
 	if err != OK:
 		Logging.log_error("[FILE] Error encountered during save of character "+CharacterData["Name"]+ " with code "+str(err))
 	
 func CreateCollider():
-	var new_collider = DataRepository.collider_resource.instance()
+	var new_collider = DataRepository.collider_resource.instantiate()
 	new_collider.name = CharacterData["uuid"]
 	new_collider.ControllingCharacter = self
 	CurrentCollider = new_collider

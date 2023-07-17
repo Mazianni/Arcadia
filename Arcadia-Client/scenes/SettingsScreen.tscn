@@ -13,45 +13,45 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -256.0
-margin_top = -290.0
-margin_right = 256.0
-margin_bottom = 290.0
-rect_min_size = Vector2( 500, 580 )
+offset_left = -256.0
+offset_top = -290.0
+offset_right = 256.0
+offset_bottom = 290.0
+custom_minimum_size = Vector2( 500, 580 )
 theme = ExtResource( 2 )
 
 [node name="ScrollContainer" type="TabContainer" parent="NinePatchRect"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 17.0
-margin_top = 63.0
-margin_right = -15.0
-margin_bottom = -55.0
+offset_left = 17.0
+offset_top = 63.0
+offset_right = -15.0
+offset_bottom = -55.0
 
-[node name="General" type="Tabs" parent="NinePatchRect/ScrollContainer"]
+[node name="General" type="TabBar" parent="NinePatchRect/ScrollContainer"]
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 4.0
-margin_top = 32.0
-margin_right = -4.0
-margin_bottom = -4.0
+offset_left = 4.0
+offset_top = 32.0
+offset_right = -4.0
+offset_bottom = -4.0
 
 [node name="GridContainer" type="GridContainer" parent="NinePatchRect/ScrollContainer/General"]
-margin_right = 472.0
-margin_bottom = 424.0
-custom_constants/vseparation = 8
-custom_constants/hseparation = 8
+offset_right = 472.0
+offset_bottom = 424.0
+theme_override_constants/v_separation = 8
+theme_override_constants/h_separation = 8
 
 [node name="UnitSelection" type="Panel" parent="NinePatchRect/ScrollContainer/General/GridContainer"]
-margin_right = 150.0
-margin_bottom = 50.0
-rect_min_size = Vector2( 150, 50 )
+offset_right = 150.0
+offset_bottom = 50.0
+custom_minimum_size = Vector2( 150, 50 )
 
 [node name="Label" type="Label" parent="NinePatchRect/ScrollContainer/General/GridContainer/UnitSelection"]
 anchor_right = 1.0
-margin_top = 2.0
-margin_bottom = 16.0
+offset_top = 2.0
+offset_bottom = 16.0
 text = "Measurement Units"
 align = 1
 valign = 1
@@ -60,20 +60,20 @@ valign = 1
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 3.0
-margin_top = -32.0
-margin_bottom = -2.0
+offset_left = 3.0
+offset_top = -32.0
+offset_bottom = -2.0
 
 [node name="Blank" type="Panel" parent="NinePatchRect/ScrollContainer/General/GridContainer"]
-margin_top = 58.0
-margin_right = 150.0
-margin_bottom = 108.0
-rect_min_size = Vector2( 150, 50 )
+offset_top = 58.0
+offset_right = 150.0
+offset_bottom = 108.0
+custom_minimum_size = Vector2( 150, 50 )
 
 [node name="Label" type="Label" parent="NinePatchRect/ScrollContainer/General/GridContainer/Blank"]
 anchor_right = 1.0
-margin_top = 2.0
-margin_bottom = 16.0
+offset_top = 2.0
+offset_bottom = 16.0
 align = 1
 valign = 1
 
@@ -81,33 +81,33 @@ valign = 1
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 3.0
-margin_top = -32.0
-margin_bottom = -2.0
+offset_left = 3.0
+offset_top = -32.0
+offset_bottom = -2.0
 
-[node name="Sound" type="Tabs" parent="NinePatchRect/ScrollContainer"]
+[node name="Sound" type="TabBar" parent="NinePatchRect/ScrollContainer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 4.0
-margin_top = 32.0
-margin_right = -4.0
-margin_bottom = -4.0
+offset_left = 4.0
+offset_top = 32.0
+offset_right = -4.0
+offset_bottom = -4.0
 
 [node name="GridContainer" type="GridContainer" parent="NinePatchRect/ScrollContainer/Sound"]
-margin_right = 472.0
-margin_bottom = 424.0
-custom_constants/vseparation = 8
-custom_constants/hseparation = 8
+offset_right = 472.0
+offset_bottom = 424.0
+theme_override_constants/v_separation = 8
+theme_override_constants/h_separation = 8
 
 [node name="MusicVolume" type="Panel" parent="NinePatchRect/ScrollContainer/Sound/GridContainer"]
-margin_right = 150.0
-margin_bottom = 50.0
-rect_min_size = Vector2( 150, 50 )
+offset_right = 150.0
+offset_bottom = 50.0
+custom_minimum_size = Vector2( 150, 50 )
 
 [node name="Label" type="Label" parent="NinePatchRect/ScrollContainer/Sound/GridContainer/MusicVolume"]
 anchor_right = 1.0
-margin_top = 2.0
-margin_bottom = 16.0
+offset_top = 2.0
+offset_bottom = 16.0
 text = "Music Volume"
 align = 1
 valign = 1
@@ -116,9 +116,9 @@ valign = 1
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 3.0
-margin_top = -32.0
-margin_bottom = -2.0
+offset_left = 3.0
+offset_top = -32.0
+offset_bottom = -2.0
 max_value = 1.0
 step = 0.05
 allow_greater = true
@@ -126,15 +126,15 @@ allow_lesser = true
 
 [node name="Blank2" type="Panel" parent="NinePatchRect/ScrollContainer/Sound/GridContainer"]
 visible = false
-margin_top = 116.0
-margin_right = 150.0
-margin_bottom = 166.0
-rect_min_size = Vector2( 150, 50 )
+offset_top = 116.0
+offset_right = 150.0
+offset_bottom = 166.0
+custom_minimum_size = Vector2( 150, 50 )
 
 [node name="Label" type="Label" parent="NinePatchRect/ScrollContainer/Sound/GridContainer/Blank2"]
 anchor_right = 1.0
-margin_top = 2.0
-margin_bottom = 16.0
+offset_top = 2.0
+offset_bottom = 16.0
 align = 1
 valign = 1
 
@@ -142,18 +142,18 @@ valign = 1
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 3.0
-margin_top = -32.0
-margin_bottom = -2.0
+offset_left = 3.0
+offset_top = -32.0
+offset_bottom = -2.0
 
 [node name="CloseButton" type="Button" parent="NinePatchRect"]
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 60.0
-margin_top = -45.0
-margin_right = -53.0
-margin_bottom = -10.0
+offset_left = 60.0
+offset_top = -45.0
+offset_right = -53.0
+offset_bottom = -10.0
 text = "Close"
 
 [connection signal="item_selected" from="NinePatchRect/ScrollContainer/General/GridContainer/UnitSelection/OptionButton" to="." method="_on_OptionButton_item_selected"]

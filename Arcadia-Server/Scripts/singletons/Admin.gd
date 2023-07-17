@@ -3,8 +3,8 @@ extends Node
 enum RANK_FLAGS {NONE, MANAGE_TICKETS, IS_STAFF, PLAYER_NOTES}
 enum TICKET_FLAGS {TICKET_OPEN, TICKET_STAFF_ASSIGNED, TICKET_CLOSED}
 
-onready	var admin_directory = "user://" + "admin"
-onready var Server = get_tree().get_root().get_node("Server")
+@onready var admin_directory = "user://" + "admin"
+@onready var Server = get_tree().get_root().get_node("Server")
 
 var next_ticket_status_check = 0
 
@@ -49,63 +49,60 @@ var ban_dict_skeleton = {
 
 func _ready():
 	CheckBanDataExists()
-	LoadBanData()
 	
 func _process(delta):
 	
-	if OS.get_system_time_secs() >= next_ticket_status_check || !next_ticket_status_check:
-		next_ticket_status_check = OS.get_system_time_secs() + 600 #10 minutes
+	if Time.get_unix_time_from_system() >= next_ticket_status_check || !next_ticket_status_check:
+		next_ticket_status_check = Time.get_unix_time_from_system() + 600 #10 minutes
 		var tickets_without_staff : int = 0
 		for I in tickets.keys():
 			if tickets[I]["Status"] == TICKET_FLAGS.TICKET_OPEN:
 				if !IsTicketClaimedByStaff(I):
-				 tickets_without_staff += 1
+					tickets_without_staff += 1
 		for I in get_tree().get_nodes_in_group("players"):
 			if HasRank(I):
 				if CheckPermissions("Manage Tickets", I):
 					Server.SendSingleChat(ChatHandler.FormatSimpleMessage("[There are "+str(tickets_without_staff)+" tickets without a staff member assigned.]"), int(I.name))
 		
 func CheckBanDataExists():
-	var dir = Directory.new()
-	dir.open(admin_directory)
+	var dir = DirAccess.open(admin_directory)
+	var error = OK
 	Logging.log_notice("[ADMIN] Loading admin data...")
 	if not dir.dir_exists(admin_directory):
 		dir.make_dir(admin_directory)
 		Logging.log_notice("[ADMIN] Creating save directory for admin data at dir " + admin_directory)
 	if not dir.file_exists(admin_directory+"/"+"ban_data.json"):
-		var newsave = File.new()
-		newsave.open(admin_directory+"/"+"ban_data.json", File.WRITE)
-		newsave.store_line(to_json(ban_data))
+		var newsave = FileAccess.open(admin_directory+"/"+"ban_data.json", FileAccess.WRITE)
+		newsave.store_line(JSON.new().stringify(ban_data))
 		Logging.log_notice("[ADMIN] Creating JSON for ban data.")
 		newsave.close()
 	if not dir.file_exists(admin_directory+"/"+"player_note_data.json"):
-		var newsave = File.new()
-		newsave.open(admin_directory+"/"+"player_note_data.json", File.WRITE)
-		newsave.store_line(to_json(player_notes))
+		var newsave = FileAccess.open(admin_directory+"/"+"player_note_data.json", FileAccess.WRITE)
+		newsave.store_line(JSON.new().stringify(player_notes))
 		Logging.log_notice("[ADMIN] Creating JSON for player note data.")
 		newsave.close()
+	LoadBanData()
 
 		
 func LoadBanData():
-	var loadfile = File.new()
-	var error = loadfile.open(admin_directory+"/"+"ban_data.json", File.READ)
+	var loadfile = FileAccess.open(admin_directory+"/"+"ban_data.json", FileAccess.READ)
 	var bandict : Dictionary
-	var temp = parse_json(loadfile.get_as_text())
+	var test_json_conv = JSON.new()
+	test_json_conv.parse(loadfile.get_as_text())
+	var temp = test_json_conv.get_data()
 	if(temp):
 		bandict = temp.duplicate(true)
 	loadfile.close()
-	if error:
-		Logging.log_error("[ADMIN] Error loading ban data from JSON with code " + str(error))
 		
 func CheckBanned(username:String, puuid:String, ip:String): # returns false if not banned
 	var result = OK
-	if !username:
+	if username == null || username != "":
 		result = ERR_PARSE_ERROR
 		return result
-	if !puuid:
+	if puuid == null || puuid != "":
 		result = ERR_PARSE_ERROR
 		return result
-	if !ip:
+	if ip == null || ip != "":
 		result = ERR_PARSE_ERROR
 		return result
 	if username in ban_data["banned_users"]:

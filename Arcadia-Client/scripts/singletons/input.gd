@@ -4,7 +4,7 @@ var request_velocity = Vector2()
 var direction = Vector2()
 
 func ready() -> void:
-	get_viewport().connect("gui_focus_changed", self, "_on_focus_changed")
+	get_viewport().connect("gui_focus_changed", Callable(self, "_on_focus_changed"))
 
 func _physics_process(delta):
 	if Globals.client_state == Globals.CLIENT_STATE_LIST.CLIENT_INGAME:

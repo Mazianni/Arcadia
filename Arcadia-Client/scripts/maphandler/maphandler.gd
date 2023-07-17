@@ -18,7 +18,7 @@ func _physics_process(delta):
 	if current_map == null:
 		return
 	interpolation_offset = interpolation_offset_base + Server.latency
-	var render_time = OS.get_system_time_msecs() - interpolation_offset
+	var render_time = Time.get_unix_time_from_system() - interpolation_offset
 	if world_state_buffer.size() > 1:
 		while world_state_buffer.size() > 2 and render_time > world_state_buffer[2].T:
 			world_state_buffer.remove(0)
@@ -63,7 +63,7 @@ func ChangeMap(mapname):
 	var path = "res://scenes/maps/"
 	print(path+str(mapname)+"/"+str(mapname)+".tscn")
 	var newmapres = load(path+str(mapname)+"/"+str(mapname)+".tscn")
-	var newmapinstance = newmapres.instance()
+	var newmapinstance = newmapres.instantiate()
 	newmapinstance.name = mapname
 	self.add_child(newmapinstance)
 	if current_map_reference:

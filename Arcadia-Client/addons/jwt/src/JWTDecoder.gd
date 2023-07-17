@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 class_name JWTDecoder
 
 var parts: Array = []
@@ -7,13 +7,21 @@ var payload_claims: Dictionary = {}
 
 func _init(jwt: String):
     self.parts = jwt.split(".")
-    var header: PoolByteArray = JWTUtils.base64URL_decode(self.parts[0])
-    var payload: PoolByteArray = JWTUtils.base64URL_decode(self.parts[1])
-    self.header_claims = _parse_json(header)
-    self.payload_claims = _parse_json(payload)
+    var header: PackedByteArray = JWTUtils.base64URL_decode(self.parts[0])
+    var payload: PackedByteArray = JWTUtils.base64URL_decode(self.parts[1])
+    var test_json_conv = JSON.new()
+    test_json_conv.parse(header)
+    self.header_claims = _test_json_conv.get_data()
+    var test_json_conv = JSON.new()
+    test_json_conv.parse(payload)
+    self.payload_claims = _test_json_conv.get_data()
 
-func _parse_json(field: PoolByteArray) -> Dictionary:
-    var parse_result: JSONParseResult = JSON.parse(field.get_string_from_utf8())
+var test_json_conv = JSON.new()
+test_json_conv.parse(field: PackedByteArray) -> Dictionary:
+func _test_json_conv.get_data()
+    var test_json_conv = JSON.new()
+    test_json_conv.parse(field.get_string_from_utf8())
+    var parse_result: JSON = test_json_conv.get_data()
     if parse_result.error != OK:
         return {}
     return parse_result.result
@@ -42,7 +50,7 @@ func get_issuer() -> String:
 func get_subject() -> String:
     return self.payload_claims.get(JWTClaims.Public.SUBJECT, "null")
 
-func get_audience() -> PoolStringArray:
+func get_audience() -> PackedStringArray:
     return self.payload_claims.get(JWTClaims.Public.AUDIENCE, "null")
 
 func get_expires_at() -> int:

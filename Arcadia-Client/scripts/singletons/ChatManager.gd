@@ -3,8 +3,8 @@ extends Node
 var CurrentChatTab : String = ""
 var CurrentTextOutput
 var MaxChatlogLength = 50
-onready var ChatMsgContainer = load("res://scenes/ChatMsg/ChatMessage.tscn")
-onready var OOCChatMsgContainer = load("res://scenes/ChatMsg/ChatMessageOOC.tscn")
+@onready var ChatMsgContainer = load("res://scenes/ChatMsg/ChatMessage.tscn")
+@onready var OOCChatMsgContainer = load("res://scenes/ChatMsg/ChatMessageOOC.tscn")
 
 func HookMainUI(node:Control):
 	CurrentTextOutput = node
@@ -30,9 +30,9 @@ func CreateNewChatMessage(msg:Dictionary):
 	print(str(msg))
 	var ncm
 	if msg["category"] == "IC":
-		ncm = ChatMsgContainer.instance()
+		ncm = ChatMsgContainer.instantiate()
 	elif (msg["category"] == "OOC" || "LOOC" || "ADMIN"):
-		ncm = OOCChatMsgContainer.instance()
+		ncm = OOCChatMsgContainer.instantiate()
 	ncm.name = Globals.uuid_generator.v4()
 	CurrentTextOutput.add_child(ncm)
 	ncm.ParseMessage(msg)

@@ -11,13 +11,11 @@ func ParseMessage(msg:Dictionary):
 	timestamp = msg["T"]
 	msgtext = msg["text"]
 	category = msg["category"]
-	rect_size = get_font("font").get_string_size(bbcode_text)
-	rect_min_size = get_font("font").get_string_size(bbcode_text)
 	DrawMsg()
 	
 func DrawMsg():
 	var t : String = ""
 	if display_timestamps:
 		t = "["+timestamp+"] "
-	bbcode_text = msgtext
+	text = msgtext
 		

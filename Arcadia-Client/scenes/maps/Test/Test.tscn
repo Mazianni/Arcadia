@@ -8,7 +8,7 @@
 [node name="Map" type="Node2D"]
 script = ExtResource( 5 )
 
-[node name="PrimarySort" type="YSort" parent="."]
+[node name="PrimarySort" type="Node2D" parent="."]
 
 [node name="TilemapContainer" type="Node2D" parent="PrimarySort"]
 
@@ -22,7 +22,7 @@ format = 1
 
 [node name="ObjectSortContainer" type="Node2D" parent="PrimarySort"]
 
-[node name="Foliage" type="YSort" parent="PrimarySort/ObjectSortContainer"]
+[node name="Foliage" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
 [node name="Node2D4" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource( 2 )]
 position = Vector2( 208, 346 )
@@ -81,12 +81,12 @@ position = Vector2( 319, 493 )
 [node name="Node2D19" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource( 3 )]
 position = Vector2( 596, 511 )
 
-[node name="Objects" type="YSort" parent="PrimarySort/ObjectSortContainer"]
+[node name="Objects" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
-[node name="Warpers" type="YSort" parent="PrimarySort/ObjectSortContainer"]
+[node name="Warpers" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
-[node name="Structures" type="YSort" parent="PrimarySort/ObjectSortContainer"]
+[node name="Structures" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
-[node name="Players" type="YSort" parent="PrimarySort/ObjectSortContainer"]
+[node name="Players" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
-[node name="Projectiles" type="YSort" parent="PrimarySort/ObjectSortContainer"]
+[node name="Projectiles" type="Node2D" parent="PrimarySort/ObjectSortContainer"]

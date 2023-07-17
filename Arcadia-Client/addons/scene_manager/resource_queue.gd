@@ -43,7 +43,7 @@ func queue_resource(path, p_in_front = false):
 		_unlock("queue_resource")
 		return
 	else:
-		var res = ResourceLoader.load_interactive(path)
+		var res = ResourceLoader.load_threaded_request(path)
 		res.set_meta("path", path)
 		if p_in_front:
 			queue.insert(0, res)
@@ -58,7 +58,7 @@ func queue_resource(path, p_in_front = false):
 func cancel_resource(path):
 	_lock("cancel_resource")
 	if path in pending:
-		if pending[path] is ResourceInteractiveLoader:
+		if pending[path] is ResourceLoader:
 			queue.erase(pending[path])
 		pending.erase(path)
 	_unlock("cancel_resource")
@@ -68,7 +68,7 @@ func get_progress(path):
 	_lock("get_progress")
 	var ret = -1
 	if path in pending:
-		if pending[path] is ResourceInteractiveLoader:
+		if pending[path] is ResourceLoader:
 			ret = float(pending[path].get_stage()) / float(pending[path].get_stage_count())
 		else:
 			ret = 1.0
@@ -80,7 +80,7 @@ func is_ready(path):
 	var ret
 	_lock("is_ready")
 	if path in pending:
-		ret = !(pending[path] is ResourceInteractiveLoader)
+		ret = !(pending[path] is ResourceLoader)
 	else:
 		ret = false
 	_unlock("is_ready")
@@ -90,7 +90,7 @@ func is_ready(path):
 func _wait_for_resource(res, path):
 	_unlock("wait_for_resource")
 	while true:
-		VisualServer.sync()
+		RenderingServer.sync()
 		OS.delay_usec(16000) # Wait approximately 1 frame.
 		_lock("wait_for_resource")
 		if queue.size() == 0 or queue[0] != res:
@@ -101,7 +101,7 @@ func _wait_for_resource(res, path):
 func get_resource(path):
 	_lock("get_resource")
 	if path in pending:
-		if pending[path] is ResourceInteractiveLoader:
+		if pending[path] is ResourceLoader:
 			var res = pending[path]
 			if res != queue[0]:
 				var pos = queue.find(res)
@@ -151,4 +151,4 @@ func start():
 	mutex = Mutex.new()
 	sem = Semaphore.new()
 	thread = Thread.new()
-	thread.start(self, "thread_func", 0)
+	thread.start(Callable(self, "thread_func").bind(0))

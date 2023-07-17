@@ -1,7 +1,7 @@
 extends Node
 
-onready var NoteContainerBox = $VBoxContainer/PanelContainer/ScrollContainer/HBoxContainer/VBoxContainer
-onready var UsernameLabel = $VBoxContainer/Panel/HBoxContainer/Label
+@onready var NoteContainerBox = $VBoxContainer/PanelContainer/ScrollContainer/HBoxContainer/VBoxContainer
+@onready var UsernameLabel = $VBoxContainer/Panel/HBoxContainer/Label
 
 var username : String
 

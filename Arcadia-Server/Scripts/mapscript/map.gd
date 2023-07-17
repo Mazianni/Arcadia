@@ -11,7 +11,7 @@ func GenerateWarpers():
 	if warpers.size():
 		Logging.log_notice("Generating warpers for map "+str(map_name))
 		for i in warpers.keys():
-			var new_warper = DataRepository.warper_resource.instance()
+			var new_warper = DataRepository.warper_resource.instantiate()
 			Logging.log_notice("Generating new warper at "+str(warpers[i]["pos"]+" linking to "+str(warpers[i]["destination"])))
 			new_warper.position = warpers[i]["pos"]
 			new_warper.warp_to = warpers[i]["destination"]

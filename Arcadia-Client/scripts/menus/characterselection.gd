@@ -4,14 +4,14 @@ var CharacterBarResource = preload("res://scenes/CharacterSelectBar.tscn")
 var CharacterCreationScreenResource = preload("res://scenes/CharacterCreation.tscn")
 
 func _ready():
-	Server.connect("character_list_recieved", self, "RenderSlots")
+	Server.connect("character_list_recieved", Callable(self, "RenderSlots"))
 	Server.RequestCharacterList()
 
 func RenderSlots():
 	var remaining_slots = 6
 	if Globals.CharacterList.size() > 0:
 		for i in Globals.CharacterList.keys():
-			var newbarinstance = CharacterBarResource.instance()
+			var newbarinstance = CharacterBarResource.instantiate()
 			newbarinstance.name = Globals.uuid_generator.v4()
 			newbarinstance.displayname = Globals.CharacterList[i]
 			newbarinstance.originator = self
@@ -21,7 +21,7 @@ func RenderSlots():
 			remaining_slots -= 1
 		if remaining_slots > 0:
 			for i in remaining_slots:
-				var newbarinstance = CharacterBarResource.instance()
+				var newbarinstance = CharacterBarResource.instantiate()
 				newbarinstance.name = Globals.uuid_generator.v4()
 				newbarinstance.displayname = "Empty Slot"
 				newbarinstance.originator = self
@@ -30,18 +30,18 @@ func RenderSlots():
 				$NinePatchRect/CenterContainer/GridContainer.add_child(newbarinstance)
 	else:
 		for i in 6:
-			var newbarinstance = CharacterBarResource.instance()
+			var newbarinstance = CharacterBarResource.instantiate()
 			newbarinstance.name = Globals.uuid_generator.v4()
 			newbarinstance.displayname = "Empty Slot"
 			newbarinstance.originator = self
 			newbarinstance.is_empty_slot = true
 			newbarinstance.assigned_uuid = null
 			$NinePatchRect/CenterContainer/GridContainer.add_child(newbarinstance)
-	Server.disconnect("character_list_recieved", self, "RenderSlots")
+	Server.disconnect("character_list_recieved", Callable(self, "RenderSlots"))
 	
 func SelectCharacter(uuid, is_new):
 	if is_new:
-		var charcreation = CharacterCreationScreenResource.instance()
+		var charcreation = CharacterCreationScreenResource.instantiate()
 		self.get_parent().add_child(charcreation)
 		self.queue_free()
 	else:

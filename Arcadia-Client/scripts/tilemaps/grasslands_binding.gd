@@ -1,4 +1,4 @@
-tool
+@tool
 extends TileSet
 
 const LEFT_TRANSITION = 45

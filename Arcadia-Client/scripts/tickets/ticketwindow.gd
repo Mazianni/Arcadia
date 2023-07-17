@@ -1,8 +1,8 @@
 extends Node
 
-onready var MessageBox = $VBoxContainer/Panel/ScrollContainer/VBoxContainer
-onready var TextInput = $VBoxContainer/TextEdit
-onready var LineResource = load("res://scenes/Tickets/TicketWindowTextLine.tscn")
+@onready var MessageBox = $VBoxContainer/Panel/ScrollContainer/VBoxContainer
+@onready var TextInput = $VBoxContainer/TextEdit
+@onready var LineResource = load("res://scenes/Tickets/TicketWindowTextLine.tscn")
 
 var ticket:Dictionary
 var ticket_number:String
@@ -17,7 +17,7 @@ func RenderMessages():
 	for L in MessageBox.get_children():
 		L.queue_free()
 	for I in ticket["Messages"].keys():
-		var newline = LineResource.instance()
+		var newline = LineResource.instantiate()
 		newline.timestamp = ticket["Messages"][I]["T"]
 		newline.sender = ticket["Messages"][I]["Sender"]
 		newline.message = ticket["Messages"][I]["Message"]

@@ -13,11 +13,11 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -150.0
-margin_top = -150.0
-margin_right = 150.0
-margin_bottom = 150.0
-rect_min_size = Vector2( 300, 200 )
+offset_left = -150.0
+offset_top = -150.0
+offset_right = 150.0
+offset_bottom = 150.0
+custom_minimum_size = Vector2( 300, 200 )
 theme = ExtResource( 2 )
 
 [node name="CenterContainer" type="CenterContainer" parent="NinePatchRect"]
@@ -25,8 +25,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="GridContainer" type="VBoxContainer" parent="NinePatchRect/CenterContainer"]
-margin_left = 150.0
-margin_top = 150.0
-margin_right = 150.0
-margin_bottom = 150.0
-custom_constants/separation = 7
+offset_left = 150.0
+offset_top = 150.0
+offset_right = 150.0
+offset_bottom = 150.0
+theme_override_constants/separation = 7

@@ -5,15 +5,15 @@ const COLOR: String = "color"
 const NO_COLOR: String = "no_color"
 const BLACK: Color = Color(0, 0, 0)
 
-onready var _fade_color_rect: ColorRect = find_node("fade")
-onready var _animation_player: AnimationPlayer = find_node("animation_player")
-onready var _in_transition: bool = false
-onready var _stack: Array = []
-onready var _stack_limit: int = -1
-onready var _current_scene: String = ""
-onready var _first_time: bool = true
-onready var _patterns: Dictionary = {}
-onready var _reserved_keys: Array = ["back", "null", "ignore", "refresh",
+@onready var _fade_color_rect: ColorRect = find_child("fade")
+@onready var _animation_player: AnimationPlayer = find_child("animation_player")
+@onready var _in_transition: bool = false
+@onready var _stack: Array = []
+@onready var _stack_limit: int = -1
+@onready var _current_scene: String = ""
+@onready var _first_time: bool = true
+@onready var _patterns: Dictionary = {}
+@onready var _reserved_keys: Array = ["back", "null", "ignore", "refresh",
 	"reload", "restart", "exit", "quit"]
 var queue = preload("res://addons/scene_manager/resource_queue.gd").new()
 var _load_scene: String = ""
@@ -52,10 +52,10 @@ func _set_current_scene() -> void:
 
 # gets patterns from `addons/scene_manager/shader_patterns`
 func _get_patterns() -> void:
-	var dir = Directory.new()
+	var dir = DirAccess.new()
 	var root_path: String = "res://addons/scene_manager/shader_patterns/"
 	if dir.open(root_path) == OK:
-		dir.list_dir_begin(true, true)
+		dir.list_dir_begin() # TODOGODOT4 fill missing arguments https://github.com/godotengine/godot/pull/40547
 
 		while true:
 			var file_folder: String = dir.get_next()
@@ -124,19 +124,19 @@ func _pop_stack() -> String:
 func _back() -> bool:
 	var pop: String = _pop_stack()
 	if pop:
-		get_tree().change_scene(Scenes.scenes[pop]["value"])
+		get_tree().change_scene_to_file(Scenes.scenes[pop]["value"])
 		return true
 	return false
 
 # restart the same scene
 func _refresh() -> bool:
-	get_tree().change_scene(Scenes.scenes[_current_scene]["value"])
+	get_tree().change_scene_to_file(Scenes.scenes[_current_scene]["value"])
 	return true
 
 # checks different states of scene and make actual transitions happen
 func _change_scene(scene, add_to_back: bool) -> bool:
 	if scene is PackedScene:
-		get_tree().change_scene_to(scene)
+		get_tree().change_scene_to_packed(scene)
 		var path: String = scene.resource_path
 		var found_key: String = ""
 		for key in Scenes.scenes:
@@ -161,7 +161,7 @@ func _change_scene(scene, add_to_back: bool) -> bool:
 		get_tree().quit(0)
 
 	else:
-		get_tree().change_scene(Scenes.scenes[scene]["value"])
+		get_tree().change_scene_to_file(Scenes.scenes[scene]["value"])
 		if add_to_back:
 			_append_stack(scene)
 		return true
@@ -186,15 +186,15 @@ func _set_pattern(options: Options, general_options: GeneralOptions) -> void:
 	if !(options.fade_pattern in _patterns):
 		options.fade_pattern = "fade"
 	if options.fade_pattern == "fade":
-		_fade_color_rect.material.set_shader_param("linear_fade", true)
-		_fade_color_rect.material.set_shader_param("color", Vector3(general_options.color.r, general_options.color.g, general_options.color.b))
-		_fade_color_rect.material.set_shader_param("custom_texture", null)
+		_fade_color_rect.material.set_shader_parameter("linear_fade", true)
+		_fade_color_rect.material.set_shader_parameter("color", Vector3(general_options.color.r, general_options.color.g, general_options.color.b))
+		_fade_color_rect.material.set_shader_parameter("custom_texture", null)
 	else:
-		_fade_color_rect.material.set_shader_param("linear_fade", false)
-		_fade_color_rect.material.set_shader_param("custom_texture", _patterns[options.fade_pattern])
-		_fade_color_rect.material.set_shader_param("inverted", options.inverted)
-		_fade_color_rect.material.set_shader_param("smoothness", options.smoothness)
-		_fade_color_rect.material.set_shader_param("color", Vector3(general_options.color.r, general_options.color.g, general_options.color.b))
+		_fade_color_rect.material.set_shader_parameter("linear_fade", false)
+		_fade_color_rect.material.set_shader_parameter("custom_texture", _patterns[options.fade_pattern])
+		_fade_color_rect.material.set_shader_parameter("inverted", options.inverted)
+		_fade_color_rect.material.set_shader_parameter("smoothness", options.smoothness)
+		_fade_color_rect.material.set_shader_parameter("color", Vector3(general_options.color.r, general_options.color.g, general_options.color.b))
 
 # used for interactive change scene
 func _process(_delta: float):
@@ -215,7 +215,7 @@ func _process(_delta: float):
 # input =  0 => we can not go back to any previos scenes
 # input >  0 => we can go back to `input` or less previous scenes
 func set_back_limit(input: int) -> void:
-	assert(input >= -1, "input must to >= -1")
+	assert(input >= -1) #,"input must to >= -1")
 	_stack_limit = input
 	if input == 0:
 		_stack.clear()
@@ -280,16 +280,16 @@ func show_first_scene(fade_in_options: Options, general_options: GeneralOptions)
 		_set_clickable(general_options.clickable)
 		_set_pattern(fade_in_options, general_options)
 		if _timeout(general_options.timeout):
-			yield(get_tree().create_timer(general_options.timeout), "timeout")
+			await get_tree().create_timer(general_options.timeout).timeout
 		if _fade_in(fade_in_options.fade_speed):
-			yield(_animation_player, "animation_finished")
+			await _animation_player.animation_finished
 		_set_clickable(true)
 		_set_out_transition()
 
 # returns scene instance of passed scene key (blocking)
 func create_scene_instance(key: String) -> Node:
 	validate_scene(key)
-	return load(Scenes.scenes[key]["value"]).instance()
+	return load(Scenes.scenes[key]["value"]).instantiate()
 
 # returns PackedScene of passed scene key (blocking)
 func get_scene(key: String) -> PackedScene:
@@ -299,22 +299,22 @@ func get_scene(key: String) -> PackedScene:
 	return queue.get_resource(address)
 
 # changes current scene to the next scene
-func change_scene(scene, fade_out_options: Options, fade_in_options: Options, general_options: GeneralOptions) -> void:
+func change_scene_to_file(scene, fade_out_options: Options, fade_in_options: Options, general_options: GeneralOptions) -> void:
 	if (scene is PackedScene || (typeof(scene) == TYPE_STRING && safe_validate_scene(scene) && !_in_transition)):
 		_first_time = false
 		_set_in_transition()
 		_set_clickable(general_options.clickable)
 		_set_pattern(fade_out_options, general_options)
 		if _fade_out(fade_out_options.fade_speed):
-			yield(_animation_player, "animation_finished")
+			await _animation_player.animation_finished
 		if _change_scene(scene, general_options.add_to_back):
-			yield(get_tree(), "node_added")
+			await get_tree().node_added
 		if _timeout(general_options.timeout):
-			yield(get_tree().create_timer(general_options.timeout), "timeout")
+			await get_tree().create_timer(general_options.timeout).timeout
 		_animation_player.play(NO_COLOR, -1, 1, false)
 		_set_pattern(fade_in_options, general_options)
 		if _fade_in(fade_in_options.fade_speed):
-			yield(_animation_player, "animation_finished")
+			await _animation_player.animation_finished
 		_set_clickable(true)
 		_set_out_transition()
 
@@ -342,7 +342,7 @@ func change_scene_to_loaded_scene(fade_out_options: Options, fade_in_options: Op
 		var scene = queue.get_resource(_load_scene) as PackedScene
 		if scene:
 			_load_scene = ""
-			change_scene(scene, fade_out_options, fade_in_options, general_options)
+			change_scene_to_file(scene, fade_out_options, fade_in_options, general_options)
 
 # returns previous scene (scene before current scene)
 func get_previous_scene() -> String:

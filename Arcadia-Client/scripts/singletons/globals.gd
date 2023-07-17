@@ -48,24 +48,22 @@ func _ready():
 	
 func CheckSettingsExist():
 	var save_dir = "user://"
-	var newsave = File.new()
-	if newsave.file_exists(save_dir+"setting.json"):
-		print("fuck")
-		newsave.open(save_dir+"settings.json", File.WRITE)
-		newsave.store_line(to_json(Settings.DefaultSettingsDict))
+	var newsave = FileAccess.open(save_dir, FileAccess.READ)
+	if FileAccess.file_exists(save_dir+"setting.json"):
+		newsave.open(save_dir+"settings.json", FileAccess.WRITE_READ)
+		newsave.store_line(JSON.new().stringify(Settings.DefaultSettingsDict))
 		newsave.close()
 
 func CheckPersistentUUIDExists():
 	var save_dir = "user://"
 	var save_file = "persistent.json"
-	var newsave = File.new()
-	if not newsave.file_exists(save_dir+save_file):
-		newsave.open(save_dir+"/"+save_file, File.WRITE)
-		newsave.store_line(to_json(uuid_generator.v4()))
+	var newsave = FileAccess.open(save_dir, FileAccess.READ)
+	if not FileAccess.file_exists(save_dir+save_file):
+		newsave.open(save_dir+"/"+save_file, FileAccess.WRITE_READ)
+		newsave.store_line(JSON.new().stringify(uuid_generator.v4()))
 		newsave.close()
 	else:
-		var loadfile = File.new()
-		loadfile.open(save_dir+save_file, File.READ)
+		var loadfile = FileAccess.open(save_dir+save_file, FileAccess.READ)
 		persistent_uuid = loadfile.get_as_text()
 		loadfile.close()
 

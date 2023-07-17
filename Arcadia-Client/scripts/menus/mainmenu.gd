@@ -8,7 +8,7 @@ func _playbuttonpress():
 	
 	# var next_level_resource = load("res://scenes/CharacterSelection.tscn") commented out until later for now. 
 	var next_level_resource = load("res://scenes/Game.tscn")
-	var next_level = next_level_resource.instance()
+	var next_level = next_level_resource.instantiate()
 	root.call_deferred("add_child", next_level)
 	
 func _settingsbuttonpress():
@@ -18,7 +18,7 @@ func _settingsbuttonpress():
 	level.call_deferred("free")
 	
 	var next_level_resource = load("res://scenes/Settings.tscn")
-	var next_level = next_level_resource.instance()
+	var next_level = next_level_resource.instantiate()
 	root.call_deferred("add_child", next_level)
 	
 func _quitbuttonpress():

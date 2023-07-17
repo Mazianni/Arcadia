@@ -1,9 +1,11 @@
-extends KinematicBody2D
+extends CharacterBody2D
 
 var ControllingCharacter : ActiveCharacter
 var player_state
-var velocity = Vector2()
 var direction = Vector2()
+
+func _ready():
+	velocity = Vector2()
 
 func _physics_process(delta):
 	UpdatePlayerState()
@@ -13,7 +15,8 @@ func UpdateVector(vector, direction): # TODO verify velocity does not exceed san
 	velocity = vector
 	direction = direction
 	velocity = velocity.normalized()
-	move_and_slide(velocity * 280)
+	set_velocity(velocity * 280)
+	move_and_slide()
 
 func UpdatePlayerState():
 	if ControllingCharacter:

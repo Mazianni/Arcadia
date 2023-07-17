@@ -6,15 +6,11 @@ enum SERVER_STATE {SERVER_LOADING, SERVER_LOADED, SERVER_SHUTTING_DOWN}
 enum MESSAGE_TYPE {NORMAL, YELL}
 
 
-onready var dbname = OS.get_executable_path().get_base_dir()+"/playerdata.db"
-onready var uuid_generator = load("res://uuid.gd")
-onready var collider_resource = load("res://Scenes/Instances/player/PlayerCollider.tscn")
-onready var warper_resource = load("res://Scenes/MapObjects/Warper.tscn")
-onready var Server = get_tree().get_root().get_node("Server")
-
-const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
-
-var db
+@onready var dbname = OS.get_executable_path().get_base_dir()+"/playerdata.db"
+@onready var uuid_generator = load("res://uuid.gd")
+@onready var collider_resource = load("res://Scenes/Instances/player/PlayerCollider.tscn")
+@onready var warper_resource = load("res://Scenes/MapObjects/Warper.tscn")
+@onready var Server = get_tree().get_root().get_node("Server")
 
 var serverversion = "0.1a"
 var saves_directory : String
@@ -49,33 +45,17 @@ var default_emote_range : int = 350
 func _ready():
 	saves_directory = "user://"+ "saves"
 	print(saves_directory)
-	var filecheck = File.new()
-	if not filecheck.file_exists(saves_directory):
-		var dir = Directory.new()
-		dir.make_dir(saves_directory)
+	if not FileAccess.file_exists(saves_directory):
+		var dir = DirAccess.open(saves_directory)
+		if not DirAccess.dir_exists_absolute(saves_directory):
+			dir.make_dir(saves_directory)
 	MapManager = get_node("/root/Server/MapManager")
 		
 func remove_pid_assoc(player_id):
 	pid_to_username.erase(str(player_id))
 	
-func WriteNewUserToDB(username, hashed, salt):
-	db = SQLite.new()
-	db.path = dbname
-	db.open_db()
-	var tableName = "playerdata"
-	var dict : Dictionary = Dictionary()
-	var success = false
-	dict["username"] = username
-	dict["hash"] = hashed
-	dict["salt"] = salt
-	success = db.insert_row(tableName, dict)
-	db.close_db()
-	return success
+func WriteNewUserToDB(username, hashed, salt): #IMPLEMENT implement sql again
+	return true
 	
 func GetDataFromDB(table, selection, data): #table = name of table selection = column name data = data to select from. Boolean return.
-	db = SQLite.new()
-	db.path = dbname
-	db.open_db()
-	var dbreturn = db.select_rows(table, selection, data)
-	db.close_db()
-	return dbreturn
+	return true

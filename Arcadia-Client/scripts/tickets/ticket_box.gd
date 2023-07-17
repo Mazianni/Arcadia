@@ -1,8 +1,8 @@
 extends Node
 
-onready var label = $Panel/HBoxContainer/TicketButton/Label
-onready var close_button = $Panel/HBoxContainer/CloseTicket
-onready var animation_player = $AnimationPlayer
+@onready var label = $Panel/HBoxContainer/TicketButton/Label
+@onready var close_button = $Panel/HBoxContainer/CloseTicket
+@onready var animation_player = $AnimationPlayer
 
 var ticket_number
 var title

@@ -18,18 +18,19 @@ func _ready():
 	for I in DefaultSettingsDict.keys():
 		if !CurrentSettingsDict.keys().has(I):
 			CurrentSettingsDict[I] = DefaultSettingsDict[I]
-	yield(get_tree().create_timer(0.01),"timeout")
+	await get_tree().create_timer(0.01).timeout
 	emit_signal("settings_loaded")
 
 func LoadSettingsFromJSON():
 	var save_dir = "user://"
 	var save_file = "settings.json"
 	var load_dict : Dictionary = {}
-	var loadfile = File.new()
+	var loadfile = FileAccess.open(save_dir+save_file, FileAccess.READ)
 	var temp
-	loadfile.open(save_dir+save_file, File.READ)
 	temp = loadfile.get_as_text()
-	load_dict = parse_json(temp)
+	var test_json_conv = JSON.new()
+	test_json_conv.parse(temp)
+	load_dict = test_json_conv.get_data()
 	CurrentSettingsDict = load_dict.duplicate(true)
 	loadfile.close()
 	
@@ -38,11 +39,10 @@ func SaveSettingsToJSON():
 	print(CurrentSettingsDict)
 	var save_dir = "user://"
 	var save_file = "settings.json"
-	var file = File.new()
-	file.open(save_dir+save_file, File.WRITE)
-	file.store_line(to_json(CurrentSettingsDict))
+	var file = FileAccess.open(save_dir+save_file, FileAccess.WRITE)
+	file.store_line(JSON.new().stringify(CurrentSettingsDict))
 	file.close()	
 	
 func PopupSettings():
-	var newsettingwindow = settingscene.instance()
+	var newsettingwindow = settingscene.instantiate()
 	Gui.GlobalGUI.add_child(newsettingwindow)

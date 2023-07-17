@@ -27,10 +27,10 @@ anchor_left = 0.5
 anchor_top = 0.533333
 anchor_right = 0.5
 anchor_bottom = 0.533333
-margin_left = -455.0
-margin_top = 123.0
-margin_right = -66.0
-margin_bottom = 159.0
+offset_left = -455.0
+offset_top = 123.0
+offset_right = -66.0
+offset_bottom = 159.0
 text = "Confirm "
 __meta__ = {
 "_edit_use_anchors_": true
@@ -42,10 +42,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -457.0
-margin_top = -238.0
-margin_right = -70.0
-margin_bottom = -197.0
+offset_left = -457.0
+offset_top = -238.0
+offset_right = -70.0
+offset_bottom = -197.0
 max_length = 64
 placeholder_text = "Enter Name Here . . . (Press enter to confirm change)"
 
@@ -55,11 +55,11 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -512.0
-margin_top = -197.0
-margin_right = -12.0
-margin_bottom = 144.0
-rect_min_size = Vector2( 500, 240 )
+offset_left = -512.0
+offset_top = -197.0
+offset_right = -12.0
+offset_bottom = 144.0
+custom_minimum_size = Vector2( 500, 240 )
 texture = SubResource( 2 )
 patch_margin_left = 100
 patch_margin_top = 100
@@ -69,20 +69,20 @@ patch_margin_bottom = 100
 [node name="Details" type="Control" parent="NinePatchRect"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_right = -2.0
-margin_bottom = -355.0
+offset_right = -2.0
+offset_bottom = -355.0
 
 [node name="GridContainer" type="GridContainer" parent="NinePatchRect/Details"]
 anchor_bottom = 1.0
-margin_left = 55.0
-margin_top = 11.0
-margin_right = 440.0
-margin_bottom = 309.0
+offset_left = 55.0
+offset_top = 11.0
+offset_right = 440.0
+offset_bottom = 309.0
 columns = 3
 
 [node name="Label" type="Label" parent="NinePatchRect/Details/GridContainer"]
-margin_right = 100.0
-margin_bottom = 14.0
+offset_right = 100.0
+offset_bottom = 14.0
 text = "Bodytype"
 align = 1
 valign = 1
@@ -91,9 +91,9 @@ __meta__ = {
 }
 
 [node name="Label4" type="Label" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 104.0
-margin_right = 204.0
-margin_bottom = 14.0
+offset_left = 104.0
+offset_right = 204.0
+offset_bottom = 14.0
 text = "Skin Color"
 align = 1
 valign = 1
@@ -102,9 +102,9 @@ __meta__ = {
 }
 
 [node name="Label3" type="Label" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 208.0
-margin_right = 308.0
-margin_bottom = 14.0
+offset_left = 208.0
+offset_right = 308.0
+offset_bottom = 14.0
 text = "Hair Style"
 align = 1
 valign = 1
@@ -113,29 +113,29 @@ __meta__ = {
 }
 
 [node name="BodytypeMenu" type="OptionButton" parent="NinePatchRect/Details/GridContainer"]
-margin_top = 18.0
-margin_right = 100.0
-margin_bottom = 68.0
-rect_min_size = Vector2( 100, 50 )
+offset_top = 18.0
+offset_right = 100.0
+offset_bottom = 68.0
+custom_minimum_size = Vector2( 100, 50 )
 
 [node name="SkinMenu" type="OptionButton" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 104.0
-margin_top = 18.0
-margin_right = 204.0
-margin_bottom = 68.0
-rect_min_size = Vector2( 100, 50 )
+offset_left = 104.0
+offset_top = 18.0
+offset_right = 204.0
+offset_bottom = 68.0
+custom_minimum_size = Vector2( 100, 50 )
 
 [node name="HairStyleMenu" type="OptionButton" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 208.0
-margin_top = 18.0
-margin_right = 308.0
-margin_bottom = 68.0
-rect_min_size = Vector2( 100, 50 )
+offset_left = 208.0
+offset_top = 18.0
+offset_right = 308.0
+offset_bottom = 68.0
+custom_minimum_size = Vector2( 100, 50 )
 
 [node name="Label5" type="Label" parent="NinePatchRect/Details/GridContainer"]
-margin_top = 72.0
-margin_right = 100.0
-margin_bottom = 86.0
+offset_top = 72.0
+offset_right = 100.0
+offset_bottom = 86.0
 text = "Tail Style"
 align = 1
 valign = 1
@@ -144,10 +144,10 @@ __meta__ = {
 }
 
 [node name="Label7" type="Label" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 104.0
-margin_top = 72.0
-margin_right = 204.0
-margin_bottom = 86.0
+offset_left = 104.0
+offset_top = 72.0
+offset_right = 204.0
+offset_bottom = 86.0
 text = "Ear Style"
 align = 1
 valign = 1
@@ -156,10 +156,10 @@ __meta__ = {
 }
 
 [node name="Label6" type="Label" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 208.0
-margin_top = 72.0
-margin_right = 308.0
-margin_bottom = 86.0
+offset_left = 208.0
+offset_top = 72.0
+offset_right = 308.0
+offset_bottom = 86.0
 text = "Accessory Style"
 align = 1
 valign = 1
@@ -168,29 +168,29 @@ __meta__ = {
 }
 
 [node name="TailMenu" type="OptionButton" parent="NinePatchRect/Details/GridContainer"]
-margin_top = 90.0
-margin_right = 100.0
-margin_bottom = 140.0
-rect_min_size = Vector2( 100, 50 )
+offset_top = 90.0
+offset_right = 100.0
+offset_bottom = 140.0
+custom_minimum_size = Vector2( 100, 50 )
 
 [node name="EarMenu" type="OptionButton" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 104.0
-margin_top = 90.0
-margin_right = 204.0
-margin_bottom = 140.0
-rect_min_size = Vector2( 100, 50 )
+offset_left = 104.0
+offset_top = 90.0
+offset_right = 204.0
+offset_bottom = 140.0
+custom_minimum_size = Vector2( 100, 50 )
 
 [node name="AccessoryMenu" type="OptionButton" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 208.0
-margin_top = 90.0
-margin_right = 308.0
-margin_bottom = 140.0
-rect_min_size = Vector2( 100, 50 )
+offset_left = 208.0
+offset_top = 90.0
+offset_right = 308.0
+offset_bottom = 140.0
+custom_minimum_size = Vector2( 100, 50 )
 
 [node name="Label8" type="Label" parent="NinePatchRect/Details/GridContainer"]
-margin_top = 144.0
-margin_right = 100.0
-margin_bottom = 158.0
+offset_top = 144.0
+offset_right = 100.0
+offset_bottom = 158.0
 text = "Spawn Location"
 align = 1
 valign = 1
@@ -199,10 +199,10 @@ __meta__ = {
 }
 
 [node name="Label9" type="Label" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 104.0
-margin_top = 144.0
-margin_right = 204.0
-margin_bottom = 158.0
+offset_left = 104.0
+offset_top = 144.0
+offset_right = 204.0
+offset_bottom = 158.0
 align = 1
 valign = 1
 __meta__ = {
@@ -210,10 +210,10 @@ __meta__ = {
 }
 
 [node name="Label10" type="Label" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 208.0
-margin_top = 144.0
-margin_right = 308.0
-margin_bottom = 158.0
+offset_left = 208.0
+offset_top = 144.0
+offset_right = 308.0
+offset_bottom = 158.0
 align = 1
 valign = 1
 __meta__ = {
@@ -221,30 +221,30 @@ __meta__ = {
 }
 
 [node name="SpawnMenu" type="OptionButton" parent="NinePatchRect/Details/GridContainer"]
-margin_top = 162.0
-margin_right = 100.0
-margin_bottom = 212.0
-rect_min_size = Vector2( 100, 50 )
+offset_top = 162.0
+offset_right = 100.0
+offset_bottom = 212.0
+custom_minimum_size = Vector2( 100, 50 )
 
 [node name="Blank1" type="Control" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 104.0
-margin_top = 162.0
-margin_right = 204.0
-margin_bottom = 212.0
-rect_min_size = Vector2( 100, 50 )
+offset_left = 104.0
+offset_top = 162.0
+offset_right = 204.0
+offset_bottom = 212.0
+custom_minimum_size = Vector2( 100, 50 )
 
 [node name="Blank2" type="Control" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 208.0
-margin_top = 162.0
-margin_right = 308.0
-margin_bottom = 212.0
-rect_min_size = Vector2( 100, 50 )
+offset_left = 208.0
+offset_top = 162.0
+offset_right = 308.0
+offset_bottom = 212.0
+custom_minimum_size = Vector2( 100, 50 )
 
 [node name="DirSelect" type="Panel" parent="NinePatchRect/Details/GridContainer"]
-margin_top = 216.0
-margin_right = 100.0
-margin_bottom = 266.0
-rect_min_size = Vector2( 100, 50 )
+offset_top = 216.0
+offset_right = 100.0
+offset_bottom = 266.0
+custom_minimum_size = Vector2( 100, 50 )
 
 [node name="Label" type="Label" parent="NinePatchRect/Details/GridContainer/DirSelect"]
 anchor_right = 1.0
@@ -258,7 +258,7 @@ anchor_left = 0.0446429
 anchor_top = 0.3
 anchor_right = 0.223214
 anchor_bottom = 0.7
-margin_right = -13.0
+offset_right = -13.0
 text = "<"
 __meta__ = {
 "_edit_use_anchors_": true
@@ -275,58 +275,58 @@ __meta__ = {
 }
 
 [node name="EyesMenu" type="Panel" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 104.0
-margin_top = 216.0
-margin_right = 204.0
-margin_bottom = 266.0
-rect_min_size = Vector2( 100, 50 )
+offset_left = 104.0
+offset_top = 216.0
+offset_right = 204.0
+offset_bottom = 266.0
+custom_minimum_size = Vector2( 100, 50 )
 
 [node name="Label" type="Label" parent="NinePatchRect/Details/GridContainer/EyesMenu"]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_left = -31.5
-margin_top = 3.0
-margin_right = 31.5
-margin_bottom = 14.0
+offset_left = -31.5
+offset_top = 3.0
+offset_right = 31.5
+offset_bottom = 14.0
 text = "Eye Color"
 
 [node name="EyePicker" type="ColorPickerButton" parent="NinePatchRect/Details/GridContainer/EyesMenu"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 10.0
-margin_top = 21.0
-margin_right = -10.0
-margin_bottom = -3.0
+offset_left = 10.0
+offset_top = 21.0
+offset_right = -10.0
+offset_bottom = -3.0
 
 [node name="HairColorMenu" type="Panel" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 208.0
-margin_top = 216.0
-margin_right = 308.0
-margin_bottom = 266.0
-rect_min_size = Vector2( 100, 50 )
+offset_left = 208.0
+offset_top = 216.0
+offset_right = 308.0
+offset_bottom = 266.0
+custom_minimum_size = Vector2( 100, 50 )
 
 [node name="Label" type="Label" parent="NinePatchRect/Details/GridContainer/HairColorMenu"]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_left = -31.5
-margin_top = 3.0
-margin_right = 31.5
-margin_bottom = 14.0
+offset_left = -31.5
+offset_top = 3.0
+offset_right = 31.5
+offset_bottom = 14.0
 text = "Hair Color"
 
 [node name="HairPicker" type="ColorPickerButton" parent="NinePatchRect/Details/GridContainer/HairColorMenu"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 10.0
-margin_top = 21.0
-margin_right = -10.0
-margin_bottom = -3.0
+offset_left = 10.0
+offset_top = 21.0
+offset_right = -10.0
+offset_bottom = -3.0
 
 [node name="AgeInput" type="HSlider" parent="NinePatchRect/Details/GridContainer"]
-margin_top = 270.0
-margin_right = 100.0
-margin_bottom = 320.0
-rect_min_size = Vector2( 100, 50 )
+offset_top = 270.0
+offset_right = 100.0
+offset_bottom = 320.0
+custom_minimum_size = Vector2( 100, 50 )
 min_value = 18.0
 max_value = 50.0
 value = 18.0
@@ -337,9 +337,9 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-margin_left = -20.0
-margin_top = -14.0
-margin_right = 20.0
+offset_left = -20.0
+offset_top = -14.0
+offset_right = 20.0
 text = "18"
 align = 1
 valign = 1
@@ -347,19 +347,19 @@ valign = 1
 [node name="Label" type="Label" parent="NinePatchRect/Details/GridContainer/AgeInput"]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_left = -20.0
-margin_right = 20.0
-margin_bottom = 14.0
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 14.0
 text = "Age"
 align = 1
 valign = 1
 
 [node name="HeightInput" type="HSlider" parent="NinePatchRect/Details/GridContainer"]
-margin_left = 104.0
-margin_top = 270.0
-margin_right = 204.0
-margin_bottom = 320.0
-rect_min_size = Vector2( 100, 50 )
+offset_left = 104.0
+offset_top = 270.0
+offset_right = 204.0
+offset_bottom = 320.0
+custom_minimum_size = Vector2( 100, 50 )
 min_value = 18.0
 max_value = 50.0
 value = 18.0
@@ -369,16 +369,16 @@ rounded = true
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_top = -14.0
+offset_top = -14.0
 align = 1
 valign = 1
 
 [node name="Label" type="Label" parent="NinePatchRect/Details/GridContainer/HeightInput"]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_left = -20.0
-margin_right = 20.0
-margin_bottom = 14.0
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 14.0
 text = "Height"
 align = 1
 valign = 1
@@ -388,11 +388,11 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -250.0
-margin_top = -300.0
-margin_right = 250.0
-margin_bottom = 300.0
-rect_min_size = Vector2( 500, 580 )
+offset_left = -250.0
+offset_top = -300.0
+offset_right = 250.0
+offset_bottom = 300.0
+custom_minimum_size = Vector2( 500, 580 )
 texture = SubResource( 2 )
 patch_margin_left = 100
 patch_margin_top = 100
@@ -402,23 +402,23 @@ patch_margin_bottom = 100
 [node name="RaceSelection" type="Control" parent="NinePatchRect2"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 59.0
-margin_top = 45.0
-margin_right = -58.0
-margin_bottom = 9.0
+offset_left = 59.0
+offset_top = 45.0
+offset_right = -58.0
+offset_bottom = 9.0
 
 [node name="RaceContainer" type="TabContainer" parent="NinePatchRect2/RaceSelection"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_bottom = -86.0
+offset_bottom = -86.0
 all_tabs_in_front = true
 
 [node name="RaceConfirm" type="Button" parent="NinePatchRect2/RaceSelection"]
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_top = -68.0
-margin_bottom = -34.0
+offset_top = -68.0
+offset_bottom = -34.0
 text = "Select Race"
 
 [node name="PreviewSpriteContainer" type="Control" parent="."]
@@ -431,10 +431,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = 88.0
-margin_top = -100.0
-margin_right = 288.0
-margin_bottom = 100.0
+offset_left = 88.0
+offset_top = -100.0
+offset_right = 288.0
+offset_bottom = 100.0
 expand = true
 
 [node name="Eyes" type="TextureRect" parent="PreviewSpriteContainer"]
@@ -443,10 +443,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = 88.0
-margin_top = -100.0
-margin_right = 288.0
-margin_bottom = 100.0
+offset_left = 88.0
+offset_top = -100.0
+offset_right = 288.0
+offset_bottom = 100.0
 expand = true
 
 [node name="Hair" type="TextureRect" parent="PreviewSpriteContainer"]
@@ -455,14 +455,14 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = 88.0
-margin_top = -100.0
-margin_right = 288.0
-margin_bottom = 100.0
+offset_left = 88.0
+offset_top = -100.0
+offset_right = 288.0
+offset_bottom = 100.0
 expand = true
 
 [connection signal="pressed" from="CreateConfirmButton" to="." method="_on_CreateConfirmButton_pressed"]
-[connection signal="text_entered" from="NameInput" to="." method="_on_NameInput_text_entered"]
+[connection signal="text_submitted" from="NameInput" to="." method="_on_NameInput_text_entered"]
 [connection signal="item_selected" from="NinePatchRect/Details/GridContainer/BodytypeMenu" to="." method="_on_GenderMenu_item_selected"]
 [connection signal="item_selected" from="NinePatchRect/Details/GridContainer/SkinMenu" to="." method="_on_SkinMenu_item_selected"]
 [connection signal="item_selected" from="NinePatchRect/Details/GridContainer/HairStyleMenu" to="." method="_on_HairStyleMenu_item_selected"]

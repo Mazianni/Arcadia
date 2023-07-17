@@ -1,26 +1,26 @@
 extends Node
 
-onready var TicketContainer = $"Panel/HBoxContainer/PanelContainer/Your Tickets/VBoxContainer"
-onready var NewTicketButton = $Panel/HBoxContainer/VBoxContainer/NewTicket
-onready var TicketWindowContainer = $TicketWindowContainer
+@onready var TicketContainer = $"Panel/HBoxContainer/PanelContainer/Your Tickets/VBoxContainer"
+@onready var NewTicketButton = $Panel/HBoxContainer/VBoxContainer/NewTicket
+@onready var TicketWindowContainer = $TicketWindowContainer
 
-onready var NewTicketDialog = $NewTicketDialog
-onready var NewTicketTitle = $NewTicketDialog/VBoxContainer/TicketTitle
-onready var NewTicketDesc = $NewTicketDialog/VBoxContainer/TicketDesc
-onready var NewTicketCritical = $NewTicketDialog/VBoxContainer/CriticalCheck
+@onready var NewTicketDialog = $NewTicketDialog
+@onready var NewTicketTitle = $NewTicketDialog/VBoxContainer/TicketTitle
+@onready var NewTicketDesc = $NewTicketDialog/VBoxContainer/TicketDesc
+@onready var NewTicketCritical = $NewTicketDialog/VBoxContainer/CriticalCheck
 
-onready var TicketSoundNotifPlayer = $TicketNotif
+@onready var TicketSoundNotifPlayer = $TicketNotif
 
-onready var MiniTicketResource = load("res://scenes/Tickets/TicketInstance.tscn")
-onready var TicketWindowResource = load("res://scenes/Tickets/TicketWindow.tscn")
+@onready var MiniTicketResource = load("res://scenes/Tickets/TicketInstance.tscn")
+@onready var TicketWindowResource = load("res://scenes/Tickets/TicketWindow.tscn")
 
 
 var tickets : Dictionary
 var cached_tickets : Dictionary
 
 func _ready():
-	Server.connect("tickets_recieved", self, "RenderTickets")
-	Server.connect("ticket_update_recieved", self, "DoUpdate")
+	Server.connect("tickets_recieved", Callable(self, "RenderTickets"))
+	Server.connect("ticket_update_recieved", Callable(self, "DoUpdate"))
 	Server.GetTickets()
 	
 func DoUpdate(ticket_number:String, ticket:Dictionary):
@@ -36,13 +36,13 @@ func RenderTickets(recieved_tickets:Dictionary):
 	tickets = recieved_tickets.duplicate(true)
 	for I in tickets.keys():
 		if !TicketContainer.has_node(I):
-			var nmt = MiniTicketResource.instance()
+			var nmt = MiniTicketResource.instantiate()
 			nmt.ticket_number = I
 			nmt.status = tickets[I]["Status"]
 			nmt.title = tickets[I]["Title"]
 			TicketContainer.add_child(nmt)
-			nmt.connect("ticket_box_clicked", self, "OpenTicketWindow")
-			nmt.connect("close_button_pressed", self, "CloseTicket")
+			nmt.connect("ticket_box_clicked", Callable(self, "OpenTicketWindow"))
+			nmt.connect("close_button_pressed", Callable(self, "CloseTicket"))
 		if TicketContainer.has_node(I):
 			TicketContainer.get_node(I).status = tickets[I]["Status"]
 			TicketContainer.get_node(I).OnUpdate()
@@ -59,11 +59,11 @@ func RenderTickets(recieved_tickets:Dictionary):
 func OpenTicketWindow(ticket_number:String):
 	Server.GetUpdateOnTicket(ticket_number)
 	if !TicketWindowContainer.has_node(ticket_number):
-		var ntw = TicketWindowResource.instance()
+		var ntw = TicketWindowResource.instantiate()
 		ntw.ticket = tickets[ticket_number].duplicate(true)
 		ntw.name = ticket_number
 		ntw.ticket_number = ticket_number
-		ntw.connect("message_sent", self, "SendTicketMessage")
+		ntw.connect("message_sent", Callable(self, "SendTicketMessage"))
 		TicketWindowContainer.add_child(ntw)
 		ntw.popup()
 	else:
@@ -79,7 +79,7 @@ func CreateTicket():
 	Server.OpenTicket(NewTicketTitle.text, NewTicketDesc.text, "", NewTicketCritical.pressed)
 	NewTicketTitle.text = ""
 	NewTicketDesc.text = ""
-	NewTicketCritical.pressed = false
+	NewTicketCritical.button_pressed = false
 	NewTicketDialog.hide()
 	
 func CloseTicket(ticket_number:String):

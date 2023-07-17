@@ -1,10 +1,10 @@
 [gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://fonts/titillium-web/TitilliumWeb-SemiBold.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://fonts/titillium-web/TitilliumWeb-SemiBold.ttf" type="FontFile" id=1]
 [ext_resource path="res://scripts/menus/characterselectionsubscenes/CharacterSelectBar.gd" type="Script" id=2]
 [ext_resource path="res://themes/angluar_panel_box.tres" type="Theme" id=3]
 
-[sub_resource type="DynamicFont" id=16]
+[sub_resource type="FontFile" id=16]
 size = 20
 outline_size = 1
 outline_color = Color( 0, 0, 0, 1 )
@@ -16,11 +16,11 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -245.0
-margin_top = -31.0
-margin_right = -45.0
-margin_bottom = -1.0
-rect_min_size = Vector2( 200, 30 )
+offset_left = -245.0
+offset_top = -31.0
+offset_right = -45.0
+offset_bottom = -1.0
+custom_minimum_size = Vector2( 200, 30 )
 size_flags_horizontal = 2
 size_flags_vertical = 2
 theme = ExtResource( 3 )
@@ -29,32 +29,32 @@ script = ExtResource( 2 )
 [node name="SelectButton" type="Button" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_right = -13.0
+offset_right = -13.0
 flat = true
 
 [node name="CharacterSelectButton" type="Label" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
-custom_fonts/font = SubResource( 16 )
+theme_override_fonts/font = SubResource( 16 )
 align = 1
 valign = 1
 
 [node name="DeleteButton" type="Button" parent="."]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -10.0
-margin_top = -3.0
-margin_right = 3.0
-margin_bottom = 15.0
+offset_left = -10.0
+offset_top = -3.0
+offset_right = 3.0
+offset_bottom = 15.0
 text = "X"
-icon_align = 1
+icon_alignment = 1
 
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="DeleteButton"]
 anchor_left = -4.58108
 anchor_top = 1.7619
 anchor_right = -0.297297
 anchor_bottom = 3.54762
-popup_exclusive = true
+exclusive = true
 window_title = "Delete Character"
 resizable = true
 dialog_text = "Are you sure you want to delete this character?

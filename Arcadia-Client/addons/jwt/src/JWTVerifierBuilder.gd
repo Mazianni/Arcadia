@@ -11,7 +11,7 @@ func _init(algorithm: JWTAlgorithm):
 
 func add_claim(name: String, value) -> void:
     match typeof(value):
-        TYPE_ARRAY, TYPE_STRING_ARRAY: 
+        TYPE_ARRAY, TYPE_PACKED_STRING_ARRAY: 
             if value.size() == 0 : 
                 self.claims.erase(name)
                 return
@@ -25,11 +25,11 @@ func add_claim(name: String, value) -> void:
                 return
     self.claims[name] = value
 
-func with_any_of_issuers(issuers: PoolStringArray) -> JWTVerifierBuilder:
+func with_any_of_issuers(issuers: PackedStringArray) -> JWTVerifierBuilder:
     add_claim(JWTClaims.Public.ISSUER, issuers)
     return self
 
-func with_any_of_audience(audience: PoolStringArray) -> JWTVerifierBuilder:
+func with_any_of_audience(audience: PackedStringArray) -> JWTVerifierBuilder:
     add_claim(JWTClaims.Public.AUDIENCE, audience)
     return self
 
@@ -67,6 +67,6 @@ func _add_leeway() -> void:
     if (_ignore_issued_at):
         claims.erase(JWTClaims.Public.ISSUED_AT)
     
-func build(clock: int = OS.get_unix_time()) -> JWTVerifier:
+func build(clock: int = Time.get_unix_time_from_system()) -> JWTVerifier:
     _add_leeway()
     return JWTVerifier.new(self.algorithm, self.claims, clock)

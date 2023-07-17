@@ -10,7 +10,7 @@ func _ready():
 	Logging.log_notice("[MAP] Total maps to load: "+str(MapsToLoad.size()))
 	if MapsToLoad.size():
 		for i in MapsToLoad.keys():
-			var new_instance = MapsToLoad[i].instance()
+			var new_instance = MapsToLoad[i].instantiate()
 			self.add_child(new_instance)
 			new_instance.name = new_instance.map_name
 			new_instance.GenerateWarpers()

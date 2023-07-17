@@ -1,17 +1,17 @@
 extends ParallaxBackground
 
-onready var viewport = get_viewport()
-onready var game_size = Vector2(
-	ProjectSettings.get_setting("display/window/size/width"),
-	ProjectSettings.get_setting("display/window/size/height"))
+@onready var viewport = get_viewport()
+@onready var game_size = Vector2(
+	ProjectSettings.get_setting("display/window/size/viewport_width"),
+	ProjectSettings.get_setting("display/window/size/viewport_height"))
 var scroll_speed = 20
 
 func _ready():
-	viewport.connect("size_changed", self, "resize_viewport")
+	viewport.connect("size_changed", Callable(self, "resize_viewport"))
 	resize_viewport()
 
 func resize_viewport():
-	var new_size = OS.get_window_size()
+	var new_size = get_window().get_size()
 	var scale_factor = round(new_size.x / 1280)
 	
 	self.scale = Vector2()

@@ -6,20 +6,20 @@ var pwdvalid_numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 var pwdvalid_symbols = ["!", "@", "#", "$", "%", "^", "&", "*"]
 
 #screen vars
-onready var loginbox = get_node("NinePatchRect/LoginBox")
-onready var accountbox = get_node("NinePatchRect/AccountBox")
+@onready var loginbox = get_node("NinePatchRect/LoginBox")
+@onready var accountbox = get_node("NinePatchRect/AccountBox")
 
-onready var username_input = get_node("NinePatchRect/LoginBox/Username")
-onready var userpassword_input = get_node("NinePatchRect/LoginBox/Password")
-onready var login_button = get_node("NinePatchRect/LoginBox/LoginButton")
-onready var create_account_button = get_node("NinePatchRect/LoginBox/CreateAccount")
-onready var login_error_text = get_node("NinePatchRect/LoginBox/ButtonMargin/LoginError")
+@onready var username_input = get_node("NinePatchRect/LoginBox/Username")
+@onready var userpassword_input = get_node("NinePatchRect/LoginBox/Password")
+@onready var login_button = get_node("NinePatchRect/LoginBox/LoginButton")
+@onready var create_account_button = get_node("NinePatchRect/LoginBox/CreateAccount")
+@onready var login_error_text = get_node("NinePatchRect/LoginBox/ButtonMargin/LoginError")
 #create account
-onready var create_username_input = get_node("NinePatchRect/AccountBox/UsernameInput")
-onready var create_userpassword_input = get_node("NinePatchRect/AccountBox/PasswordInput")
-onready var create_userpassword_confirm_input = get_node("NinePatchRect/AccountBox/RepeatPass")
-onready var create_confirm_button= get_node("NinePatchRect/AccountBox/Confirm")
-onready var create_back_button = get_node("NinePatchRect/AccountBox/Back")
+@onready var create_username_input = get_node("NinePatchRect/AccountBox/UsernameInput")
+@onready var create_userpassword_input = get_node("NinePatchRect/AccountBox/PasswordInput")
+@onready var create_userpassword_confirm_input = get_node("NinePatchRect/AccountBox/RepeatPass")
+@onready var create_confirm_button= get_node("NinePatchRect/AccountBox/Confirm")
+@onready var create_back_button = get_node("NinePatchRect/AccountBox/Back")
 
 
 func _ready():
@@ -38,17 +38,17 @@ func _on_LoginButton_pressed():
 		Server.Login(username, password, Globals.uuid, Globals.persistent_uuid)
 		username = ""
 		password = ""
-		Server.network.connect("connection_failed", self, "_OnConnectionFailed")
-		Server.network.connect("server_disconnected", self, "_OnDisconnected")
+		Server.network.connect("connection_failed", Callable(self, "_OnConnectionFailed"))
+		Server.network.connect("server_disconnected", Callable(self, "_OnDisconnected"))
 		Gui.CreateFloatingMessage("Attempting to connect to server...", "neutral")
 		
 func _OnConnectionFailed():
 	Gui.CreateFloatingMessage("Failed to connect to server.", "bad")
-	Server.network.disconnect("connection_failed", self, "_OnConnectionFailed")
+	Server.network.disconnect("connection_failed", Callable(self, "_OnConnectionFailed"))
 	EnableInputs()
 	
 func _OnDisconnected():
-	Server.network.disconnect("server_disconnected", self, "_OnDisconnected")
+	Server.network.disconnect("server_disconnected", Callable(self, "_OnDisconnected"))
 	print("disconnected")
 	EnableInputs()
 	

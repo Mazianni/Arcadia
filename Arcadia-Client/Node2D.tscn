@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=2]
 
-[ext_resource path="res://sprites/player/image.png" type="Texture" id=1]
+[ext_resource path="res://sprites/player/image.png" type="Texture2D" id=1]
 
 [sub_resource type="AtlasTexture" id=1]
 flags = 4
@@ -42,12 +42,12 @@ animations = [ {
 
 [node name="Node2D" type="Node2D"]
 
-[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2( 497, 262 )
 frames = SubResource( 7 )
 frame = 3
 playing = true
 
 [node name="ColorPickerButton" type="ColorPickerButton" parent="."]
-margin_right = 233.0
-margin_bottom = 482.0
+offset_right = 233.0
+offset_bottom = 482.0

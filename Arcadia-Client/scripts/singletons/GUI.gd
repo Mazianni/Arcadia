@@ -12,11 +12,11 @@ var GUI_Scenes : Dictionary = {
 var floating_box_instance = preload("res://scenes/FloatingMessageBox.tscn")
 var bottomrightboxinstance= preload("res://scenes/BottomRightBox.tscn")
 
-onready var GlobalGUI = get_tree().get_root().get_node("RootNode/GUI")
+@onready var GlobalGUI = get_tree().get_root().get_node("RootNode/GUI")
 
 func CreateFloatingMessage(message, type):
 	var GUI = get_tree().get_root().get_node("RootNode/GUI/CanvasLayer/FloatingMessageContainer")
-	var fbi = floating_box_instance.instance()
+	var fbi = floating_box_instance.instantiate()
 	fbi.name = Globals.uuid_generator.v4()
 	fbi.type = type
 	fbi.message = message
@@ -24,7 +24,7 @@ func CreateFloatingMessage(message, type):
 	
 func CreateEaseFloatingMessage(message):
 	var GUI = get_tree().get_root().get_node("RootNode/GUI/CanvasLayer/FloatingMessageContainer")
-	var fbi : Control = bottomrightboxinstance.instance()
+	var fbi : Control = bottomrightboxinstance.instantiate()
 	fbi.name = Globals.uuid_generator.v4()
 	fbi.message = message
 	GUI.add_child(fbi)
@@ -35,7 +35,7 @@ func ChangeGUIScene(newscenename):
 			current_loaded_GUI.queue_free()
 		current_loaded_GUI_name = newscenename
 		var newguisceneresource = load(GUI_Scenes[newscenename])
-		var newguisceneinstance = newguisceneresource.instance()
+		var newguisceneinstance = newguisceneresource.instantiate()
 		current_loaded_GUI = newguisceneinstance
 		GlobalGUI.add_child(newguisceneinstance)
 	

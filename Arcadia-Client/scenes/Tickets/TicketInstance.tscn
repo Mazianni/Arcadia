@@ -2,9 +2,9 @@
 
 [ext_resource path="res://scripts/tickets/ticket_box.gd" type="Script" id=1]
 [ext_resource path="res://themes/main_theme.tres" type="Theme" id=2]
-[ext_resource path="res://fonts/titillium-web/TitilliumWeb-SemiBold.ttf" type="DynamicFontData" id=3]
+[ext_resource path="res://fonts/titillium-web/TitilliumWeb-SemiBold.ttf" type="FontFile" id=3]
 
-[sub_resource type="DynamicFont" id=1]
+[sub_resource type="FontFile" id=1]
 outline_size = 1
 outline_color = Color( 0, 0, 0, 1 )
 use_filter = true
@@ -19,8 +19,8 @@ tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 1 ),
-"transitions": PoolRealArray( 1, 1 ),
+"times": PackedFloat32Array( 0, 1 ),
+"transitions": PackedFloat32Array( 1, 1 ),
 "update": 0,
 "values": [ Color( 0.584314, 0.584314, 0.584314, 1 ), Color( 0.584314, 0.584314, 0.584314, 1 ) ]
 }
@@ -36,8 +36,8 @@ tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 1, 2 ),
-"transitions": PoolRealArray( 1, 1, 1 ),
+"times": PackedFloat32Array( 0, 1, 2 ),
+"transitions": PackedFloat32Array( 1, 1, 1 ),
 "update": 0,
 "values": [ Color( 1, 1, 1, 1 ), Color( 1, 0.631373, 0, 1 ), Color( 1, 1, 1, 1 ) ]
 }
@@ -53,8 +53,8 @@ tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 2, 4 ),
-"transitions": PoolRealArray( 1, 1, 1 ),
+"times": PackedFloat32Array( 0, 2, 4 ),
+"transitions": PackedFloat32Array( 1, 1, 1 ),
 "update": 0,
 "values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
 }
@@ -71,10 +71,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -139.5
-margin_top = -17.5
-margin_right = 139.5
-margin_bottom = 17.5
+offset_left = -139.5
+offset_top = -17.5
+offset_right = 139.5
+offset_bottom = 17.5
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource( 2 )
@@ -82,33 +82,33 @@ theme = ExtResource( 2 )
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 7.0
-margin_right = 3.0
+offset_left = 7.0
+offset_right = 3.0
 
 [node name="TicketButton" type="Button" parent="Panel/HBoxContainer"]
-margin_right = 220.0
-margin_bottom = 35.0
-rect_min_size = Vector2( 220, 30 )
+offset_right = 220.0
+offset_bottom = 35.0
+custom_minimum_size = Vector2( 220, 30 )
 flat = true
 
 [node name="Label" type="Label" parent="Panel/HBoxContainer/TicketButton"]
 modulate = Color( 0.584314, 0.584314, 0.584314, 1 )
-margin_left = -1.0
-margin_right = 222.0
-margin_bottom = 36.0
+offset_left = -1.0
+offset_right = 222.0
+offset_bottom = 36.0
 size_flags_horizontal = 3
 size_flags_vertical = 0
 align = 1
 valign = 1
 
 [node name="CloseTicket" type="Button" parent="Panel/HBoxContainer"]
-margin_left = 224.0
-margin_right = 273.0
-margin_bottom = 35.0
-custom_fonts/font = SubResource( 1 )
+offset_left = 224.0
+offset_right = 273.0
+offset_bottom = 35.0
+theme_override_fonts/font = SubResource( 1 )
 text = "Close"
 flat = true
-icon_align = 1
+icon_alignment = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/closed = SubResource( 4 )

@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 class_name JWTVerifier
 
 enum JWTExceptions {
@@ -35,15 +35,15 @@ func verify_claim_values(jwt_decoder: JWTDecoder, expected_claims: Dictionary) -
         match claim:
             JWTClaims.Public.EXPRIES_AT:
                 if not assert_valid_date_claim(jwt_decoder.get_expires_at(), expected_claims.get(claim), true):
-                    self.exception = "The Token has expired on %s." % OS.get_datetime_from_unix_time(jwt_decoder.get_expires_at())
+                    self.exception = "The Token has expired on %s." % Time.get_datetime_dict_from_system_from_unix_time(jwt_decoder.get_expires_at())
                     return false
             JWTClaims.Public.ISSUED_AT:
                 if not assert_valid_date_claim(jwt_decoder.get_issued_at(), expected_claims.get(claim), false):
-                    self.exception = "The Token can't be used before %s." % OS.get_datetime_from_unix_time(jwt_decoder.get_expires_at())
+                    self.exception = "The Token can't be used before %s." % Time.get_datetime_dict_from_system_from_unix_time(jwt_decoder.get_expires_at())
                     return false
             JWTClaims.Public.NOT_BEFORE:
                 if not assert_valid_date_claim(jwt_decoder.get_not_before(), expected_claims.get(claim), false):
-                    self.exception = "The Token can't be used before %s." % OS.get_datetime_from_unix_time(jwt_decoder.get_expires_at())
+                    self.exception = "The Token can't be used before %s." % Time.get_datetime_dict_from_system_from_unix_time(jwt_decoder.get_expires_at())
                     return false
             JWTClaims.Public.ISSUER:
                 if not jwt_decoder.get_issuer() == expected_claims.get(claim):
@@ -83,11 +83,11 @@ func assert_valid_date_claim(date: int, leeway: int, should_be_future: bool) -> 
 
 func assert_valid_header(jwt_decoder: JWTDecoder) -> bool:
     self.exception = "The header is empty or invalid."
-    return not jwt_decoder.header_claims.empty()    
+    return not jwt_decoder.header_claims.is_empty()    
 
 func assert_valid_payload(jwt_decoder: JWTDecoder) -> bool:
     self.exception = "The payload is empty or invalid."
-    return not jwt_decoder.payload_claims.empty()
+    return not jwt_decoder.payload_claims.is_empty()
 
 func verify(jwt: String) -> int:
     self.jwt_decoder = JWTDecoder.new(jwt)

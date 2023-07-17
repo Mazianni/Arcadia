@@ -5,16 +5,16 @@ var originator
 var is_empty_slot
 var assigned_uuid
 
-onready var ConfirmationDiag = $DeleteButton/ConfirmationDialog
-onready var DeleteButton = $DeleteButton
+@onready var ConfirmationDiag = $DeleteButton/ConfirmationDialog
+@onready var DeleteButton = $DeleteButton
 
 signal SelectButtonPressed(charname, empty)
 signal DeleteConfirmed(charname)
 
 func _ready():
 	get_node("CharacterSelectButton").text = displayname
-	connect("SelectButtonPressed", originator, "SelectCharacter")
-	connect("DeleteConfirmed", originator, "DeleteCharacter")
+	connect("SelectButtonPressed", Callable(originator, "SelectCharacter"))
+	connect("DeleteConfirmed", Callable(originator, "DeleteCharacter"))
 	if is_empty_slot:
 		DeleteButton.hide()
 

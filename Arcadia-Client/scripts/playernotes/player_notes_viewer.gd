@@ -1,17 +1,17 @@
 extends Node
 
-onready var NoteTree = $HBoxContainer/NoteTree/ScrollContainer/VBoxContainer
-onready var NoteInstance = load("res://scenes/Admin/PlayerNotes/PlayernoteInstance.tscn")
-onready var NoteHeaderInstance = load("res://scenes/Admin/PlayerNotes/PlayernoteHeader.tscn")
+@onready var NoteTree = $HBoxContainer/NoteTree/ScrollContainer/VBoxContainer
+@onready var NoteInstance = load("res://scenes/Admin/PlayerNotes/PlayernoteInstance.tscn")
+@onready var NoteHeaderInstance = load("res://scenes/Admin/PlayerNotes/PlayernoteHeader.tscn")
 
-onready var ShowOnlyUsersWithNotesToggle = $HBoxContainer/VBoxContainer/ShowOnlyExistingNotes
+@onready var ShowOnlyUsersWithNotesToggle = $HBoxContainer/VBoxContainer/ShowOnlyExistingNotes
 
-onready var NoteEditDialog = $"../../../EditNoteDialog"
-onready var NoteEditDialogTextEdit = $"../../../EditNoteDialog/VBoxContainer/TextEdit"
+@onready var NoteEditDialog = $"../../../EditNoteDialog"
+@onready var NoteEditDialogTextEdit = $"../../../EditNoteDialog/VBoxContainer/TextEdit"
 
-onready var NoteAddDialog = $"../../../AddNoteDialog"
-onready var NoteAddDialogTextEdit = $"../../../AddNoteDialog/VBoxContainer/TextEdit"
-onready var NoteAddDialogTitle = $"../../../AddNoteDialog/VBoxContainer/LineEdit"
+@onready var NoteAddDialog = $"../../../AddNoteDialog"
+@onready var NoteAddDialogTextEdit = $"../../../AddNoteDialog/VBoxContainer/TextEdit"
+@onready var NoteAddDialogTitle = $"../../../AddNoteDialog/VBoxContainer/LineEdit"
 
 var player_notes:Dictionary
 
@@ -20,7 +20,7 @@ var last_edited_note_username
 var last_added_note_username
 
 func _ready():
-	Server.connect("player_notes_recieved", self, "UpdateNotes")
+	Server.connect("player_notes_recieved", Callable(self, "UpdateNotes"))
 	Server.RequestNotes()
 	Server.GetPlayerList()
 	
@@ -33,17 +33,17 @@ func UpdateNotes(new_notes:Dictionary):
 	if ShowOnlyUsersWithNotesToggle.pressed:
 		note_render_dict = player_notes
 	else:
-		note_render_dict = yield(Server,"player_list_recieved")
+		note_render_dict = await Server.player_list_recieved
 	for I in note_render_dict.keys():
-		var new_header = NoteHeaderInstance.instance()
+		var new_header = NoteHeaderInstance.instantiate()
 		NoteTree.add_child(new_header)
-		new_header.connect("add_note_button_pressed", self, "AddNotePressed")
+		new_header.connect("add_note_button_pressed", Callable(self, "AddNotePressed"))
 		new_header.username = I
 		if player_notes[I].keys().has(I):
 			for N in player_notes[I].keys():
-				var new_note = NoteInstance.instance()
-				new_note.connect("edit_button_pressed", self, "NoteEditButtonPressed")
-				new_note.connect("delete_button_pressed", self, "NoteRemoveButtonPressed")
+				var new_note = NoteInstance.instantiate()
+				new_note.connect("edit_button_pressed", Callable(self, "NoteEditButtonPressed"))
+				new_note.connect("delete_button_pressed", Callable(self, "NoteRemoveButtonPressed"))
 				new_note.number = N
 				new_note.title = player_notes[I][N]["Description"]
 				new_note.date = player_notes[I][N]["Date"]

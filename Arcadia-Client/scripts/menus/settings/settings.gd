@@ -1,7 +1,7 @@
 extends Node
 
-onready var UnitSelectionOptions = $NinePatchRect/ScrollContainer/General/GridContainer/UnitSelection/OptionButton
-onready var MusicVolSlider = $NinePatchRect/ScrollContainer/Sound/GridContainer/MusicVolume/VolumeSlider
+@onready var UnitSelectionOptions = $NinePatchRect/ScrollContainer/General/GridContainer/UnitSelection/OptionButton
+@onready var MusicVolSlider = $NinePatchRect/ScrollContainer/Sound/GridContainer/MusicVolume/VolumeSlider
 
 func _ready():
 	PopulateSettings()
@@ -21,5 +21,5 @@ func _on_CloseButton_pressed():
 	queue_free()
 
 func _on_VolumeSlider_drag_ended(value_changed):
-	Musicmanager.music_player.volume_db = linear2db(MusicVolSlider.value)
+	Musicmanager.music_player.volume_db = linear_to_db(MusicVolSlider.value)
 	Settings.CurrentSettingsDict["Music Volume"] = MusicVolSlider.value

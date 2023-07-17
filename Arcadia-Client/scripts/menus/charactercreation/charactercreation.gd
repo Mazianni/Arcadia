@@ -31,40 +31,40 @@ var SubraceScene = preload("res://scenes/RaceTab/SubraceTab.tscn")
 var previewspritespath = "res://sprites/player/"
 var previewspriteshairpath = "res://sprites/player/hair"
 
-onready var maxpopuprect : Rect2 = Rect2(0,0,500,500)
+@onready var maxpopuprect : Rect2 = Rect2(0,0,500,500)
 
-onready var doll_eyes = $PreviewSpriteContainer/Eyes
-onready var doll_body = $PreviewSpriteContainer/Body
-onready var doll_hair = $PreviewSpriteContainer/Hair
+@onready var doll_eyes = $PreviewSpriteContainer/Eyes
+@onready var doll_body = $PreviewSpriteContainer/Body
+@onready var doll_hair = $PreviewSpriteContainer/Hair
 
-onready var DetailsPanel = $NinePatchRect/Details
-onready var DetailsPanelContainer = $NinePatchRect
-onready var RacePanel = $NinePatchRect2/RaceSelection/RaceContainer
-onready var RaceSelection = $NinePatchRect2/RaceSelection
-onready var RaceSelectionContainer = $NinePatchRect2
+@onready var DetailsPanel = $NinePatchRect/Details
+@onready var DetailsPanelContainer = $NinePatchRect
+@onready var RacePanel = $NinePatchRect2/RaceSelection/RaceContainer
+@onready var RaceSelection = $NinePatchRect2/RaceSelection
+@onready var RaceSelectionContainer = $NinePatchRect2
 
-onready var BodytypeSelection = $NinePatchRect/Details/GridContainer/BodytypeMenu
-onready var HairStyleSelection = $NinePatchRect/Details/GridContainer/HairStyleMenu
-onready var SkinColorSelection = $NinePatchRect/Details/GridContainer/SkinMenu
-onready var TailStyleSelection = $NinePatchRect/Details/GridContainer/TailMenu
-onready var AccessoryStyleSelection = $NinePatchRect/Details/GridContainer/AccessoryMenu
-onready var EyeColorSelection = $NinePatchRect/Details/GridContainer/EyesMenu/EyePicker
-onready var HairColorSelection = $NinePatchRect/Details/GridContainer/HairColorMenu/HairPicker
-onready var DirSelection = $NinePatchRect/Details/GridContainer/DirSelect
-onready var SpawnLocationSelection = $NinePatchRect/Details/GridContainer/SpawnMenu
-onready var EarStyleSelection = $NinePatchRect/Details/GridContainer/EarMenu
-onready var AgeInputSlider = $NinePatchRect/Details/GridContainer/AgeInput
-onready var NameInput = $NameInput
-onready var CreateConfirmButton = $CreateConfirmButton
-onready var HeightInputSlider = $NinePatchRect/Details/GridContainer/HeightInput
+@onready var BodytypeSelection = $NinePatchRect/Details/GridContainer/BodytypeMenu
+@onready var HairStyleSelection = $NinePatchRect/Details/GridContainer/HairStyleMenu
+@onready var SkinColorSelection = $NinePatchRect/Details/GridContainer/SkinMenu
+@onready var TailStyleSelection = $NinePatchRect/Details/GridContainer/TailMenu
+@onready var AccessoryStyleSelection = $NinePatchRect/Details/GridContainer/AccessoryMenu
+@onready var EyeColorSelection = $NinePatchRect/Details/GridContainer/EyesMenu/EyePicker
+@onready var HairColorSelection = $NinePatchRect/Details/GridContainer/HairColorMenu/HairPicker
+@onready var DirSelection = $NinePatchRect/Details/GridContainer/DirSelect
+@onready var SpawnLocationSelection = $NinePatchRect/Details/GridContainer/SpawnMenu
+@onready var EarStyleSelection = $NinePatchRect/Details/GridContainer/EarMenu
+@onready var AgeInputSlider = $NinePatchRect/Details/GridContainer/AgeInput
+@onready var NameInput = $NameInput
+@onready var CreateConfirmButton = $CreateConfirmButton
+@onready var HeightInputSlider = $NinePatchRect/Details/GridContainer/HeightInput
 
-onready var AgeInputLabel = $NinePatchRect/Details/GridContainer/AgeInput/Label2
-onready var HeightInputLabel = $NinePatchRect/Details/GridContainer/HeightInput/Label2
+@onready var AgeInputLabel = $NinePatchRect/Details/GridContainer/AgeInput/Label2
+@onready var HeightInputLabel = $NinePatchRect/Details/GridContainer/HeightInput/Label2
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	Server.GetRaceList()
-	yield(get_tree().create_timer(0.1), "timeout")
+	await get_tree().create_timer(0.1).timeout
 	var defaultlist = Globals.RaceList.keys()
 	GenerateRaces()
 	
@@ -73,7 +73,7 @@ func GenerateRaces():
 		print(i)
 		print(Globals.RaceList[i]["Long Description"])
 		print(Globals.RaceList[i]["Icon"])
-		var newraceinstance = SubraceScene.instance()
+		var newraceinstance = SubraceScene.instantiate()
 		newraceinstance.name = i
 		newraceinstance.racename = i 
 		newraceinstance.racedesc = Globals.RaceList[i]["Long Description"]

@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 class_name JWTAlgorithmBuilder
 
 static func random_secret(length: int = 10) -> String:
@@ -31,7 +31,7 @@ static func RSA256(public_key: CryptoKey, private_key: CryptoKey) -> JWTAlgorith
 static func RS256(public_key: CryptoKey, private_key: CryptoKey) -> JWTAlgorithm:
     return RSA256(public_key, private_key)
 
-static func sign(text: String, algorithm: JWTAlgorithm) -> PoolByteArray:
+static func sign(text: String, algorithm: JWTAlgorithm) -> PackedByteArray:
     return algorithm.sign(text)
 
 static func verify(jwt: JWTDecoder, algorithm: JWTAlgorithm) -> bool:

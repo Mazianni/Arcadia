@@ -11,8 +11,8 @@ var ActiveCharacter : ActiveCharacter
 signal loaded
 
 func _ready():
-	connect("tree_exiting", self, "OnDeleted")
-	yield(get_tree().create_timer(0.1), "timeout") # wait for a little while for username to populate.
+	connect("tree_exiting", Callable(self, "OnDeleted"))
+	await get_tree().create_timer(0.1).timeout # wait for a little while for username to populate.
 	CheckSaveDataExists()
 	MigrateSaveData()
 	
@@ -29,17 +29,17 @@ func CheckSaveDataExists(): #Verify that the directory and JSON file for this pl
 	var save_dir = DataRepository.saves_directory + "/" + str(PlayerData["username"])
 	print(DataRepository.saves_directory)
 	print(save_dir)
-	var dir = Directory.new()
+	var dir = DirAccess.open(save_dir)
 	dir.open(save_dir)
 	Logging.log_notice("Checking save data for " + str(PlayerData["username"]))
 	if not dir.dir_exists(save_dir):
 		dir.make_dir(save_dir)
 		Logging.log_notice("Creating save directory for " + str(PlayerData["username"]) + " at dir " + save_dir)
 	if not dir.file_exists(save_dir+"/"+str(PlayerData["username"])+".json"):
-		var newsave = File.new()
-		newsave.open(save_dir+"/"+str(PlayerData["username"])+".json", File.WRITE)
-		newsave.store_line(to_json(PlayerData))
+		var newsave = FileAccess.open(save_dir+"/"+str(PlayerData["username"])+".json", FileAccess.WRITE)
+		newsave.store_line(JSON.new().stringify(PlayerData))
 		Logging.log_notice("Creating save JSON for " + str(PlayerData["username"]))
+		var err = newsave.get_error()
 		newsave.close()
 	LoadSaveData()
 		
@@ -47,11 +47,12 @@ func LoadSaveData():
 	var save_dir = DataRepository.saves_directory + "/" + str(PlayerData["username"])
 	var save_file = save_dir+"/"+str(PlayerData["username"])+".json"
 	var load_dict : Dictionary = {}
-	var loadfile = File.new()
+	var loadfile = FileAccess.open(save_file, FileAccess.READ)
 	var temp
-	loadfile.open(save_file, File.READ)
 	temp = loadfile.get_as_text()
-	load_dict = parse_json(temp)
+	var test_json_conv = JSON.new()
+	test_json_conv.parse(temp)
+	load_dict = test_json_conv.get_data()
 	PlayerData = load_dict.duplicate(true)
 	loadfile.close()
 	HasLoaded = true
@@ -60,21 +61,27 @@ func LoadSaveData():
 func WriteSaveData():
 	var save_dir = DataRepository.saves_directory + "/" + str(PlayerData["username"])
 	var save_file = save_dir+"/"+str(PlayerData["username"])+".json"
-	var file = File.new()
-	var err = file.open(save_file, File.WRITE)
-	file.store_line(to_json(PlayerData))
+	var file = FileAccess.open(save_file, FileAccess.WRITE)
+	var err = file.get_error()
+	file.store_line(JSON.new().stringify(PlayerData))
 	if !err:
 		Logging.log_notice("Data for " + str(PlayerData["username"]) + " saved.")
 	else:
 		Logging.log_error("[FILE] Error encountered during save for "+str(PlayerData["username"])+" with code "+str(err))
+	file.close()
 	
 func DeleteSaveData(charname):
 	Logging.log_notice("Deleting character "+charname+" for "+PlayerData["username"])
 	var save_dir = DataRepository.saves_directory + "/" + str(PlayerData["username"])
 	var save_file = save_dir+"/"+str(charname)+".json"
-	var dir = Directory.new()
-	dir.open(save_dir)
+	var dir = DirAccess.open(save_dir)
 	dir.remove(save_file)
+	var err = dir.get_error()
+	if !err:
+		Logging.log_notice("Data for " + str(PlayerData["username"]) + " Deleted.")
+	else:
+		Logging.log_error("[FILE] Error encountered during save deletion for "+str(PlayerData["username"])+" with code "+str(err))	
+	dir.close()
 	
 func DeleteCharacter(char_name):
 	PlayerData["character_dict"].erase(char_name)
@@ -82,16 +89,16 @@ func DeleteCharacter(char_name):
 	WriteSaveData()
 	
 func CreateActiveCharacter(character_name, player_id):
-	ActiveCharacter = ActiveCharacterPath.instance()
+	ActiveCharacter = ActiveCharacterPath.instantiate()
 	ActiveCharacter.name = character_name
 	ActiveCharacter.ActiveController = self
 	self.add_child(ActiveCharacter)
 	Logging.log_notice("Loading existing character for "+str(player_id)+": "+character_name)
-	ActiveCharacter.CharacterData["LastPlayed"] = OS.get_system_time_secs()
+	ActiveCharacter.CharacterData["LastPlayed"] = Time.get_unix_time_from_system()
 	
 func CreateNewActiveCharacter(cuuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height):
 	Logging.log_notice("Creating new character for "+PlayerData["username"]+": "+character_name+" UUID "+str(cuuid))
-	ActiveCharacter = ActiveCharacterPath.instance()
+	ActiveCharacter = ActiveCharacterPath.instantiate()
 	ActiveCharacter.name = cuuid
 	ActiveCharacter.ActiveController = self
 	ActiveCharacter.CreateNewCharacter(cuuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height)

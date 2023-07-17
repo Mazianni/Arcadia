@@ -1,8 +1,8 @@
 extends Node
 
-onready var TimestampLabel = $HBoxContainer/Panel3/Timestamp
-onready var SenderLabel = $HBoxContainer/Panel2/SenderLabel
-onready var MessageLabel = $HBoxContainer/Panel/MsgLabel
+@onready var TimestampLabel = $HBoxContainer/Panel3/Timestamp
+@onready var SenderLabel = $HBoxContainer/Panel2/SenderLabel
+@onready var MessageLabel = $HBoxContainer/Panel/MsgLabel
 
 var timestamp
 var sender
