@@ -16,11 +16,12 @@ func _ready():
 	CheckSaveDataExists()
 	MigrateSaveData()
 	
-func MigrateSaveData():
-	for I in DataRepository.DefaultPlayerDataPlayerData.keys():
-		if !I in PlayerData.keys():
-			PlayerData[I] = DataRepository.DefaultPlayerDataPlayerData[I]
-			Logging.log_warning("[SAVES] Key "+I+" not found in "+PlayerData["username"]+"'s save. Adding.")
+func MigrateSaveData(): #IMPL whatever the fuck this was
+	return true
+#	for I in DataRepository.DefaultPlayerData.keys():
+#		if !I in PlayerData.keys():
+#			PlayerData[I] = DataRepository.DefaultPlayerDataPlayerData[I]
+	#		Logging.log_warning("[SAVES] Key "+I+" not found in "+PlayerData["username"]+"'s save. Adding.")
 	
 func OnDeleted():
 	WriteSaveData()
@@ -30,7 +31,6 @@ func CheckSaveDataExists(): #Verify that the directory and JSON file for this pl
 	print(DataRepository.saves_directory)
 	print(save_dir)
 	var dir = DirAccess.open(save_dir)
-	dir.open(save_dir)
 	Logging.log_notice("Checking save data for " + str(PlayerData["username"]))
 	if not dir.dir_exists(save_dir):
 		dir.make_dir(save_dir)
@@ -74,14 +74,13 @@ func DeleteSaveData(charname):
 	Logging.log_notice("Deleting character "+charname+" for "+PlayerData["username"])
 	var save_dir = DataRepository.saves_directory + "/" + str(PlayerData["username"])
 	var save_file = save_dir+"/"+str(charname)+".json"
-	var dir = DirAccess.open(save_dir)
+	var dir : DirAccess = DirAccess.open(save_dir)
 	dir.remove(save_file)
-	var err = dir.get_error()
+	var err = dir.get_open_error()
 	if !err:
 		Logging.log_notice("Data for " + str(PlayerData["username"]) + " Deleted.")
 	else:
 		Logging.log_error("[FILE] Error encountered during save deletion for "+str(PlayerData["username"])+" with code "+str(err))	
-	dir.close()
 	
 func DeleteCharacter(char_name):
 	PlayerData["character_dict"].erase(char_name)

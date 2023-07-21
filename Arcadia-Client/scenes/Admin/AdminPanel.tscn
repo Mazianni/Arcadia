@@ -1,28 +1,35 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=6 format=3 uid="uid://c42m1mvjav3e1"]
 
-[ext_resource path="res://sounds/adminhelp.ogg" type="AudioStream" id=1]
-[ext_resource path="res://fonts/titillium-web/TitilliumWeb-Regular.ttf" type="FontFile" id=2]
-[ext_resource path="res://scripts/tickets/adminticketviewer.gd" type="Script" id=4]
-[ext_resource path="res://scripts/playernotes/player_notes_viewer.gd" type="Script" id=5]
+[ext_resource type="AudioStream" uid="uid://dkxli8xwxgfyq" path="res://sounds/adminhelp.ogg" id="1"]
+[ext_resource type="FontFile" uid="uid://v12ky2oersqn" path="res://fonts/titillium-web/TitilliumWeb-Regular.ttf" id="2"]
+[ext_resource type="Script" path="res://scripts/tickets/adminticketviewer.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/playernotes/player_notes_viewer.gd" id="5"]
 
-[sub_resource type="FontFile" id=1]
-outline_size = 1
-outline_color = Color( 0, 0, 0, 1 )
-use_filter = true
-font_data = ExtResource( 2 )
+[sub_resource type="FontFile" id="1"]
+fallbacks = Array[Font]([ExtResource("2")])
+face_index = null
+embolden = null
+transform = null
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
 
 [node name="AdminPanel" type="Window"]
-visible = true
-anchor_right = 1.0
-anchor_bottom = 1.0
-window_title = "Admin Panel"
-resizable = true
+title = "Administrative Panel"
+position = Vector2i(11, 46)
+size = Vector2i(500, 500)
+popup_window = true
 
 [node name="Control" type="Panel" parent="."]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="TabContainer" type="TabContainer" parent="Control"]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 10.0
@@ -31,278 +38,215 @@ offset_right = -10.0
 offset_bottom = -10.0
 
 [node name="Player Notes" type="TabBar" parent="Control/TabContainer"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 4.0
-offset_top = 32.0
-offset_right = -4.0
-offset_bottom = -4.0
-script = ExtResource( 5 )
+layout_mode = 2
+script = ExtResource("5")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Control/TabContainer/Player Notes"]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="NoteTree" type="PanelContainer" parent="Control/TabContainer/Player Notes/HBoxContainer"]
-offset_right = 700.0
-offset_bottom = 544.0
-custom_minimum_size = Vector2( 700, 0 )
+custom_minimum_size = Vector2(700, 0)
+layout_mode = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Control/TabContainer/Player Notes/HBoxContainer/NoteTree"]
-offset_left = 7.0
-offset_top = 7.0
-offset_right = 693.0
-offset_bottom = 537.0
+layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control/TabContainer/Player Notes/HBoxContainer/NoteTree/ScrollContainer"]
-offset_right = 686.0
-offset_bottom = 530.0
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control/TabContainer/Player Notes/HBoxContainer"]
-offset_left = 704.0
-offset_right = 963.0
-offset_bottom = 544.0
+layout_mode = 2
 
 [node name="ShowOnlyExistingNotes" type="CheckBox" parent="Control/TabContainer/Player Notes/HBoxContainer/VBoxContainer"]
-offset_right = 259.0
-offset_bottom = 24.0
+layout_mode = 2
 text = "Only show users with existing notes"
 
 [node name="Tickets" type="TabBar" parent="Control/TabContainer"]
 visible = false
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 4.0
-offset_top = 32.0
-offset_right = -4.0
-offset_bottom = -4.0
-script = ExtResource( 4 )
+layout_mode = 2
+script = ExtResource("4")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Control/TabContainer/Tickets"]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="PanelContainer" type="PanelContainer" parent="Control/TabContainer/Tickets/HBoxContainer"]
-offset_right = 550.0
-offset_bottom = 544.0
-custom_minimum_size = Vector2( 550, 0 )
+custom_minimum_size = Vector2(550, 0)
+layout_mode = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Control/TabContainer/Tickets/HBoxContainer/PanelContainer"]
-offset_left = 7.0
-offset_top = 7.0
-offset_right = 543.0
-offset_bottom = 537.0
+layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control/TabContainer/Tickets/HBoxContainer/PanelContainer/ScrollContainer"]
+layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control/TabContainer/Tickets/HBoxContainer"]
-offset_left = 554.0
-offset_right = 766.0
-offset_bottom = 544.0
-custom_minimum_size = Vector2( 120, 0 )
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
 
 [node name="NewTicketWithPlayer" type="Button" parent="Control/TabContainer/Tickets/HBoxContainer/VBoxContainer"]
-offset_right = 212.0
-offset_bottom = 32.0
-theme_override_fonts/font = SubResource( 1 )
+layout_mode = 2
+theme_override_fonts/font = SubResource("1")
 text = "Open New Ticket With Player"
 
 [node name="AddPlayerToTicket" type="Button" parent="Control/TabContainer/Tickets/HBoxContainer/VBoxContainer"]
-offset_top = 36.0
-offset_right = 212.0
-offset_bottom = 68.0
-theme_override_fonts/font = SubResource( 1 )
+layout_mode = 2
+theme_override_fonts/font = SubResource("1")
 text = "Add Player To Ticket"
 
 [node name="Bans" type="TabBar" parent="Control/TabContainer"]
 visible = false
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 4.0
-offset_top = 32.0
-offset_right = -4.0
-offset_bottom = -4.0
+layout_mode = 2
 
 [node name="TicketNotif" type="AudioStreamPlayer" parent="."]
-stream = ExtResource( 1 )
+stream = ExtResource("1")
 
 [node name="TicketWindowContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="NewTicketDialog" type="Window" parent="."]
-offset_left = 608.0
-offset_top = 182.0
-offset_right = 859.0
-offset_bottom = 482.0
-window_title = "New Admin Ticket"
+title = "New Ticket"
+position = Vector2i(648, 36)
+size = Vector2i(300, 300)
+transient = true
+popup_window = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="NewTicketDialog"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = 5.0
 offset_bottom = -5.0
 
 [node name="TicketTitleLabel" type="Label" parent="NewTicketDialog/VBoxContainer"]
-offset_right = 251.0
-offset_bottom = 14.0
+layout_mode = 2
 text = "Ticket Title"
 
 [node name="TicketTitle" type="LineEdit" parent="NewTicketDialog/VBoxContainer"]
-offset_top = 18.0
-offset_right = 251.0
-offset_bottom = 42.0
+layout_mode = 2
 caret_blink = true
 caret_blink_interval = 0.5
 
 [node name="UserNameSelectionlabel" type="Label" parent="NewTicketDialog/VBoxContainer"]
-offset_top = 46.0
-offset_right = 251.0
-offset_bottom = 60.0
+layout_mode = 2
 text = "With User"
 
 [node name="UserNameSelection" type="OptionButton" parent="NewTicketDialog/VBoxContainer"]
-offset_top = 64.0
-offset_right = 251.0
-offset_bottom = 84.0
+layout_mode = 2
 
 [node name="TicketDescLabel2" type="Label" parent="NewTicketDialog/VBoxContainer"]
-offset_top = 88.0
-offset_right = 251.0
-offset_bottom = 102.0
+layout_mode = 2
 text = "Description"
 
 [node name="TicketDesc" type="TextEdit" parent="NewTicketDialog/VBoxContainer"]
-offset_top = 106.0
-offset_right = 251.0
-offset_bottom = 238.0
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="CriticalCheck" type="CheckBox" parent="NewTicketDialog/VBoxContainer"]
-offset_top = 242.0
-offset_right = 251.0
-offset_bottom = 266.0
+layout_mode = 2
 text = "Critical Issue "
 
 [node name="SubmitButton" type="Button" parent="NewTicketDialog/VBoxContainer"]
-offset_top = 270.0
-offset_right = 251.0
-offset_bottom = 290.0
+layout_mode = 2
 text = "Open Ticket"
 
 [node name="AddPlayerToTicketDialog" type="Window" parent="."]
-offset_left = 218.0
-offset_top = 305.0
-offset_right = 451.0
-offset_bottom = 450.0
-window_title = "Add Player To Ticket"
+title = "Add Player To Ticket"
+position = Vector2i(526, 36)
+size = Vector2i(300, 300)
+transient = true
+popup_window = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="AddPlayerToTicketDialog"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_bottom = -199.0
 
 [node name="UserNameSelectionlabel" type="Label" parent="AddPlayerToTicketDialog/VBoxContainer"]
-offset_right = 233.0
-offset_bottom = 14.0
+layout_mode = 2
 text = "User"
 
 [node name="TicketSelection" type="OptionButton" parent="AddPlayerToTicketDialog/VBoxContainer"]
-offset_top = 18.0
-offset_right = 233.0
-offset_bottom = 38.0
+layout_mode = 2
 
 [node name="Ticket" type="Label" parent="AddPlayerToTicketDialog/VBoxContainer"]
-offset_top = 42.0
-offset_right = 233.0
-offset_bottom = 56.0
+layout_mode = 2
 text = "To Ticket"
 
 [node name="UserSelection" type="OptionButton" parent="AddPlayerToTicketDialog/VBoxContainer"]
-offset_top = 60.0
-offset_right = 233.0
-offset_bottom = 80.0
+layout_mode = 2
 
 [node name="AddButton" type="Button" parent="AddPlayerToTicketDialog/VBoxContainer"]
-offset_top = 84.0
-offset_right = 233.0
-offset_bottom = 104.0
+layout_mode = 2
 text = "Add Player"
 
 [node name="EditNoteDialog" type="Window" parent="."]
-offset_left = 762.0
-offset_top = 203.0
-offset_right = 984.0
-offset_bottom = 432.0
-window_title = "Edit Player Note"
-resizable = true
+title = "Edit Note"
+position = Vector2i(648, 380)
+size = Vector2i(300, 260)
+transient = true
+popup_window = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="EditNoteDialog"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="Note" type="Label" parent="EditNoteDialog/VBoxContainer"]
-offset_right = 222.0
-offset_bottom = 14.0
+layout_mode = 2
 text = "Note"
 
 [node name="TextEdit" type="TextEdit" parent="EditNoteDialog/VBoxContainer"]
-offset_top = 18.0
-offset_right = 222.0
-offset_bottom = 205.0
-custom_minimum_size = Vector2( 0, 100 )
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="NoteEditConfirm" type="Button" parent="EditNoteDialog/VBoxContainer"]
-offset_top = 209.0
-offset_right = 222.0
-offset_bottom = 229.0
+layout_mode = 2
 text = "Submit Note"
 
 [node name="AddNoteDialog" type="Window" parent="."]
-offset_left = 290.0
-offset_top = 202.0
-offset_right = 512.0
-offset_bottom = 431.0
-window_title = "Add Player Note"
-resizable = true
+title = "Add Note"
+position = Vector2i(526, 390)
+size = Vector2i(300, 260)
+transient = true
+popup_window = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="AddNoteDialog"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="Note" type="Label" parent="AddNoteDialog/VBoxContainer"]
-offset_right = 222.0
-offset_bottom = 14.0
+layout_mode = 2
 text = "Subject"
 
 [node name="LineEdit" type="LineEdit" parent="AddNoteDialog/VBoxContainer"]
-offset_top = 18.0
-offset_right = 222.0
-offset_bottom = 42.0
+layout_mode = 2
 
 [node name="Note2" type="Label" parent="AddNoteDialog/VBoxContainer"]
-offset_top = 46.0
-offset_right = 222.0
-offset_bottom = 60.0
+layout_mode = 2
 text = "Note"
 
 [node name="TextEdit" type="TextEdit" parent="AddNoteDialog/VBoxContainer"]
-offset_top = 64.0
-offset_right = 222.0
-offset_bottom = 205.0
-custom_minimum_size = Vector2( 0, 100 )
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="NoteAddConfirm" type="Button" parent="AddNoteDialog/VBoxContainer"]
-offset_top = 209.0
-offset_right = 222.0
-offset_bottom = 229.0
+layout_mode = 2
 text = "Submit Note"
 
 [node name="TicketRefreshTimer" type="Timer" parent="."]

@@ -1,80 +1,73 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=5 format=3 uid="uid://buou7lbxqo24k"]
 
-[ext_resource path="res://fonts/titillium-web/TitilliumWeb-Regular.ttf" type="FontFile" id=1]
-[ext_resource path="res://scripts/tickets/ticketline.gd" type="Script" id=2]
-[ext_resource path="res://themes/ticketboxtheme.tres" type="Theme" id=3]
+[ext_resource type="FontFile" uid="uid://v12ky2oersqn" path="res://fonts/titillium-web/TitilliumWeb-Regular.ttf" id="1"]
+[ext_resource type="Script" path="res://scripts/tickets/ticketline.gd" id="2"]
+[ext_resource type="Theme" uid="uid://dkcaaaiec7h5y" path="res://themes/ticketboxtheme.tres" id="3"]
 
-[sub_resource type="FontFile" id=1]
-outline_size = 1
-outline_color = Color( 0, 0, 0, 1 )
-use_filter = true
-font_data = ExtResource( 1 )
+[sub_resource type="FontFile" id="1"]
+fallbacks = Array[Font]([ExtResource("1")])
+face_index = null
+embolden = null
+transform = null
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
 
 [node name="Control" type="Panel"]
+custom_minimum_size = Vector2(273, 40)
 offset_right = 273.0
 offset_bottom = 40.0
-custom_minimum_size = Vector2( 273, 40 )
 size_flags_horizontal = 3
-script = ExtResource( 2 )
+script = ExtResource("2")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
 anchor_left = 0.00732601
 anchor_top = 0.05
 anchor_right = 0.996337
 anchor_bottom = 0.95
 size_flags_horizontal = 2
 size_flags_vertical = 2
-__meta__ = {
-"_edit_use_anchors_": true
-}
 
 [node name="Panel3" type="Panel" parent="HBoxContainer"]
-offset_right = 80.0
-offset_bottom = 36.0
-custom_minimum_size = Vector2( 80, 0 )
-theme = ExtResource( 3 )
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme = ExtResource("3")
 
 [node name="Timestamp" type="Label" parent="HBoxContainer/Panel3"]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_fonts/font = SubResource( 1 )
-align = 1
-valign = 1
-autowrap = true
+theme_override_fonts/font = SubResource("1")
 
 [node name="Panel2" type="Panel" parent="HBoxContainer"]
-offset_left = 84.0
-offset_right = 164.0
-offset_bottom = 36.0
-custom_minimum_size = Vector2( 80, 0 )
-theme = ExtResource( 3 )
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme = ExtResource("3")
 
 [node name="SenderLabel" type="Label" parent="HBoxContainer/Panel2"]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_fonts/font = SubResource( 1 )
-align = 1
-valign = 1
-autowrap = true
+theme_override_fonts/font = SubResource("1")
 
 [node name="Panel" type="Panel" parent="HBoxContainer"]
-offset_left = 168.0
-offset_right = 270.0
-offset_bottom = 36.0
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme = ExtResource( 3 )
+theme = ExtResource("3")
 
 [node name="MsgLabel" type="Label" parent="HBoxContainer/Panel"]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = -2.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-align = 1
-valign = 1
-autowrap = true

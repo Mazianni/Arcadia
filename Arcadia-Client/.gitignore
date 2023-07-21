@@ -9,6 +9,8 @@ icon.png
 
 # Godot-specific ignores
 .import/
+.godot/editor/
+.godot/imported/
 export.cfg
 export_presets.cfg
 default_env.tres

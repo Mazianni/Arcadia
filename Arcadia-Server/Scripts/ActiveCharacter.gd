@@ -57,13 +57,25 @@ func CheckJSONExists(character_name):
 func LoadJSON(character_name):
 	var save_dir = DataRepository.saves_directory + "/" + str(ActiveController.PlayerData["username"])
 	var save_file = save_dir+"/"+str(character_name)+".json"
-	var load_dict = {}
-	var loadfile
-	var temp
-	loadfile = FileAccess.open(save_file, FileAccess.READ)
+	var load_dict : Dictionary = {}
+	var loadfile = FileAccess.open(save_file, FileAccess.READ)
+	var temp : String
 	temp = loadfile.get_as_text()
 	var test_json_conv = JSON.new()
 	test_json_conv.parse(temp)
+	if(loadfile.get_error()):
+		Logging.log_error("[FILE] Error loading save file for "+character_name+" username "+ActiveController.PlayerData["username"])
+		loadfile.close()
+		return
+	if(test_json_conv.get_error_message()):
+		Logging.log_error("[FILE] Error parsing JSON for "+character_name+" username "+ActiveController.PlayerData["username"])
+		loadfile.close()
+		return
+	if(test_json_conv.get_data() == null):
+		Logging.log_error("[FILE] Null data/corrupt data parsed in save file for "+character_name+" username "+ActiveController.PlayerData["username"])
+		loadfile.close()
+		return
+	print(str(test_json_conv.get_data()))
 	load_dict = test_json_conv.get_data()
 	CharacterData = load_dict.duplicate(true)
 	BaseSpecies = DataRepository.races[CharacterData["Species"]]

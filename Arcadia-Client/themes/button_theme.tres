@@ -1,0 +1,25 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://xjwshynbp6sr"]
+
+[sub_resource type="StyleBoxFlat" id="1"]
+bg_color = Color(0.243137, 0.231373, 0.231373, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.552941, 0.772549, 1, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+corner_detail = 1
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+shadow_color = Color(0, 0, 0, 1)
+anti_aliasing_size = 0.968
+
+[resource]
+Panel/styles/panel = SubResource("1")
+PanelContainer/colors/test = Color(0, 0, 0, 1)
+PanelContainer/styles/panel = null

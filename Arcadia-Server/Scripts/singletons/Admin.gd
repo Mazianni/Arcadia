@@ -96,13 +96,16 @@ func LoadBanData():
 		
 func CheckBanned(username:String, puuid:String, ip:String): # returns false if not banned
 	var result = OK
-	if username == null || username != "":
+	print("user "+username)
+	print("puuid "+puuid)
+	print("ip "+ip)
+	if !username:
 		result = ERR_PARSE_ERROR
 		return result
-	if puuid == null || puuid != "":
+	if !puuid:
 		result = ERR_PARSE_ERROR
 		return result
-	if ip == null || ip != "":
+	if !ip:
 		result = ERR_PARSE_ERROR
 		return result
 	if username in ban_data["banned_users"]:

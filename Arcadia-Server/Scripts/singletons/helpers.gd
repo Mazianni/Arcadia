@@ -11,8 +11,11 @@ static func string_to_vector2(string := "") -> Vector2:
 		new_string.erase(0, 1)
 		new_string.erase(new_string.length() - 1, 1)
 		var array: Array = new_string.split(", ")
+		var vec : Vector2
+		vec.x = float(array[0])
+		vec.y = float(array[1])
 
-		return Vector2(array[0], array[1])
+		return vec
 
 	return Vector2.ZERO
 	
@@ -26,7 +29,7 @@ func PID2Username(pid:int):
 		return Server.get_node(str(pid)).PlayerData["username"]
 		
 func GetActiveStaff():
-	var staff_array : Array
+	var staff_array : Array = []
 	for I in get_tree().get_nodes_in_group("players"):
 		if Admin.HasRank(I):
 			if Admin.CheckPermissions("Is Staff", I):
@@ -91,7 +94,7 @@ func Match3(input:String, to_find:String, start_location:int):
 	return false
 	
 func GetCurrentPlayerList():
-	var return_array : Array
+	var return_array : Array = []
 	for I in get_tree().get_nodes_in_group("players"):
 		return_array.append(I.PlayerData["username"])
 	return return_array

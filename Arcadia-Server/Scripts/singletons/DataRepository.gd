@@ -5,7 +5,6 @@ extends Node
 enum SERVER_STATE {SERVER_LOADING, SERVER_LOADED, SERVER_SHUTTING_DOWN}
 enum MESSAGE_TYPE {NORMAL, YELL}
 
-
 @onready var dbname = OS.get_executable_path().get_base_dir()+"/playerdata.db"
 @onready var uuid_generator = load("res://uuid.gd")
 @onready var collider_resource = load("res://Scenes/Instances/player/PlayerCollider.tscn")
@@ -16,6 +15,7 @@ var serverversion = "0.1a"
 var saves_directory : String
 var CurrentState 
 var MapManager : Node
+var db : SQLite
 
 var races : Dictionary = {
 	"Human" : load("res://Resources/Races/human.tres")
@@ -54,8 +54,24 @@ func _ready():
 func remove_pid_assoc(player_id):
 	pid_to_username.erase(str(player_id))
 	
-func WriteNewUserToDB(username, hashed, salt): #IMPLEMENT implement sql again
-	return true
+func WriteNewUserToDB(username, hashed, salt):
+	db = SQLite.new()
+	db.path = dbname
+	db.open_db()
+	var tableName = "playerdata"
+	var dict : Dictionary = Dictionary()
+	var success = false
+	dict["username"] = username
+	dict["hash"] = hashed
+	dict["salt"] = salt
+	success = db.insert_row(tableName, dict)
+	db.close_db()
+	return success
 	
 func GetDataFromDB(table, selection, data): #table = name of table selection = column name data = data to select from. Boolean return.
-	return true
+	db = SQLite.new()
+	db.path = dbname
+	db.open_db()
+	var dbreturn = db.select_rows(table, selection, data)
+	db.close_db()
+	return dbreturn

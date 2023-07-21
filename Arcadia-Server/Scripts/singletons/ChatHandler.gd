@@ -34,7 +34,7 @@ func IsMsgOOC(msg:Dictionary):
 	return false
 	
 func FormatSimpleMessage(msg:String):
-	var outputdict : Dictionary
+	var outputdict : Dictionary = {}
 	outputdict["is_emote"] = false
 	outputdict["T"] = Time.get_time_string_from_system(true)
 	outputdict["category"] = "ETC"

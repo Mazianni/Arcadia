@@ -36,21 +36,21 @@ func ConnectToServer():
 	network.create_client(ip, port)
 	multiplayer.multiplayer_peer = network
 	
-	network.connect("connection_failed", Callable(self, "_OnConnectionFailed"))
-	network.connect("connection_succeeded", Callable(self, "_OnConnectionSucceeded"))
-	network.connect("server_disconnected", Callable(self, "_OnServerDisconnected"))
+	#multiplayer.connect("connection_failed", Callable(self, "_OnConnectionFailed"))
+	#multiplayer.connect("connected_to_server", Callable(self, "_OnConnectionSucceeded"))
+	#multiplayer.connect("server_disconnected", Callable(self, "_OnServerDisconnected"))
 	
 #Connection signals
 	
 func _OnConnectionFailed():
 	print("Failed to Connect.")
 	
-	network.disconnect("connection_failed", Callable(self, "_OnConnectionFailed"))
-	network.disconnect("connection_succeeded", Callable(self, "_OnConnectionSucceeded"))
-	network.disconnect("server_disconnected", Callable(self, "_OnServerDisconnected"))
+	multiplayer.disconnect("connection_failed", Callable(self, "_OnConnectionFailed"))
+	multiplayer.disconnect("connected_to_server", Callable(self, "_OnConnectionSucceeded"))
+	multiplayer.disconnect("server_disconnected", Callable(self, "_OnServerDisconnected"))
 	await get_tree().create_timer(1).timeout
-	get_tree().set_multiplayer_peer(null)
-	network = null
+	#multiplayer.multiplayer_peer = null
+	#network = null
 		
 func _OnConnectionSucceeded():
 	print("Connection Succcessful.")
@@ -65,11 +65,11 @@ func _OnConnectionSucceeded():
 func _OnServerDisconnected(): #todo make this return to the login screen.
 	Globals.client_state = Globals.SERVER_CONNECTION_STATE.DISCONNECTED
 	Globals.client_state = Globals.CLIENT_STATE_LIST.CLIENT_UNAUTHENTICATED	
-	network.disconnect("connection_failed", Callable(self, "_OnConnectionFailed"))
-	network.disconnect("connection_succeeded", Callable(self, "_OnConnectionSucceeded"))
-	network.disconnect("server_disconnected", Callable(self, "_OnServerDisconnected"))
+	multiplayer.disconnect("connection_failed", Callable(self, "_OnConnectionFailed"))
+	multiplayer.disconnect("connection_succeeded", Callable(self, "_OnConnectionSucceeded"))
+	multiplayer.disconnect("server_disconnected", Callable(self, "_OnServerDisconnected"))
 	await get_tree().create_timer(1).timeout
-	get_tree().set_multiplayer_peer(null)
+	multiplayer.multiplayer_peer = null
 	network = null
 	if Gui.current_loaded_GUI_name != "LoginScreen":
 		Gui.CreateFloatingMessage("Server disconnected! Please login again.", "bad")
@@ -84,7 +84,7 @@ func SendPlayerState(state):
 	pass
 	
 func DetermineLatency():
-	if network:
+	if multiplayer.multiplayer_peer:
 		rpc_id(1, "DetermineLatency", Time.get_unix_time_from_system())
 	
 @rpc("any_peer") func ReturnLatency(client_time):
@@ -137,7 +137,7 @@ func DetermineLatency():
 #character creation handling start
 
 func GetRaceList():
-	rpc_id(1, "BuildRaceList")
+	rpc_id(1, "ServRPC_BuildRaceList")
 	
 @rpc("any_peer") func RecieveRaceList(racelist : Dictionary):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
@@ -149,7 +149,7 @@ func GetRaceList():
 #character selection
 
 func RequestCharacterList():
-	rpc_id(1, "ReturnRequestedCharacterList")
+	rpc_id(1, "ServRPC_ReturnRequestedCharacterList")
 
 @rpc("any_peer") func RecieveCharacterList(characterlist):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
@@ -158,13 +158,13 @@ func RequestCharacterList():
 	emit_signal("character_list_recieved")
 		
 func SelectCharacter(charname):
-	rpc_id(1, "CreateExistingCharacter", charname)
+	rpc_id(1, "ServRPC_CreateExistingCharacter", charname)
 	
 func RequestNewCharacter(species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height):
-	rpc_id(1, "RequestNewCharacter", species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height)
+	rpc_id(1, "ServRPC_RequestNewCharacter", species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height)
 	
 func DeleteCharacter(char_name):
-	rpc_id(1, "DeleteCharacter", char_name)
+	rpc_id(1, "ServRPC_DeleteCharacter", char_name)
 	
 @rpc("any_peer") func LoadWorld(worldname):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
@@ -179,13 +179,13 @@ func DeleteCharacter(char_name):
 func Login(username, password, uuid, puuid):
 	Server.ConnectToServer()
 	await get_tree().create_timer(1).timeout
-	if network:
-		rpc_id(1,"Login", username, password, uuid, Globals.persistent_uuid)
+	if multiplayer.multiplayer_peer:
+		rpc_id(1,"ServRPC_Login", username, password, uuid, Globals.persistent_uuid)
 
 func CreateAccount(username, password):
 	Server.ConnectToServer()
 	await get_tree().create_timer(0.1).timeout
-	rpc_id(1,"CreateAccount", username, password)
+	rpc_id(1,"ServRPC_CreateAccount", username, password)
 	
 @rpc("any_peer") func CreateAccountResults(result, message):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
@@ -222,14 +222,14 @@ func CreateAccount(username, password):
 #movement request start
 
 func RequestMovement(vector, direction):
-	rpc_id(1, "RequestColliderMovement", vector, direction)
+	rpc_id(1, "ServRPC_RequestColliderMovement", vector, direction)
 
 #movement request end
 
 #chat functions start
 
 func SendChat(msg):
-	rpc_id(1, "RecieveChat", msg)
+	rpc_id(1, "ServRPC_RecieveChat", msg)
 	
 @rpc("any_peer") func RecieveChat(msg):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
@@ -251,18 +251,18 @@ func SendChat(msg):
 @rpc("any_peer") func SendVersion():
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
-	rpc_id(1, "RecieveVersion", Globals.client_version)
+	rpc_id(1, "ServRPC_RecieveVersion", Globals.client_version)
 	print(Globals.client_version)
 	
 @rpc("any_peer") func SendPersistentUUID():
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
-	rpc_id(1, "RecievePersistentUUID", Globals.persistent_uuid)
+	rpc_id(1, "ServRPC_RecievePersistentUUID", Globals.persistent_uuid)
 #version checking end
 
 #permissions start
 func GetClientPermissions():
-	rpc_id(1, "SendPermissions")
+	rpc_id(1, "ServRPC_SendPermissions")
 	
 func RecievePermissions(permissions_array:Array):
 	emit_signal("permissions_recieved", permissions_array)
@@ -272,10 +272,10 @@ func RecievePermissions(permissions_array:Array):
 #tickets start
 	
 func GetTickets(for_staff:bool = false):
-	rpc_id(1, "GetTickets", for_staff)
+	rpc_id(1, "ServRPC_GetTickets", for_staff)
 	
 func GetUpdateOnTicket(ticket_number:String):
-	rpc_id(1, "UpdateSoloTicket", ticket_number)
+	rpc_id(1, "ServRPC_UpdateSoloTicket", ticket_number)
 	
 @rpc("any_peer") func RecieveTicketsAdmin(ticket_dict:Dictionary):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
@@ -293,34 +293,34 @@ func GetUpdateOnTicket(ticket_number:String):
 	emit_signal("ticket_update_recieved",ticket_number, ticket_dict)
 	
 func OpenTicket(title:String, details:String, with_user:String, critical:bool = false):
-	rpc_id(1, "OpenTicket", title, details, with_user, critical)
+	rpc_id(1, "ServRPC_OpenTicket", title, details, with_user, critical)
 	
 func CloseTicket(ticket_number:String):
-	rpc_id(1, "CloseTicket", ticket_number)
+	rpc_id(1, "ServRPC_CloseTicket", ticket_number)
 	
 func ClaimTicket(ticket_number:String):
-	rpc_id(1, "ClaimTicket", ticket_number)
+	rpc_id(1, "ServRPC_ClaimTicket", ticket_number)
 	
 func SendMessageToTicket(message:String, ticket_number:String):
-	rpc_id(1, "SendMessageToTicket", message, ticket_number)
+	rpc_id(1, "ServRPC_SendMessageToTicket", message, ticket_number)
 	
 func AddUserToTicket(username:String, ticket_number:String):
-	rpc_id(1, "AddUserToTicket", username, ticket_number)
+	rpc_id(1, "ServRPC_AddUserToTicket", username, ticket_number)
 #tickets end
 
 #player notes
 
 func RequestNotes():
-	rpc_id(1, "GetPlayerNotes")
+	rpc_id(1, "ServRPC_GetPlayerNotes")
 	
 func AddPlayerNote(username:String, title:String, note:String):
-	rpc_id(1, "AddPlayerNote", username, title, note)
+	rpc_id(1, "ServRPC_AddPlayerNote", username, title, note)
 	
 func RemovePlayerNote(username:String, note_number:String):
-	rpc_id(1, "RemovePlayerNote", username, note_number)
+	rpc_id(1, "ServRPC_RemovePlayerNote", username, note_number)
 	
 func EditPlayerNote(username:String, note_number:String, new_note:String):
-	rpc_id(1, "EditPlayerNote", username, note_number, new_note)
+	rpc_id(1, "ServRPC_EditPlayerNote", username, note_number, new_note)
 
 @rpc("any_peer") func RecievePlayerNotes(note_dict: Dictionary):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
@@ -332,7 +332,7 @@ func EditPlayerNote(username:String, note_number:String, new_note:String):
 #misc
 
 func GetPlayerList():
-	rpc_id(1, "GetCurrentPlayers")
+	rpc_id(1, "ServRPC_GetCurrentPlayers")
 	
 @rpc("any_peer") func RecieveCurrentPlayers(player_list):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
@@ -340,7 +340,7 @@ func GetPlayerList():
 	emit_signal("player_list_recieved", player_list)
 	
 func IsClientAdmin():
-	rpc_id(1, "IsClientAdmin")
+	rpc_id(1, "ServRPC_IsClientAdmin")
 	
 @rpc("any_peer") func VerifyClientIsAdmin(decision:bool):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
@@ -350,3 +350,33 @@ func IsClientAdmin():
 		emit_signal("admin_verified", decision)
 
 #misc end
+
+#BOILERPLATE BEGIN NONE OF THESE DO ANYTHING BUT GODOT 4.X REQUIRES MATCHING RPCS BETWEEN CLIENT/SERVER.
+@rpc("any_peer") func ServRPC_FetchServerTime(client_time): pass
+@rpc("any_peer") func ServRPC_DetermineLatency(client_time): pass
+@rpc("any_peer") func ServRPC_ReturnRequestedCharacterList(): pass
+@rpc("any_peer") func ServRPC_CreateExistingCharacter(cuuid): pass
+@rpc("any_peer") func ServRPC_RequestNewCharacter(species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height): pass
+@rpc("any_peer") func ServRPC_DeleteCharacter(char_name): pass
+@rpc("any_peer") func ServRPC_BuildRaceList(): pass
+@rpc("any_peer") func ServRPC_Login(username, password, uuid, puuid): pass
+@rpc("any_peer") func ServRPC_CreateAccount(username, password): pass
+@rpc("any_peer") func ServRPC_RecievePersistentUUID(puuid): pass
+@rpc("any_peer") func ServRPC_RequestColliderMovement(vector, direction): pass
+@rpc("any_peer") func ServRPC_RecieveChat(msg:Dictionary): pass
+@rpc("any_peer") func ServRPC_RecieveVersion(clientversion): pass
+@rpc("any_peer") func ServRPC_SendPermissions(): pass
+@rpc("any_peer") func ServRPC_UpdateSoloTicket(ticket_number:String): pass
+@rpc("any_peer") func ServRPC_GetTickets(for_staff:bool = false): pass
+@rpc("any_peer") func ServRPC_OpenTicket(title:String, details:String, with_user:String, critical:bool = false): pass
+@rpc("any_peer") func ServRPC_CloseTicket(ticket_number:String): pass
+@rpc("any_peer") func ServRPC_SendMessageToTicket(message:String, ticket_number:String): pass
+@rpc("any_peer") func ServRPC_ClaimTicket(ticket_number:String): pass
+@rpc("any_peer") func ServRPC_AddUserToTicket(username:String, ticket_number:String): pass
+@rpc("any_peer") func ServRPC_AddPlayerNote(username:String, title:String, note:String): pass
+@rpc("any_peer") func ServRPC_RemovePlayerNote(username:String, note_number:String): pass
+@rpc("any_peer") func ServRPC_EditPlayerNote(username:String, note_number:String, new_note:String): pass
+@rpc("any_peer") func ServRPC_IsClientAdmin(): pass
+@rpc("any_peer") func ServRPC_GetCurrentPlayers(): pass
+
+#BOILERPLATE END

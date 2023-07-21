@@ -1,7 +1,7 @@
 extends Node
 
 
-var network = ENetMultiplayerPeer.new()
+var network : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 var port = 5000
 var max_players = 300
 
@@ -25,9 +25,8 @@ func StartServer():
 	network.connect("peer_disconnected", Callable(self, "_Peer_Disconnected"))
 	
 func _Peer_Connected(player_id):
-	Logging.log_notice("User "+str(player_id)+" Connected from IP "+str(network.get_peer_address(player_id)))
+	Logging.log_notice("User "+str(player_id)+" Connected from IP "+str(network.get_peer(player_id).get_remote_address()))
 	rpc_id(player_id, "SendVersion")
-	
 	
 func _Peer_Disconnected(player_id):
 	Logging.log_notice("User "+str(player_id)+" Disconnected")
@@ -45,23 +44,23 @@ func GeneratePlayerStates(uuid, state):
 func SendWorldState(world_state):
 	rpc_id(0, "RecieveWorldState", world_state)
 	
-@rpc("any_peer") func FetchServerTime(client_time):
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_FetchServerTime(client_time):
+	var player_id = multiplayer.get_remote_sender_id()
 	rpc_id(player_id, "ReturnServerTime", Time.get_unix_time_from_system(), client_time)
 	
-@rpc("any_peer") func DetermineLatency(client_time):
-	var player_id = get_tree().get_remote_sender_id()	
+@rpc("any_peer") func ServRPC_DetermineLatency(client_time):
+	var player_id = multiplayer.get_remote_sender_id()	
 	rpc_id(player_id, "ReturnLatency", client_time)
 	
 #player state / synch end
 
 #character handling start
 
-@rpc("any_peer") func ReturnRequestedCharacterList():
-	SendPlayerCharacterList(get_tree().get_remote_sender_id())
+@rpc("any_peer") func ServRPC_ReturnRequestedCharacterList():
+	SendPlayerCharacterList(multiplayer.get_remote_sender_id())
 	
 func SendPlayerCharacterList(player_id):
-	player_id = get_tree().get_remote_sender_id()
+	player_id = multiplayer.get_remote_sender_id()
 	var CharacterList : Dictionary
 	var retryload = true
 	if has_node(str(player_id)):
@@ -79,20 +78,20 @@ func SendPlayerCharacterList(player_id):
 				rpc_id(player_id, "RecieveCharacterList", CharacterList)
 				Logging.log_notice("deferred Sending character list of "+str(player_id)+".")		
 	
-@rpc("any_peer") func CreateExistingCharacter(cuuid):
-	var player_id = get_tree().get_remote_sender_id() 
+@rpc("any_peer") func ServRPC_CreateExistingCharacter(cuuid):
+	var player_id = multiplayer.get_remote_sender_id()
 	if has_node(str(player_id)):
 			get_node(str(player_id)).CreateActiveCharacter(cuuid, player_id)
 			ReturnCharacterLoaded(player_id, get_node(str(player_id)).ActiveCharacter.CurrentMap)
 			
-@rpc("any_peer") func RequestNewCharacter(species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height):
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_RequestNewCharacter(species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height):
+	var player_id = multiplayer.get_remote_sender_id()
 	var cuuid = uuid_generator.v4()
 	if has_node(str(player_id)):
 			get_node(str(player_id)).CreateNewActiveCharacter(cuuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height)
 			
-@rpc("any_peer") func DeleteCharacter(char_name):
-	var player_id = get_tree().get_remote_sender_id()	
+@rpc("any_peer") func ServRPC_DeleteCharacter(char_name):
+	var player_id = multiplayer.get_remote_sender_id()
 	if has_node(str(player_id)):
 		get_node(str(player_id)).DeleteCharacter(char_name)
 		
@@ -102,10 +101,10 @@ func ReturnCharacterLoaded(pid, worldname):
 
 #character creation handling start
 
-@rpc("any_peer") func BuildRaceList():
-	var player_id = get_tree().get_remote_sender_id()
-	var racedict : Dictionary
-	var racesubdict : Dictionary
+@rpc("any_peer") func ServRPC_BuildRaceList():
+	var player_id = multiplayer.get_remote_sender_id()
+	var racedict : Dictionary = {}
+	var racesubdict : Dictionary = {}
 	for i in DataRepository.races.keys():
 		var racecheck : SpeciesBase = DataRepository.races[i]
 		print(str(racecheck.race_name))
@@ -139,8 +138,8 @@ func CheckPlayerApprovedForRace(username, race):
 
 #login start
 
-@rpc("any_peer") func Login(username, password, uuid, puuid):
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_Login(username, password, uuid, puuid):
+	var player_id = multiplayer.get_remote_sender_id()
 	var message
 	Logging.log_notice("[AUTH] Login attempt from PID" + str(player_id) + " UUID " + str(uuid))
 	var status = false
@@ -151,7 +150,7 @@ func CheckPlayerApprovedForRace(username, race):
 		DataRepository.SERVER_STATE.SERVER_SHUTTING_DOWN:
 			message = "Server shutting down. Connection refused."
 			status = false
-	var bancheck = Admin.CheckBanned(username, puuid, str(network.get_peer_address(player_id)))
+	var bancheck = Admin.CheckBanned(username, puuid, str(network.get_peer(player_id).get_remote_address()))
 	if bancheck:
 		match bancheck:
 			FAILED:
@@ -175,7 +174,7 @@ func ReportLoginStatus(player_id, status, message):
 func AuthenticatePlayer(username, password, player_id, player_uuid):
 	var token
 	Logging.log_notice("[AUTH] Authentication request recieved from "+str(player_id))
-	var gateway_id = get_tree().get_remote_sender_id()
+	var gateway_id = multiplayer.get_remote_sender_id()
 	var result = false
 	Logging.log_notice("[AUTH] Starting authentication for "+str(player_id))
 	var dbcheckuser = "'"+username+"'"
@@ -202,8 +201,8 @@ func AuthenticatePlayer(username, password, player_id, player_uuid):
 	Logging.log_notice("[AUTH] Sending authentication results to user " + str(player_id))
 	return result
 	
-@rpc("any_peer") func CreateAccount(username, password):
-	var gateway_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_CreateAccount(username, password):
+	var gateway_id = multiplayer.get_remote_sender_id()
 	var result
 	var message
 	var dbcheckuser = "'"+username+"'"
@@ -261,16 +260,16 @@ func FillPlayerContainer(player_container, player_id, uuid):
 func RequestPersistentUUID(player_id):
 	rpc_id(player_id, "SendPersistentUUID")
 
-@rpc("any_peer") func RecievePersistentUUID(puuid):
-	if has_node(str(get_tree().get_remote_sender_id())):
-		get_node(str(get_tree().get_remote_sender_id())).PlayerData["persistent_uuid"] = puuid
+@rpc("any_peer") func ServRPC_RecievePersistentUUID(puuid):
+	if has_node(str(multiplayer.get_remote_sender_id())):
+		get_node(str(multiplayer.get_remote_sender_id())).PlayerData["persistent_uuid"] = puuid
 
 #login end
 
 #movement request start
 
-@rpc("any_peer") func RequestColliderMovement(vector, direction):
-	var playerid = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_RequestColliderMovement(vector, direction):
+	var playerid = multiplayer.get_remote_sender_id()
 	if has_node(str(playerid)):
 		var pid_collider = get_node(str(playerid)).ActiveCharacter.CurrentCollider
 		pid_collider.UpdateVector(vector, direction)
@@ -279,8 +278,8 @@ func RequestPersistentUUID(player_id):
 
 #chat start
 
-@rpc("any_peer") func RecieveChat(msg:Dictionary):
-	var playerid = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_RecieveChat(msg:Dictionary):
+	var playerid = multiplayer.get_remote_sender_id()
 	if msg.size() != 3: #malformed - will cause errors. someone's doing something fucky.
 		Logging.log_error("[CHAT] Malformed chat message from "+str(playerid)+get_node(str(playerid)).PlayerData["Username"] + "contents "+str(msg))
 		return
@@ -331,8 +330,8 @@ func SendSingleChat(msg:Dictionary, playerid):
 #chat end
 
 #version checking
-@rpc("any_peer") func RecieveVersion(clientversion):
-	var playerid = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_RecieveVersion(clientversion):
+	var playerid = multiplayer.get_remote_sender_id()
 	CheckClientVersion(playerid, clientversion)
 
 func CheckClientVersion(player_id, clientversion):
@@ -345,8 +344,8 @@ func CheckClientVersion(player_id, clientversion):
 
 #permissions
 
-@rpc("any_peer") func SendPermissions():
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_SendPermissions():
+	var player_id = multiplayer.get_remote_sender_id()
 	if has_node(str(player_id)):
 		rpc_id(player_id, "RecievePermissions", Admin.RetrievePermissions(get_node(str(player_id))))
 
@@ -360,12 +359,12 @@ func PushTicketsToClient(pid:int, tickets):
 func UpdateTicket(pid:int, ticket_number:String, ticket:String):
 	rpc_id(pid, "UpdateTicket", ticket_number, ticket)
 	
-@rpc("any_peer") func UpdateSoloTicket(ticket_number:String):
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_UpdateSoloTicket(ticket_number:String):
+	var player_id = multiplayer.get_remote_sender_id()
 	Admin.UpdateTicketMessages(ticket_number)
 
-@rpc("any_peer") func GetTickets(for_staff:bool = false):
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_GetTickets(for_staff:bool = false):
+	var player_id = multiplayer.get_remote_sender_id()
 	var return_dict
 	var all_tickets = false
 	if has_node(str(player_id)):
@@ -380,27 +379,27 @@ func UpdateTicket(pid:int, ticket_number:String, ticket:String):
 			return_dict = Admin.GetTicketsWithUser(Helpers.PID2Username(player_id))
 			rpc_id(player_id, "RecieveTickets", return_dict, all_tickets)
 	
-@rpc("any_peer") func OpenTicket(title:String, details:String, with_user:String, critical:bool = false):
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_OpenTicket(title:String, details:String, with_user:String, critical:bool = false):
+	var player_id = multiplayer.get_remote_sender_id()
 	if with_user:
 		if Admin.CheckPermissions("Manage Tickets", get_node(str(player_id))):
 			Admin.CreateTicket(Helpers.PID2Username(player_id), with_user, title, details, critical, true)
 	else:
 		Admin.CreateTicket(Helpers.PID2Username(player_id), "", title, details, critical, false)
 		
-@rpc("any_peer") func CloseTicket(ticket_number:String):
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_CloseTicket(ticket_number:String):
+	var player_id = multiplayer.get_remote_sender_id()
 	Admin.CloseTicket(ticket_number, player_id)
 		
-@rpc("any_peer") func SendMessageToTicket(message:String, ticket_number:String):
-	Admin.AddMessageToTicket(message, ticket_number, str(get_tree().get_remote_sender_id()))
+@rpc("any_peer") func ServRPC_SendMessageToTicket(message:String, ticket_number:String):
+	Admin.AddMessageToTicket(message, ticket_number, str(multiplayer.get_remote_sender_id()))
 	
-@rpc("any_peer") func ClaimTicket(ticket_number:String):
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_ClaimTicket(ticket_number:String):
+	var player_id = multiplayer.get_remote_sender_id()
 	Admin.ClaimTicket(Helpers.PID2Username(player_id), ticket_number)
 	
-@rpc("any_peer") func AddUserToTicket(username:String, ticket_number:String):
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_AddUserToTicket(username:String, ticket_number:String):
+	var player_id = multiplayer.get_remote_sender_id()
 	if has_node(str(player_id)):
 		if Admin.CheckPermissions("Manage Tickets", get_node(str(player_id))):
 			Admin.AddUserToTicket(username, ticket_number)
@@ -410,24 +409,24 @@ func UpdateTicket(pid:int, ticket_number:String, ticket:String):
 
 #notes begin
 
-@rpc("any_peer") func AddPlayerNote(username:String, title:String, note:String):
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_AddPlayerNote(username:String, title:String, note:String):
+	var player_id = multiplayer.get_remote_sender_id()
 	if has_node(str(player_id)):
 		if Admin.CheckPermissions("Player Notes", get_node(str(player_id))):
 			Admin.AddPlayerNote(username, title, note, player_id)
 		else:
 			Logging.log_notice("User "+Helpers.PID2Username(player_id)+" tried to edit a player's notes without permissions.")
 			
-@rpc("any_peer") func RemovePlayerNote(username:String, note_number:String):
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_RemovePlayerNote(username:String, note_number:String):
+	var player_id = multiplayer.get_remote_sender_id()
 	if has_node(str(player_id)):
 		if Admin.CheckPermissions("Player Notes", get_node(str(player_id))):
 			Admin.RemovePlayerNote(username, note_number, player_id)
 		else:
 			Logging.log_notice("User "+Helpers.PID2Username(player_id)+" tried to edit a player's notes without permissions.")
 	
-@rpc("any_peer") func EditPlayerNote(username:String, note_number:String, new_note:String):
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_EditPlayerNote(username:String, note_number:String, new_note:String):
+	var player_id = multiplayer.get_remote_sender_id()
 	if has_node(str(player_id)):
 		if Admin.CheckPermissions("Player Notes", get_node(str(player_id))):
 			Admin.EditPlayerNote(username, note_number, new_note, player_id)
@@ -435,7 +434,7 @@ func UpdateTicket(pid:int, ticket_number:String, ticket:String):
 			Logging.log_notice("User "+Helpers.PID2Username(player_id)+" tried to edit a player's notes without permissions.")
 			
 func GetPlayerNotes():
-	var player_id = get_tree().get_remote_sender_id()
+	var player_id = multiplayer.get_remote_sender_id()
 	if has_node(str(player_id)):
 		if Admin.CheckPermissions("Player Notes", get_node(str(player_id))):
 			rpc_id(player_id, "RecievePlayerNotes", Admin.GetPlayerNotes())
@@ -446,16 +445,38 @@ func GetPlayerNotes():
 
 #misc start
 
-@rpc("any_peer") func IsClientAdmin():
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_IsClientAdmin():
+	var player_id = multiplayer.get_remote_sender_id()
 	var decision = false
 	if has_node(str(player_id)):
 		if Admin.CheckPermissions("Is Staff", get_node(str(player_id))):
 			decision = true
 	rpc_id(player_id, "VerifyClientIsAdmin", decision)
 
-@rpc("any_peer") func GetCurrentPlayers():
-	var player_id = get_tree().get_remote_sender_id()
+@rpc("any_peer") func ServRPC_GetCurrentPlayers():
+	var player_id = multiplayer.get_remote_sender_id()
 	rpc_id(player_id, "RecieveCurrentPlayers", Helpers.GetCurrentPlayerList())
 
 #misc end
+
+# BOILERPLATE BEGIN NONE OF THESE DO ANYTHING BUT GODOT 4.X REQUIRES RPCS MATCH BETWEEN CLIENT/SERVER.
+@rpc("any_peer") func RecievePlayerNotes(note_dict: Dictionary): pass
+@rpc("any_peer") func RecieveTicketsAdmin(ticket_dict:Dictionary): pass
+@rpc("any_peer") func RecieveTickets(ticket_dict:Dictionary, all_tickets:bool = false): pass
+@rpc("any_peer") func SendPersistentUUID(): pass
+@rpc("any_peer") func SendVersion(): pass
+@rpc("any_peer") func Disconnect(reason : String = ""): pass
+@rpc("any_peer") func ReturnLogin(status, message): pass
+@rpc("any_peer") func CreateAccountResults(result, message): pass
+@rpc("any_peer") func LoadWorld(worldname): pass
+@rpc("any_peer") func RecieveCharacterList(characterlist): pass
+@rpc("any_peer") func RecieveRaceList(racelist : Dictionary): pass
+@rpc("any_peer") func DespawnPlayer(player_id): pass
+@rpc("any_peer") func SpawnNewPlayer(player_id, spawn_position): pass
+@rpc("any_peer") func ReturnServerTime(server_time, client_time): pass
+@rpc("any_peer", "unreliable") func RecieveWorldState(state): pass
+@rpc("any_peer") func ReturnLatency(client_time): pass
+@rpc("any_peer") func RecieveChat(msg): pass
+@rpc("any_peer") func VerifyClientIsAdmin(decision:bool): pass 
+@rpc("any_peer") func RecieveCurrentPlayers(player_list): pass 
+
