@@ -3,11 +3,11 @@ extends Node
 @onready var TicketContainer = $HBoxContainer/PanelContainer/ScrollContainer/VBoxContainer
 @onready var TicketWindowContainer = $"../../../TicketWindowContainer"
 
-@onready var NewTicketDialog = $NewTicketDialog
-@onready var NewTicketTitle = $NewTicketDialog/VBoxContainer/TicketTitle
-@onready var NewTicketDesc = $NewTicketDialog/VBoxContainer/TicketDesc
+@onready var NewTicketDialog = %NewTicketDialog
+@onready var NewTicketTitle = $"../../../NewTicketDialog/VBoxContainer/TicketTitle"
+@onready var NewTicketDesc = $"../../../NewTicketDialog/VBoxContainer/TicketDesc"
 @onready var NewTicketPlayerSelection = $"../../../NewTicketDialog/VBoxContainer/UserNameSelection"
-@onready var NewTicketCritical = $NewTicketDialog/VBoxContainer/CriticalCheck
+@onready var NewTicketCritical = $"../../../NewTicketDialog/VBoxContainer/CriticalCheck"
 
 @onready var TicketSoundNotifPlayer = $"../../../TicketNotif"
 
@@ -23,9 +23,9 @@ var tickets : Dictionary
 var cached_tickets : Dictionary
 
 func _ready():
-	Server.connect("admin_tickets_recieved", Callable(self, "RenderTickets"))
-	Server.connect("ticket_update_recieved", Callable(self, "DoUpdate"))
-	Server.connect("player_list_recieved", Callable(self, "PopulateUserSelectionDialog"))
+	Server.admin_tickets_recieved.connect(RenderTickets)
+	Server.tickets_recieved.connect(DoUpdate)
+	Server.player_list_recieved.connect(PopulateUserSelectionDialog)
 	Server.GetTickets(true)
 	
 func DoUpdate(ticket_number:String, ticket:Dictionary):
@@ -46,9 +46,9 @@ func RenderTickets(recieved_tickets:Dictionary):
 			nmt.status = tickets[I]["Status"]
 			nmt.title = tickets[I]["Title"]
 			TicketContainer.add_child(nmt)
-			nmt.connect("ticket_box_clicked", Callable(self, "OpenTicketWindow"))
-			nmt.connect("close_button_pressed", Callable(self, "CloseTicket"))
-			nmt.connect("claim_button_pressed", Callable(self, "ClaimTicket"))
+			nmt.ticket_box_clicked.connect(OpenTicketWindow)
+			nmt.close_button_pressed.connect(CloseTicket)
+			nmt.claim_button_pressed.connect(ClaimTicket)
 		if TicketContainer.has_node(I):
 			TicketContainer.get_node(I).status = tickets[I]["Status"]
 			TicketContainer.get_node(I).OnUpdate()
@@ -69,7 +69,7 @@ func OpenTicketWindow(ticket_number:String):
 		ntw.ticket = tickets[ticket_number].duplicate(true)
 		ntw.name = ticket_number
 		ntw.ticket_number = ticket_number
-		ntw.connect("message_sent", Callable(self, "SendTicketMessage"))
+		ntw.message_sent.connect(SendTicketMessage)
 		TicketWindowContainer.add_child(ntw)
 		ntw.popup()
 	else:

@@ -1,17 +1,26 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=7 format=3 uid="uid://bbiyb8t62nqtf"]
 
-[ext_resource path="res://fonts/titillium-web/TitilliumWeb-SemiBold.ttf" type="FontFile" id=1]
-[ext_resource path="res://scripts/menus/characterselectionsubscenes/CharacterSelectBar.gd" type="Script" id=2]
-[ext_resource path="res://themes/angluar_panel_box.tres" type="Theme" id=3]
+[ext_resource type="FontFile" uid="uid://dvawglhcp46vu" path="res://fonts/titillium-web/TitilliumWeb-SemiBold.ttf" id="1"]
+[ext_resource type="Script" path="res://scripts/menus/characterselectionsubscenes/CharacterSelectBar.gd" id="2"]
+[ext_resource type="Theme" uid="uid://cakbdiympnnj6" path="res://themes/angluar_panel_box.tres" id="3"]
+[ext_resource type="Theme" uid="uid://xjwshynbp6sr" path="res://themes/button_theme.tres" id="4_28l3j"]
+[ext_resource type="Texture2D" uid="uid://dkyyxtndooyi1" path="res://fonts/fontawesome-free-6.4.0-desktop/svgs/solid/trash.svg" id="4_i4s7r"]
 
-[sub_resource type="FontFile" id=16]
-size = 20
-outline_size = 1
-outline_color = Color( 0, 0, 0, 1 )
-use_filter = true
-font_data = ExtResource( 1 )
+[sub_resource type="FontFile" id="16"]
+fallbacks = Array[Font]([ExtResource("1")])
+face_index = null
+embolden = null
+transform = null
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
 
 [node name="CharacterSelectBar" type="Panel"]
+custom_minimum_size = Vector2(200, 30)
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -20,48 +29,42 @@ offset_left = -245.0
 offset_top = -31.0
 offset_right = -45.0
 offset_bottom = -1.0
-custom_minimum_size = Vector2( 200, 30 )
 size_flags_horizontal = 2
 size_flags_vertical = 2
-theme = ExtResource( 3 )
-script = ExtResource( 2 )
+theme = ExtResource("3")
+script = ExtResource("2")
 
 [node name="SelectButton" type="Button" parent="."]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = -13.0
 flat = true
 
 [node name="CharacterSelectButton" type="Label" parent="."]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme_override_fonts/font = SubResource( 16 )
-align = 1
-valign = 1
+theme_override_fonts/font = SubResource("16")
 
 [node name="DeleteButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -10.0
-offset_top = -3.0
-offset_right = 3.0
-offset_bottom = 15.0
-text = "X"
+offset_left = 5.0
+offset_right = 25.0
+offset_bottom = 20.0
+grow_horizontal = 0
+theme = ExtResource("4_28l3j")
+icon = ExtResource("4_i4s7r")
 icon_alignment = 1
+expand_icon = true
 
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="DeleteButton"]
-anchor_left = -4.58108
-anchor_top = 1.7619
-anchor_right = -0.297297
-anchor_bottom = 3.54762
-exclusive = true
-window_title = "Delete Character"
-resizable = true
+size = Vector2i(381, 105)
 dialog_text = "Are you sure you want to delete this character?
 This cannot be undone."
-__meta__ = {
-"_edit_use_anchors_": true
-}
 
 [connection signal="pressed" from="SelectButton" to="." method="_on_SelectButton_pressed"]
 [connection signal="pressed" from="DeleteButton" to="." method="_on_DeleteButton_pressed"]

@@ -34,21 +34,24 @@ func _on_LoginButton_pressed():
 		var username = username_input.get_text()
 		var password = userpassword_input.get_text()
 		print("Attempting to Login...")
+		Gui.CreateFloatingMessage("Attempting to connect to server...", "neutral")
 		Server.ConnectToServer()
+		Server.multiplayer.connection_failed.connect(_OnConnectionFailed)
+		Server.multiplayer.server_disconnected.connect(_OnDisconnected)
+		await Server.multiplayer.connected_to_server
 		Server.Login(username, password, Globals.uuid, Globals.persistent_uuid)
 		username = ""
 		password = ""
-		Server.multiplayer.connect("connection_failed", Callable(self, "_OnConnectionFailed"))
-		Server.multiplayer.connect("server_disconnected", Callable(self, "_OnDisconnected"))
-		Gui.CreateFloatingMessage("Attempting to connect to server...", "neutral")
 		
 func _OnConnectionFailed():
 	Gui.CreateFloatingMessage("Failed to connect to server.", "bad")
-	Server.multiplayer.disconnect("connection_failed", Callable(self, "_OnConnectionFailed"))
+	Server.multiplayer.connection_failed.disconnect(_OnConnectionFailed)
+	Server.multiplayer.connection_failed.disconnect(_OnConnectionFailed)
 	EnableInputs()
 	
 func _OnDisconnected():
-	Server.multiplayer.disconnect("server_disconnected", Callable(self, "_OnDisconnected"))
+	Server.multiplayer.server_disconnected.disconnect(_OnDisconnected)
+	Server.multiplayer.connection_failed.disconnect(_OnConnectionFailed)
 	print("disconnected")
 	EnableInputs()
 	

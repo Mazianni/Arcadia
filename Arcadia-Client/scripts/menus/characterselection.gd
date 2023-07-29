@@ -5,7 +5,10 @@ var CharacterCreationScreenResource = preload("res://scenes/CharacterCreation.ts
 
 func _ready():
 	Server.connect("character_list_recieved", Callable(self, "RenderSlots"))
-	Server.RequestCharacterList()
+	if Globals.CharacterList.size() == 0:
+		Server.RequestCharacterList()
+	else:
+		RenderSlots()
 
 func RenderSlots():
 	var remaining_slots = 6
@@ -50,3 +53,7 @@ func SelectCharacter(uuid, is_new):
 		
 func DeleteCharacter(uuid):
 	Server.DeleteCharacter(uuid)
+	
+func RefreshCharacterList():
+	Server.RequestCharacterList()
+	RenderSlots()

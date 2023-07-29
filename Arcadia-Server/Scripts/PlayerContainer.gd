@@ -1,4 +1,4 @@
-extends Node
+class_name PlayerContainer extends Node
 
 var ActiveCharacterPath = preload("res://Scenes/Instances/ActiveCharacter.tscn")
 
@@ -6,9 +6,12 @@ var PlayerStats
 var HasLoaded = false
 var PlayerData : Dictionary =  {"username":"", "displayname":"", "rank":"", "ooc_color":"", "character_dict":{},"lastlogin":0, "persistent_uuid":""}
 var associated_uuid
-var ActiveCharacter : ActiveCharacter
+var associated_pid # godot node names are a special type in 4.0, not strings.
+var CurrentActiveCharacter : ActiveCharacter
+var ClientState
 
 signal loaded
+signal load_failed(pid)
 
 func _ready():
 	connect("tree_exiting", Callable(self, "OnDeleted"))
@@ -23,6 +26,24 @@ func MigrateSaveData(): #IMPL whatever the fuck this was
 #			PlayerData[I] = DataRepository.DefaultPlayerDataPlayerData[I]
 	#		Logging.log_warning("[SAVES] Key "+I+" not found in "+PlayerData["username"]+"'s save. Adding.")
 	
+func HandleStateUpdate(client_state):
+	if not client_state:
+		Logging.log_error("[PLAYER CONTAINER] HandleStateUpdate called with a null arg on "+name+" "+PlayerData["username"])
+		return
+		
+	match client_state:
+		DataRepository.CLIENT_STATE_LIST.CLIENT_PREGAME:
+			ClientState = DataRepository.CLIENT_STATE_LIST.CLIENT_PREGAME
+			if CurrentActiveCharacter:
+				Logging.log_notice("[PLAYER CONTAINER] ClientState for "+name+" "+PlayerData["username"]+" going from INGAME to PREGAME.")
+				if CurrentActiveCharacter.CurrentCollider:
+					CurrentActiveCharacter.CurrentCollider.queue_free()
+				CurrentActiveCharacter.queue_free()
+				
+		DataRepository.CLIENT_STATE_LIST.CLIENT_INGAME:
+			Logging.log_notice("[PLAYER CONTAINER] ClientState for "+name+" "+PlayerData["username"]+" going from PREGAME to INGAME.")
+			ClientState = DataRepository.CLIENT_STATE_LIST.CLIENT_INGAME
+			
 func OnDeleted():
 	WriteSaveData()
 
@@ -31,6 +52,9 @@ func CheckSaveDataExists(): #Verify that the directory and JSON file for this pl
 	print(DataRepository.saves_directory)
 	print(save_dir)
 	var dir = DirAccess.open(save_dir)
+	if DirAccess.get_open_error():
+		Logging.log_error("[FILE] Error opening directory "+save_dir)
+		return
 	Logging.log_notice("Checking save data for " + str(PlayerData["username"]))
 	if not dir.dir_exists(save_dir):
 		dir.make_dir(save_dir)
@@ -46,15 +70,11 @@ func CheckSaveDataExists(): #Verify that the directory and JSON file for this pl
 func LoadSaveData():
 	var save_dir = DataRepository.saves_directory + "/" + str(PlayerData["username"])
 	var save_file = save_dir+"/"+str(PlayerData["username"])+".json"
-	var load_dict : Dictionary = {}
-	var loadfile = FileAccess.open(save_file, FileAccess.READ)
-	var temp
-	temp = loadfile.get_as_text()
-	var test_json_conv = JSON.new()
-	test_json_conv.parse(temp)
-	load_dict = test_json_conv.get_data()
-	PlayerData = load_dict.duplicate(true)
-	loadfile.close()
+	var return_dict : Dictionary = SaveHandler.ReadFile(save_file)
+	if not return_dict: #IMPLEMENT handling for a failure to load player data.
+		Logging.log_error("[FILE] SaveHandler returned null data for "+str(PlayerData["username"]))
+		return
+	PlayerData = return_dict.duplicate(true)
 	HasLoaded = true
 	emit_signal("loaded", self.name)
 	
@@ -88,25 +108,25 @@ func DeleteCharacter(char_name):
 	WriteSaveData()
 	
 func CreateActiveCharacter(character_name, player_id):
-	ActiveCharacter = ActiveCharacterPath.instantiate()
-	ActiveCharacter.name = character_name
-	ActiveCharacter.ActiveController = self
-	self.add_child(ActiveCharacter)
+	CurrentActiveCharacter = ActiveCharacterPath.instantiate()
+	CurrentActiveCharacter.name = character_name
+	CurrentActiveCharacter.ActiveController = self
+	self.add_child(CurrentActiveCharacter)
 	Logging.log_notice("Loading existing character for "+str(player_id)+": "+character_name)
-	ActiveCharacter.CharacterData["LastPlayed"] = Time.get_unix_time_from_system()
+	CurrentActiveCharacter.CharacterData["LastPlayed"] = Time.get_unix_time_from_system()
 	
 func CreateNewActiveCharacter(cuuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height):
 	Logging.log_notice("Creating new character for "+PlayerData["username"]+": "+character_name+" UUID "+str(cuuid))
-	ActiveCharacter = ActiveCharacterPath.instantiate()
-	ActiveCharacter.name = cuuid
-	ActiveCharacter.ActiveController = self
-	ActiveCharacter.CreateNewCharacter(cuuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height)
-	ActiveCharacter.CurrentMap = DataRepository.spawns[DataRepository.races[species_name].valid_spawns[0]]["MapName"]
-	ActiveCharacter.CurrentPosition = DataRepository.spawns[DataRepository.races[species_name].valid_spawns[0]]["pos"]
+	CurrentActiveCharacter = ActiveCharacterPath.instantiate()
+	CurrentActiveCharacter.name = cuuid
+	CurrentActiveCharacter.ActiveController = self
+	CurrentActiveCharacter.CreateNewCharacter(cuuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height)
+	CurrentActiveCharacter.CurrentMap = DataRepository.spawns[DataRepository.races[species_name].valid_spawns[0]]["MapName"]
+	CurrentActiveCharacter.CurrentPosition = DataRepository.spawns[DataRepository.races[species_name].valid_spawns[0]]["pos"]
 	PlayerData["character_dict"][cuuid] = character_name
-	self.add_child(ActiveCharacter)
+	self.add_child(CurrentActiveCharacter)
 	WriteSaveData()
-	ActiveCharacter.WriteJSON(cuuid)
+	CurrentActiveCharacter.WriteJSON(cuuid)
 	
 	
 	

@@ -2,6 +2,7 @@ extends Node
 
 # This file exists mostly to hold all the singleton declarations which are copied or referenced at one point or another.
 
+enum CLIENT_STATE_LIST {CLIENT_UNAUTHENTICATED, CLIENT_PREGAME, CLIENT_INGAME}
 enum SERVER_STATE {SERVER_LOADING, SERVER_LOADED, SERVER_SHUTTING_DOWN}
 enum MESSAGE_TYPE {NORMAL, YELL}
 

@@ -2,7 +2,7 @@ extends Control
 
 @onready var ChatBar = $ChatboxContainer/Chatbox/ChatInput/OneLineChat
 @onready var RPBox = $RPDialog/MarginContainer/RPBox/TextEdit
-@onready var AdminButton = $GridContainer/AdminButton
+@onready var AdminButton = $GridContainer/AdminPanelButton
 @onready var TicketViewerResource = load("res://scenes/TicketViewer.tscn")
 @onready var AdminPanelResource = load("res://scenes/Admin/AdminPanel.tscn")
 

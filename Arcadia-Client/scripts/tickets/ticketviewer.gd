@@ -1,4 +1,4 @@
-extends Node
+extends Window
 
 @onready var TicketContainer = $"Panel/HBoxContainer/PanelContainer/Your Tickets/VBoxContainer"
 @onready var NewTicketButton = $Panel/HBoxContainer/VBoxContainer/NewTicket
@@ -76,7 +76,7 @@ func CreateTicket():
 	if !NewTicketDesc.text:
 		Gui.CreateFloatingMessage("A description is required to open a new ticket.", "bad")	
 		return
-	Server.OpenTicket(NewTicketTitle.text, NewTicketDesc.text, "", NewTicketCritical.pressed)
+	Server.OpenTicket(NewTicketTitle.text, NewTicketDesc.text, "", NewTicketCritical.button_pressed)
 	NewTicketTitle.text = ""
 	NewTicketDesc.text = ""
 	NewTicketCritical.button_pressed = false
@@ -112,3 +112,9 @@ func _on_TicketDesc_focus_exited():
 
 func _on_TicketViewer_about_to_show():
 	Server.GetTickets()
+
+func _on_new_ticket_dialog_close_requested():
+	NewTicketDialog.hide()
+
+func _on_close_requested():
+	self.hide()

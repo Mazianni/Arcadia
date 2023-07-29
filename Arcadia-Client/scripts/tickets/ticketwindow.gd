@@ -1,4 +1,4 @@
-extends Node
+extends Window
 
 @onready var MessageBox = $VBoxContainer/Panel/ScrollContainer/VBoxContainer
 @onready var TextInput = $VBoxContainer/TextEdit
@@ -11,7 +11,7 @@ signal message_sent(message, ticket_number)
 
 func _ready():
 	RenderMessages()
-	self.window_title = "#"+ticket_number + " - " +ticket["Title"]
+	self.title = "#"+ticket_number + " - " +ticket["Title"]
 	
 func RenderMessages():
 	for L in MessageBox.get_children():
@@ -29,3 +29,5 @@ func _input(event):
 			emit_signal("message_sent", $VBoxContainer/TextEdit.text, ticket_number)
 			$VBoxContainer/TextEdit.text = ""
 		
+func _on_close_requested():
+	queue_free()

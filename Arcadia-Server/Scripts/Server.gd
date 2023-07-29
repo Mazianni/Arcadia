@@ -1,6 +1,30 @@
 extends Node
 
-
+# BOILERPLATE BEGIN NONE OF THESE DO ANYTHING BUT GODOT 4.X REQUIRES RPCS MATCH BETWEEN CLIENT/SERVER.
+@rpc("any_peer") func ReturnLatency(client_time): pass
+@rpc("any_peer", "unreliable") func RecieveWorldState(state): pass
+@rpc("any_peer") func ReturnServerTime(server_time, client_time): pass
+@rpc("any_peer") func SpawnNewPlayer(player_id, spawn_position): pass
+@rpc("any_peer") func DespawnPlayer(player_id): pass
+@rpc("any_peer") func RecieveRaceList(racelist : Dictionary): pass
+@rpc("any_peer") func RecieveCharacterList(characterlist): pass
+@rpc("any_peer") func LoadWorld(worldname): pass
+@rpc("any_peer") func CreateAccountResults(result, message): pass
+@rpc("any_peer") func ReturnLogin(status, message): pass
+@rpc("any_peer") func RecieveChat(msg): pass
+@rpc("any_peer") func Disconnect(reason : String = ""): pass
+@rpc("any_peer") func SendVersion(): pass
+@rpc("any_peer") func SendPersistentUUID(): pass
+@rpc("any_peer") func RecieveTicketsAdmin(ticket_dict:Dictionary): pass
+@rpc("any_peer") func RecieveTickets(ticket_dict:Dictionary, all_tickets:bool = false): pass
+@rpc("any_peer") func ClientRPC_UpdateTicket(ticket_number:String, ticket_dict:Dictionary): pass
+@rpc("any_peer") func RecievePlayerNotes(note_dict: Dictionary): pass
+@rpc("any_peer") func RecieveCurrentPlayers(player_list): pass
+@rpc("any_peer") func VerifyClientIsAdmin(decision:bool): pass
+@rpc("any_peer") func ReportClientState(client_state): pass
+@rpc("any_peer") func RecieveClientStateSync(client_state): pass
+@rpc("any_peer") func ClientRPC_ReturnCharacterLoadFailed(pid): pass
+	
 var network : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 var port = 5000
 var max_players = 300
@@ -10,6 +34,8 @@ var characters_awaiting_creation = {}
 
 @onready var uuid_generator = preload("res://uuid.gd")
 @onready var player_container_scene = preload("res://Scenes/Instances/PlayerContainer.tscn")
+
+signal character_load_failed
 
 func _ready():
 	StartServer()
@@ -43,6 +69,7 @@ func GeneratePlayerStates(uuid, state):
 			
 func SendWorldState(world_state):
 	rpc_id(0, "RecieveWorldState", world_state)
+	
 	
 @rpc("any_peer") func ServRPC_FetchServerTime(client_time):
 	var player_id = multiplayer.get_remote_sender_id()
@@ -80,9 +107,11 @@ func SendPlayerCharacterList(player_id):
 	
 @rpc("any_peer") func ServRPC_CreateExistingCharacter(cuuid):
 	var player_id = multiplayer.get_remote_sender_id()
-	if has_node(str(player_id)):
-			get_node(str(player_id)).CreateActiveCharacter(cuuid, player_id)
-			ReturnCharacterLoaded(player_id, get_node(str(player_id)).ActiveCharacter.CurrentMap)
+	if has_node(str(player_id)): #IMPLEMENT blocking code based on server state
+			var playernode : PlayerContainer = get_node(str(player_id))
+			playernode.CreateActiveCharacter(cuuid, player_id)
+			await playernode.CurrentActiveCharacter.load_success
+			ReturnCharacterLoaded(player_id, get_node(str(player_id)).CurrentActiveCharacter.CurrentMap)
 			
 @rpc("any_peer") func ServRPC_RequestNewCharacter(species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height):
 	var player_id = multiplayer.get_remote_sender_id()
@@ -97,7 +126,22 @@ func SendPlayerCharacterList(player_id):
 		
 func ReturnCharacterLoaded(pid, worldname):
 	rpc_id(pid, "LoadWorld", worldname)
+	
+func ReturnCharacterLoadFailed(pid):
+	rpc_id(pid, "ClientRPC_ReturnCharacterLoadFailed")
 #character handling end
+
+#client state reporting
+
+@rpc("any_peer") func ServRPC_RecieveClientState(client_state):
+	var player_id = multiplayer.get_remote_sender_id()
+	if has_node(str(player_id)):
+		get_node(str(player_id)).HandleStateUpdate(client_state)
+		
+func SetClientState(client_state, player_id): #forcefully sets a client's state.
+	rpc_id(player_id, "RecieveClientStateSync", client_state)
+
+#end client state reporting
 
 #character creation handling start
 
@@ -154,7 +198,7 @@ func CheckPlayerApprovedForRace(username, race):
 	if bancheck:
 		match bancheck:
 			FAILED:
-				message = "Connection Rejected: /nBanned User/IP"
+				message = "Connection Rejected: \nBanned User/IP"
 				Logging.log_notice("[AUTH] Connection from PID" + str(player_id) + " failed: Banned user.")
 			ERR_PARSE_ERROR:
 				Logging.log_error("[AUTH] Login attempt from PID" + str(player_id) + " failed: Malformed login information.")
@@ -249,6 +293,7 @@ func CreatePlayerContainer(player_id, uuid):
 	var new_player_container = player_container_scene.instantiate()
 	new_player_container.name = str(player_id)
 	new_player_container.associated_uuid = uuid
+	new_player_container.associated_pid = player_id
 	self.add_child(new_player_container, true)
 	var player_container = get_node("../Server/"+ str(player_id))
 	FillPlayerContainer(player_container, player_id, uuid)
@@ -356,8 +401,8 @@ func CheckClientVersion(player_id, clientversion):
 func PushTicketsToClient(pid:int, tickets):
 	rpc_id(pid, "RecieveTickets", tickets, false)
 
-func UpdateTicket(pid:int, ticket_number:String, ticket:String):
-	rpc_id(pid, "UpdateTicket", ticket_number, ticket)
+func UpdateTicket(pid:int, ticket_number:String, ticket:Dictionary):
+	rpc_id(pid, "ClientRPC_UpdateTicket", ticket_number, ticket)
 	
 @rpc("any_peer") func ServRPC_UpdateSoloTicket(ticket_number:String):
 	var player_id = multiplayer.get_remote_sender_id()
@@ -433,7 +478,7 @@ func UpdateTicket(pid:int, ticket_number:String, ticket:String):
 		else:
 			Logging.log_notice("User "+Helpers.PID2Username(player_id)+" tried to edit a player's notes without permissions.")
 			
-func GetPlayerNotes():
+@rpc("any_peer") func ServRPC_GetPlayerNotes():
 	var player_id = multiplayer.get_remote_sender_id()
 	if has_node(str(player_id)):
 		if Admin.CheckPermissions("Player Notes", get_node(str(player_id))):
@@ -459,24 +504,4 @@ func GetPlayerNotes():
 
 #misc end
 
-# BOILERPLATE BEGIN NONE OF THESE DO ANYTHING BUT GODOT 4.X REQUIRES RPCS MATCH BETWEEN CLIENT/SERVER.
-@rpc("any_peer") func RecievePlayerNotes(note_dict: Dictionary): pass
-@rpc("any_peer") func RecieveTicketsAdmin(ticket_dict:Dictionary): pass
-@rpc("any_peer") func RecieveTickets(ticket_dict:Dictionary, all_tickets:bool = false): pass
-@rpc("any_peer") func SendPersistentUUID(): pass
-@rpc("any_peer") func SendVersion(): pass
-@rpc("any_peer") func Disconnect(reason : String = ""): pass
-@rpc("any_peer") func ReturnLogin(status, message): pass
-@rpc("any_peer") func CreateAccountResults(result, message): pass
-@rpc("any_peer") func LoadWorld(worldname): pass
-@rpc("any_peer") func RecieveCharacterList(characterlist): pass
-@rpc("any_peer") func RecieveRaceList(racelist : Dictionary): pass
-@rpc("any_peer") func DespawnPlayer(player_id): pass
-@rpc("any_peer") func SpawnNewPlayer(player_id, spawn_position): pass
-@rpc("any_peer") func ReturnServerTime(server_time, client_time): pass
-@rpc("any_peer", "unreliable") func RecieveWorldState(state): pass
-@rpc("any_peer") func ReturnLatency(client_time): pass
-@rpc("any_peer") func RecieveChat(msg): pass
-@rpc("any_peer") func VerifyClientIsAdmin(decision:bool): pass 
-@rpc("any_peer") func RecieveCurrentPlayers(player_list): pass 
 

@@ -1,8 +1,9 @@
 class_name ActiveCharacter extends Node
 
+@onready var Server = get_tree().get_root().get_node("Server")
 var IsNewCharacter = false
 var BaseSpecies : SpeciesBase
-var ActiveController : Node
+var ActiveController : PlayerContainer
 var CurrentPosition : Vector2
 var CurrentMap : String
 var CurrentCollider
@@ -30,19 +31,33 @@ var CharacterData : Dictionary = {
 	"LastPlayed":0
 }
 
+signal load_success
+signal load_failed(pid)
+
 func _ready():
 	connect("tree_exiting", Callable(self, "OnDeleted"))
+	load_failed.connect(Callable(Server,"ReturnCharacterLoadFailed"))
+	load_failed.connect(Callable(self,"OnLoadFailed"))
 	if IsNewCharacter != true:
 		LoadJSON(self.name)
 	if not CheckJSONExists(self.name): #check if JSON exists, if not, create and store defaults.
 		IsNewCharacter = true
-	
+	await load_success
 	CreateCollider()
+	load_failed.disconnect(Callable(self,"OnLoadFailed"))
+	load_failed.disconnect(Callable(Server,"ReturnCharacterLoadFailed"))
 	
 func OnDeleted():
 	WriteJSON(CharacterData["uuid"])
-	CurrentCollider.queue_free()
+	if CurrentCollider:
+		CurrentCollider.queue_free()
+	if ActiveController:
+		ActiveController.CurrentActiveCharacter = null
 		
+func OnLoadFailed(pid):
+	Server.SetClientState(DataRepository.CLIENT_STATE_LIST.CLIENT_PREGAME, ActiveController.associated_pid)
+	queue_free()
+	
 func CheckJSONExists(character_name):
 	var save_dir = DataRepository.saves_directory + "/" + str(ActiveController.PlayerData["username"])
 	var save_file = save_dir+"/"+str(character_name)+".json"
@@ -66,20 +81,23 @@ func LoadJSON(character_name):
 	if(loadfile.get_error()):
 		Logging.log_error("[FILE] Error loading save file for "+character_name+" username "+ActiveController.PlayerData["username"])
 		loadfile.close()
+		load_failed.emit(ActiveController.associated_pid)
 		return
 	if(test_json_conv.get_error_message()):
 		Logging.log_error("[FILE] Error parsing JSON for "+character_name+" username "+ActiveController.PlayerData["username"])
 		loadfile.close()
+		load_failed.emit(ActiveController.associated_pid)
 		return
 	if(test_json_conv.get_data() == null):
 		Logging.log_error("[FILE] Null data/corrupt data parsed in save file for "+character_name+" username "+ActiveController.PlayerData["username"])
+		load_failed.emit(ActiveController.associated_pid)
 		loadfile.close()
 		return
-	print(str(test_json_conv.get_data()))
 	load_dict = test_json_conv.get_data()
 	CharacterData = load_dict.duplicate(true)
 	BaseSpecies = DataRepository.races[CharacterData["Species"]]
-	loadfile.close()	
+	loadfile.close()
+	emit_signal("load_success")
 		
 func WriteJSON(character_name):
 	var save_dir = DataRepository.saves_directory + "/" + str(ActiveController.PlayerData["username"])
@@ -97,7 +115,6 @@ func CreateCollider():
 	new_collider.name = CharacterData["uuid"]
 	new_collider.ControllingCharacter = self
 	CurrentCollider = new_collider
-	print("fart")
 	if CharacterData["LastMap"]:
 		DataRepository.MapManager.MovePlayerToMapStandalone(new_collider, CharacterData["LastMap"], Helpers.string_to_vector2(CharacterData["LastPosition"]))
 		

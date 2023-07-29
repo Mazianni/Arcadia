@@ -1,8 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://cuihtpkcpv6qq"]
+[gd_scene load_steps=6 format=3 uid="uid://cuihtpkcpv6qq"]
 
-[ext_resource type="FontFile" uid="uid://dvawglhcp46vu" path="res://fonts/titillium-web/TitilliumWeb-SemiBold.ttf" id="1"]
 [ext_resource type="Script" path="res://scripts/menus/floatingmsgbox/messagebox.gd" id="2"]
 [ext_resource type="Theme" uid="uid://bhc3t63rlcktd" path="res://themes/box_theme.tres" id="3"]
+[ext_resource type="Theme" uid="uid://ct384odpdduql" path="res://themes/chattheme.tres" id="3_ouf7p"]
 
 [sub_resource type="Animation" id="5"]
 resource_name = "flash"
@@ -24,18 +24,6 @@ tracks/0/keys = {
 _data = {
 "flash": SubResource("5")
 }
-
-[sub_resource type="FontFile" id="6"]
-fallbacks = Array[Font]([ExtResource("1")])
-face_index = null
-embolden = null
-transform = null
-cache/0/16/0/ascent = 0.0
-cache/0/16/0/descent = 0.0
-cache/0/16/0/underline_position = 0.0
-cache/0/16/0/underline_thickness = 0.0
-cache/0/16/0/scale = 1.0
-cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
 
 [node name="FloatingMessageBox" type="MarginContainer"]
 anchors_preset = 15
@@ -70,7 +58,8 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="CenterContainer"]
 layout_mode = 2
-theme_override_fonts/font = SubResource("6")
+theme = ExtResource("3_ouf7p")
+autowrap_mode = 3
 
 [connection signal="timeout" from="FadeoutTimer" to="." method="_on_Timer_timeout"]
 [connection signal="timeout" from="DeleteTimer" to="." method="_on_DeleteTimer_timeout"]

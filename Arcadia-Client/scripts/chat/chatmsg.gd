@@ -5,6 +5,10 @@ var is_emote : bool = false
 var timestamp : String
 var msgtext : String
 var category : String
+@onready var themeresource = load("res://themes/chattheme.tres")
+
+func _ready():
+	theme = themeresource
 
 func ParseMessage(msg:Dictionary):
 	is_emote = msg["is_emote"]
@@ -18,4 +22,6 @@ func DrawMsg():
 	if display_timestamps:
 		t = "["+timestamp+"] "
 	text = msgtext
+	var themefont : Font = theme.get_font("mono_font", "RichTextLabel")
+	custom_minimum_size = themefont.get_multiline_string_size(text)
 		

@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://c42m1mvjav3e1"]
+[gd_scene load_steps=7 format=3 uid="uid://c42m1mvjav3e1"]
 
 [ext_resource type="AudioStream" uid="uid://dkxli8xwxgfyq" path="res://sounds/adminhelp.ogg" id="1"]
+[ext_resource type="Script" path="res://scripts/admin/adminpanel.gd" id="1_5b5er"]
 [ext_resource type="FontFile" uid="uid://v12ky2oersqn" path="res://fonts/titillium-web/TitilliumWeb-Regular.ttf" id="2"]
 [ext_resource type="Script" path="res://scripts/tickets/adminticketviewer.gd" id="4"]
 [ext_resource type="Script" path="res://scripts/playernotes/player_notes_viewer.gd" id="5"]
@@ -22,6 +23,7 @@ title = "Administrative Panel"
 position = Vector2i(11, 46)
 size = Vector2i(500, 500)
 popup_window = true
+script = ExtResource("1_5b5er")
 
 [node name="Control" type="Panel" parent="."]
 anchors_preset = 15
@@ -113,9 +115,11 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="NewTicketDialog" type="Window" parent="."]
+unique_name_in_owner = true
 title = "New Ticket"
 position = Vector2i(648, 36)
 size = Vector2i(300, 300)
+visible = false
 transient = true
 popup_window = true
 
@@ -163,6 +167,7 @@ text = "Open Ticket"
 title = "Add Player To Ticket"
 position = Vector2i(526, 36)
 size = Vector2i(300, 300)
+visible = false
 transient = true
 popup_window = true
 
@@ -194,6 +199,7 @@ text = "Add Player"
 title = "Edit Note"
 position = Vector2i(648, 380)
 size = Vector2i(300, 260)
+visible = false
 transient = true
 popup_window = true
 
@@ -220,6 +226,7 @@ text = "Submit Note"
 title = "Add Note"
 position = Vector2i(526, 390)
 size = Vector2i(300, 260)
+visible = false
 transient = true
 popup_window = true
 
@@ -253,13 +260,18 @@ text = "Submit Note"
 wait_time = 10.0
 autostart = true
 
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
 [connection signal="pressed" from="Control/TabContainer/Player Notes/HBoxContainer/VBoxContainer/ShowOnlyExistingNotes" to="Control/TabContainer/Player Notes" method="_on_ShowOnlyExistingNotes_pressed"]
 [connection signal="tab_hovered" from="Control/TabContainer/Tickets" to="Control/TabContainer/Tickets" method="_on_Tickets_tab_hover"]
 [connection signal="pressed" from="Control/TabContainer/Tickets/HBoxContainer/VBoxContainer/NewTicketWithPlayer" to="Control/TabContainer/Tickets" method="_on_NewTicketWithPlayer_pressed"]
 [connection signal="pressed" from="Control/TabContainer/Tickets/HBoxContainer/VBoxContainer/AddPlayerToTicket" to="Control/TabContainer/Tickets" method="_on_AddPlayerToTicket_pressed"]
 [connection signal="about_to_popup" from="NewTicketDialog" to="Control/TabContainer/Tickets" method="_on_NewTicketDialog_about_to_show"]
+[connection signal="close_requested" from="NewTicketDialog" to="." method="_on_new_ticket_dialog_close_requested"]
 [connection signal="about_to_popup" from="AddPlayerToTicketDialog" to="Control/TabContainer/Tickets" method="_on_AddPlayerToTicketDialog_about_to_show"]
+[connection signal="close_requested" from="AddPlayerToTicketDialog" to="." method="_on_add_player_to_ticket_dialog_close_requested"]
 [connection signal="pressed" from="AddPlayerToTicketDialog/VBoxContainer/AddButton" to="Control/TabContainer/Tickets" method="_on_AddButton_pressed"]
+[connection signal="close_requested" from="EditNoteDialog" to="." method="_on_edit_note_dialog_close_requested"]
 [connection signal="pressed" from="EditNoteDialog/VBoxContainer/NoteEditConfirm" to="Control/TabContainer/Player Notes" method="_on_NoteEditConfirm_pressed"]
+[connection signal="close_requested" from="AddNoteDialog" to="." method="_on_add_note_dialog_close_requested"]
 [connection signal="pressed" from="AddNoteDialog/VBoxContainer/NoteAddConfirm" to="Control/TabContainer/Player Notes" method="_on_NoteAddConfirm_pressed"]
 [connection signal="timeout" from="TicketRefreshTimer" to="Control/TabContainer/Tickets" method="_on_Timer_timeout"]

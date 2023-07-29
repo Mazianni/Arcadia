@@ -1,0 +1,14 @@
+[gd_resource type="Theme" load_steps=6 format=3 uid="uid://ct384odpdduql"]
+
+[ext_resource type="FontFile" uid="uid://c6e5pcw0f4xh1" path="res://fonts/titillium-web/TitilliumWeb-Bold.ttf" id="1_ofdji"]
+[ext_resource type="FontFile" uid="uid://cxgrxxgipxf1" path="res://fonts/titillium-web/TitilliumWeb-BoldItalic.ttf" id="2_hieko"]
+[ext_resource type="FontFile" uid="uid://da22l5ytmi0hn" path="res://fonts/titillium-web/TitilliumWeb-Italic.ttf" id="3_8qfiq"]
+[ext_resource type="FontFile" uid="uid://y783c6ovqukc" path="res://fonts/titillium-web/TitilliumWeb-Light.ttf" id="4_tbdfp"]
+[ext_resource type="FontFile" uid="uid://v12ky2oersqn" path="res://fonts/titillium-web/TitilliumWeb-Regular.ttf" id="5_w0xh1"]
+
+[resource]
+RichTextLabel/fonts/bold_font = ExtResource("1_ofdji")
+RichTextLabel/fonts/bold_italics_font = ExtResource("2_hieko")
+RichTextLabel/fonts/italics_font = ExtResource("3_8qfiq")
+RichTextLabel/fonts/mono_font = ExtResource("4_tbdfp")
+RichTextLabel/fonts/normal_font = ExtResource("5_w0xh1")

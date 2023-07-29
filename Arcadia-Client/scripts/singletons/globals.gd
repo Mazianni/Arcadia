@@ -1,5 +1,7 @@
 extends Node
 
+@onready var maphandler = get_tree().get_root().get_node("RootNode/Maphandler")
+
 enum RANK_FLAGS {NONE, MANAGE_TICKETS, IS_STAFF}
 enum TICKET_FLAGS {TICKET_OPEN, TICKET_STAFF_ASSIGNED, TICKET_CLOSED}
 
@@ -46,6 +48,19 @@ func _ready():
 	CheckPersistentUUIDExists()
 	Settings.LoadSettingsFromJSON()
 	
+func SetClientState(new_state):
+	client_state = new_state
+	Server.ReportClientState(client_state)
+	match new_state:
+		CLIENT_STATE_LIST.CLIENT_PREGAME:
+			Gui.ChangeGUIScene("CharacterSelect")				
+			maphandler.ClearScenes()
+		CLIENT_STATE_LIST.CLIENT_INGAME:
+			Gui.ChangeGUIScene("MainGameUI")
+		CLIENT_STATE_LIST.CLIENT_UNAUTHENTICATED:
+			Gui.ChangeGUIScene("LoginScreen")				
+			maphandler.ClearScenes()
+				
 func CheckSettingsExist():
 	var save_dir = "user://"
 	var newsave = FileAccess.open(save_dir, FileAccess.READ)

@@ -1,5 +1,37 @@
 extends Node
 
+#BOILERPLATE BEGIN NONE OF THESE DO ANYTHING BUT GODOT 4.X REQUIRES MATCHING RPCS BETWEEN CLIENT/SERVER.
+@rpc("any_peer") func ServRPC_FetchServerTime(client_time): pass
+@rpc("any_peer") func ServRPC_DetermineLatency(client_time): pass
+@rpc("any_peer") func ServRPC_ReturnRequestedCharacterList(): pass
+@rpc("any_peer") func ServRPC_CreateExistingCharacter(cuuid): pass
+@rpc("any_peer") func ServRPC_RequestNewCharacter(species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height): pass
+@rpc("any_peer") func ServRPC_DeleteCharacter(char_name): pass
+@rpc("any_peer") func ServRPC_BuildRaceList(): pass
+@rpc("any_peer") func ServRPC_Login(username, password, uuid, puuid): pass
+@rpc("any_peer") func ServRPC_CreateAccount(username, password): pass
+@rpc("any_peer") func ServRPC_RecievePersistentUUID(puuid): pass
+@rpc("any_peer") func ServRPC_RequestColliderMovement(vector, direction): pass
+@rpc("any_peer") func ServRPC_RecieveChat(msg:Dictionary): pass
+@rpc("any_peer") func ServRPC_RecieveVersion(clientversion): pass
+@rpc("any_peer") func ServRPC_SendPermissions(): pass
+@rpc("any_peer") func ServRPC_UpdateSoloTicket(ticket_number:String): pass
+@rpc("any_peer") func ServRPC_GetTickets(for_staff:bool = false): pass
+@rpc("any_peer") func ServRPC_OpenTicket(title:String, details:String, with_user:String, critical:bool = false): pass
+@rpc("any_peer") func ServRPC_CloseTicket(ticket_number:String): pass
+@rpc("any_peer") func ServRPC_SendMessageToTicket(message:String, ticket_number:String): pass
+@rpc("any_peer") func ServRPC_ClaimTicket(ticket_number:String): pass
+@rpc("any_peer") func ServRPC_AddUserToTicket(username:String, ticket_number:String): pass
+@rpc("any_peer") func ServRPC_AddPlayerNote(username:String, title:String, note:String): pass
+@rpc("any_peer") func ServRPC_RemovePlayerNote(username:String, note_number:String): pass
+@rpc("any_peer") func ServRPC_EditPlayerNote(username:String, note_number:String, new_note:String): pass
+@rpc("any_peer") func ServRPC_GetPlayerNotes(): pass
+@rpc("any_peer") func ServRPC_IsClientAdmin(): pass
+@rpc("any_peer") func ServRPC_GetCurrentPlayers(): pass
+@rpc("any_peer") func ServRPC_RecieveClientState(client_state): pass
+
+#BOILERPLATE END
+
 var network : ENetMultiplayerPeer
 var ip = "127.0.0.1"
 var port = 5000
@@ -22,7 +54,7 @@ signal admin_tickets_recieved(tickets)
 signal player_list_recieved(playerlist)
 signal player_notes_recieved(player_notes)
 signal admin_verified(verified)
-
+ 
 func _physics_process(delta):
 	client_clock += int(delta*1000) + delta_latency
 	delta_latency -= delta_latency
@@ -36,44 +68,45 @@ func ConnectToServer():
 	network.create_client(ip, port)
 	multiplayer.multiplayer_peer = network
 	
-	#multiplayer.connect("connection_failed", Callable(self, "_OnConnectionFailed"))
-	#multiplayer.connect("connected_to_server", Callable(self, "_OnConnectionSucceeded"))
-	#multiplayer.connect("server_disconnected", Callable(self, "_OnServerDisconnected"))
+	
+	multiplayer.connection_failed.connect(_OnConnectionFailed)
+	multiplayer.connected_to_server.connect(_OnConnectionSucceeded)
+	multiplayer.server_disconnected.connect(_OnServerDisconnected)
 	
 #Connection signals
 	
 func _OnConnectionFailed():
 	print("Failed to Connect.")
 	
-	multiplayer.disconnect("connection_failed", Callable(self, "_OnConnectionFailed"))
-	multiplayer.disconnect("connected_to_server", Callable(self, "_OnConnectionSucceeded"))
-	multiplayer.disconnect("server_disconnected", Callable(self, "_OnServerDisconnected"))
+	multiplayer.connection_failed.disconnect(_OnConnectionFailed)
+	multiplayer.connected_to_server.disconnect(_OnConnectionSucceeded)
+	multiplayer.server_disconnected.disconnect(_OnServerDisconnected)
 	await get_tree().create_timer(1).timeout
 	#multiplayer.multiplayer_peer = null
 	#network = null
 		
 func _OnConnectionSucceeded():
 	print("Connection Succcessful.")
-	rpc_id(1, "FetchServerTime", Time.get_unix_time_from_system())
+	rpc_id(1, "ServRPC_FetchServerTime", Time.get_unix_time_from_system())
 	var timer = Timer.new()
 	timer.wait_time = 0.5
 	timer.autostart = true
-	timer.connect("timeout", Callable(self, "DetermineLatency"))
+	timer.timeout.connect(DetermineLatency)
 	self.add_child(timer)
 	Globals.client_state = Globals.SERVER_CONNECTION_STATE.CONNECTED
 	
 func _OnServerDisconnected(): #todo make this return to the login screen.
 	Globals.client_state = Globals.SERVER_CONNECTION_STATE.DISCONNECTED
 	Globals.client_state = Globals.CLIENT_STATE_LIST.CLIENT_UNAUTHENTICATED	
-	multiplayer.disconnect("connection_failed", Callable(self, "_OnConnectionFailed"))
-	multiplayer.disconnect("connection_succeeded", Callable(self, "_OnConnectionSucceeded"))
-	multiplayer.disconnect("server_disconnected", Callable(self, "_OnServerDisconnected"))
+	multiplayer.connection_failed.disconnect(_OnConnectionFailed)
+	multiplayer.connected_to_server.disconnect(_OnConnectionSucceeded)
+	multiplayer.server_disconnected.disconnect(_OnServerDisconnected)
 	await get_tree().create_timer(1).timeout
 	multiplayer.multiplayer_peer = null
 	network = null
 	if Gui.current_loaded_GUI_name != "LoginScreen":
 		Gui.CreateFloatingMessage("Server disconnected! Please login again.", "bad")
-		Gui.ChangeGUIScene("LoginScreen")
+		Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_UNAUTHENTICATED)
 		maphandler.ClearScenes()
 	
 #End connection signals
@@ -85,7 +118,7 @@ func SendPlayerState(state):
 	
 func DetermineLatency():
 	if multiplayer.multiplayer_peer:
-		rpc_id(1, "DetermineLatency", Time.get_unix_time_from_system())
+		rpc_id(1, "ServRPC_DetermineLatency", Time.get_unix_time_from_system())
 	
 @rpc("any_peer") func ReturnLatency(client_time):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
@@ -107,6 +140,7 @@ func DetermineLatency():
 @rpc("any_peer", "unreliable") func RecieveWorldState(state):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
+	pass
 	maphandler.UpdateWorldState(state)
 	
 @rpc("any_peer") func ReturnServerTime(server_time, client_time):
@@ -166,18 +200,34 @@ func RequestNewCharacter(species_name, character_name, age, hair_color, skin_col
 func DeleteCharacter(char_name):
 	rpc_id(1, "ServRPC_DeleteCharacter", char_name)
 	
+#end character selection
+	
 @rpc("any_peer") func LoadWorld(worldname):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
-	get_tree().get_root().get_node("RootNode/Maphandler").ChangeMap(worldname)
-	Globals.client_state = Globals.CLIENT_STATE_LIST.CLIENT_INGAME
-	Gui.ChangeGUIScene("MainGameUI")
-#end character selection
+	maphandler.ChangeMap(worldname)
+	await maphandler.map_loaded
+	Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_INGAME)
+	
+@rpc("any_peer") func ClientRPC_ReturnCharacterLoadFailed():
+	Gui.CreateFloatingMessage("The server reported an error loading your character. \nPlease try again or inform a developer.", "bad")
+	
+	
+@rpc("any_peer") func RecieveClientStateSync(client_state):
+	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
+		return
+	Globals.SetClientState(client_state)
+
+#client state reporting
+
+@rpc("any_peer") func ReportClientState(client_state):
+	rpc_id(1, "ServRPC_RecieveClientState", client_state)
+
+#end client state reporting
 
 #login
 
 func Login(username, password, uuid, puuid):
-	Server.ConnectToServer()
 	await get_tree().create_timer(1).timeout
 	if multiplayer.multiplayer_peer:
 		rpc_id(1,"ServRPC_Login", username, password, uuid, Globals.persistent_uuid)
@@ -214,8 +264,7 @@ func CreateAccount(username, password):
 		network.disconnect("connection_succeeded", Callable(self, "_OnConnectionSucceeded"))
 	else:
 		Gui.CreateFloatingMessage("Login successful.", "good")
-		Globals.client_state = Globals.CLIENT_STATE_LIST.CLIENT_PREGAME
-		Gui.ChangeGUIScene("CharacterSelect")
+		Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_PREGAME)
 		
 #end login
 
@@ -243,7 +292,7 @@ func SendChat(msg):
 @rpc("any_peer") func Disconnect(reason : String = ""):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
-	Globals.client_state = Globals.CLIENT_STATE_LIST.CLIENT_UNAUTHENTICATED
+	Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_UNAUTHENTICATED)
 	if(reason):
 		Gui.CreateFloatingMessage(reason, "bad")
 		
@@ -287,7 +336,7 @@ func GetUpdateOnTicket(ticket_number:String):
 		return
 	emit_signal("tickets_recieved", ticket_dict)
 	
-@rpc("any_peer") func UpdateTicket(ticket_number:String, ticket_dict:Dictionary):
+@rpc("any_peer") func ClientRPC_UpdateTicket(ticket_number:String, ticket_dict:Dictionary):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	emit_signal("ticket_update_recieved",ticket_number, ticket_dict)
@@ -351,32 +400,4 @@ func IsClientAdmin():
 
 #misc end
 
-#BOILERPLATE BEGIN NONE OF THESE DO ANYTHING BUT GODOT 4.X REQUIRES MATCHING RPCS BETWEEN CLIENT/SERVER.
-@rpc("any_peer") func ServRPC_FetchServerTime(client_time): pass
-@rpc("any_peer") func ServRPC_DetermineLatency(client_time): pass
-@rpc("any_peer") func ServRPC_ReturnRequestedCharacterList(): pass
-@rpc("any_peer") func ServRPC_CreateExistingCharacter(cuuid): pass
-@rpc("any_peer") func ServRPC_RequestNewCharacter(species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height): pass
-@rpc("any_peer") func ServRPC_DeleteCharacter(char_name): pass
-@rpc("any_peer") func ServRPC_BuildRaceList(): pass
-@rpc("any_peer") func ServRPC_Login(username, password, uuid, puuid): pass
-@rpc("any_peer") func ServRPC_CreateAccount(username, password): pass
-@rpc("any_peer") func ServRPC_RecievePersistentUUID(puuid): pass
-@rpc("any_peer") func ServRPC_RequestColliderMovement(vector, direction): pass
-@rpc("any_peer") func ServRPC_RecieveChat(msg:Dictionary): pass
-@rpc("any_peer") func ServRPC_RecieveVersion(clientversion): pass
-@rpc("any_peer") func ServRPC_SendPermissions(): pass
-@rpc("any_peer") func ServRPC_UpdateSoloTicket(ticket_number:String): pass
-@rpc("any_peer") func ServRPC_GetTickets(for_staff:bool = false): pass
-@rpc("any_peer") func ServRPC_OpenTicket(title:String, details:String, with_user:String, critical:bool = false): pass
-@rpc("any_peer") func ServRPC_CloseTicket(ticket_number:String): pass
-@rpc("any_peer") func ServRPC_SendMessageToTicket(message:String, ticket_number:String): pass
-@rpc("any_peer") func ServRPC_ClaimTicket(ticket_number:String): pass
-@rpc("any_peer") func ServRPC_AddUserToTicket(username:String, ticket_number:String): pass
-@rpc("any_peer") func ServRPC_AddPlayerNote(username:String, title:String, note:String): pass
-@rpc("any_peer") func ServRPC_RemovePlayerNote(username:String, note_number:String): pass
-@rpc("any_peer") func ServRPC_EditPlayerNote(username:String, note_number:String, new_note:String): pass
-@rpc("any_peer") func ServRPC_IsClientAdmin(): pass
-@rpc("any_peer") func ServRPC_GetCurrentPlayers(): pass
 
-#BOILERPLATE END

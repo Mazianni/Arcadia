@@ -4,10 +4,15 @@ var last_world_state = 0
 var world_state_buffer = []
 var current_map : String
 var current_map_reference
-var interpolation_offset = 40
-var interpolation_offset_base = 40
+var interpolation_offset = 0
+var interpolation_offset_base = 0
+
+signal map_loaded
+signal map_load_failed
 
 func UpdateWorldState(world_state):
+	if Globals.client_state != Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
+		return
 	if world_state["T"] > last_world_state:
 		last_world_state = world_state["T"]
 		world_state_buffer.append(world_state)
@@ -20,8 +25,10 @@ func _physics_process(delta):
 	interpolation_offset = interpolation_offset_base + Server.latency
 	var render_time = Time.get_unix_time_from_system() - interpolation_offset
 	if world_state_buffer.size() > 1:
-		while world_state_buffer.size() > 2 and render_time > world_state_buffer[2].T:
-			world_state_buffer.remove(0)
+		while world_state_buffer.size() > 2 and render_time > world_state_buffer[2]["T"]:
+			world_state_buffer.remove_at(0)
+		if world_state_buffer.size() > 10:
+			world_state_buffer.remove_at(0)
 		if world_state_buffer.size() > 2:
 			var interpolation_factor = float(render_time - world_state_buffer[1]["T"]) / float(world_state_buffer[2]["T"] - world_state_buffer[1]["T"])
 			for player in world_state_buffer[2].keys():
@@ -63,6 +70,11 @@ func ChangeMap(mapname):
 	var path = "res://scenes/maps/"
 	print(path+str(mapname)+"/"+str(mapname)+".tscn")
 	var newmapres = load(path+str(mapname)+"/"+str(mapname)+".tscn")
+	if not newmapres:
+		Gui.CreateFloatingMessage("There was an error loading the map for your character. Please report this to a developer.", "bad")
+		Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_PREGAME)
+		emit_signal("map_load_failed")
+		return
 	var newmapinstance = newmapres.instantiate()
 	newmapinstance.name = mapname
 	self.add_child(newmapinstance)
@@ -70,6 +82,7 @@ func ChangeMap(mapname):
 		current_map_reference.queue_free()
 	current_map_reference = newmapinstance
 	current_map = mapname
+	emit_signal("map_loaded")
 
 func ClearScenes():
 	if current_map_reference:

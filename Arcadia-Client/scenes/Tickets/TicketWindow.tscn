@@ -30,3 +30,5 @@ size_flags_vertical = 3
 [node name="TextEdit" type="TextEdit" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
+
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
