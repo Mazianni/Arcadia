@@ -2,9 +2,11 @@ extends Control
 
 @onready var ChatBar = $ChatboxContainer/Chatbox/ChatInput/OneLineChat
 @onready var RPBox = $RPDialog/MarginContainer/RPBox/TextEdit
+@onready var RPDialog = $RPDialog
 @onready var AdminButton = $GridContainer/AdminPanelButton
 @onready var TicketViewerResource = load("res://scenes/TicketViewer.tscn")
 @onready var AdminPanelResource = load("res://scenes/Admin/AdminPanel.tscn")
+@onready var MarkupDialog = $RPDialog/MarkupDialog
 
 var ticketviewer
 var adminpanel
@@ -23,8 +25,9 @@ func _input(event):
 					ChatManager.SendChat(ChatBar.text, false)
 					ChatBar.set_text("")
 					
-func OnAdminVerification():
-	AdminButton.show()
+func OnAdminVerification(decision:bool):
+	if decision:
+		AdminButton.show()
 	
 func _on_RP_pressed():
 	var vis = false
@@ -46,18 +49,6 @@ func _on_SubmitButton_pressed():
 		ChatManager.SendChat(RPBox.text, true)
 		RPBox.set_text("")
 		$RPDialog.hide()
-
-func _on_MarkupButton_pressed():
-	var vis = false
-	match $RPDialog/MarkupDialog.visible:
-		false:
-			vis = false
-		true:
-			vis = true
-	if(!vis):
-		$RPDialog/MarkupDialog.popup()
-	else:
-		$RPDialog/MarkupDialog.hide()
 
 func _on_ChatSelectTabs_tab_changed(tab):
 	ChatManager.SetCurrentChatTab($ChatboxContainer/Chatbox/ChatSelect/ChatSelectTabs.get_tab_control(tab))
@@ -84,3 +75,10 @@ func _on_AdminPanelButton_pressed():
 		adminpanel.popup()
 	else:
 		adminpanel.popup()
+
+
+func _on_markup_dialog_close_requested():
+	MarkupDialog.hide()
+
+func _on_rp_dialog_close_requested():
+	RPDialog.hide()

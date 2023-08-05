@@ -22,11 +22,12 @@ ServerData="*res://Scripts/ServerData.gd"
 DataRepository="*res://Scripts/singletons/DataRepository.gd"
 Helpers="*res://Scripts/singletons/helpers.gd"
 ChatHandler="*res://Scripts/singletons/ChatHandler.gd"
-Admin="*res://Scripts/singletons/Admin.gd"
 SaveHandler="*res://Scripts/singletons/SaveHandler.gd"
+SubsystemManager="*res://Scripts/singletons/SubsystemManager.gd"
 
 [debug]
 
+file_logging/enable_file_logging=true
 gdscript/warnings/unused_variable=0
 gdscript/warnings/unused_parameter=0
 gdscript/warnings/return_value_discarded=false

@@ -30,7 +30,7 @@ var client_state
 var serverconn
 var currentscene
 
-var is_admin_client = false #you may think you're very clever by setting this to true. you're not.
+var is_client_admin = false #you may think you're very clever by setting this to true. you're not.
 
 var config_file
 var client_version = "0.1a"
@@ -39,6 +39,9 @@ enum CLIENT_STATE_LIST {CLIENT_UNAUTHENTICATED, CLIENT_PREGAME, CLIENT_INGAME}
 enum SERVER_CONNECTION_STATE {DISCONNECTED, CONNECTED}
 enum CURRENT_SCENE {SCENE_LOGIN, SCENE_SELECTION, SCENE_CREATION, SCENE_PLAYING}
 enum MESSAGE_CATEGORY {IC, OOC, LOOC, ADMIN, ETC}
+
+signal character_list_refresh_requested
+signal show_viewport(show)
 
 func _ready():
 	uuid = uuid_generator.v4()
@@ -53,20 +56,28 @@ func SetClientState(new_state):
 	Server.ReportClientState(client_state)
 	match new_state:
 		CLIENT_STATE_LIST.CLIENT_PREGAME:
-			Gui.ChangeGUIScene("CharacterSelect")				
+			Gui.ChangeGUIScene("CharacterSelect")
+			if CharacterList.size():
+				character_list_refresh_requested.emit()
 			maphandler.ClearScenes()
+			get_tree().get_root().get_node("RootNode").ShowBackground(true)
+			show_viewport.emit(false)
 		CLIENT_STATE_LIST.CLIENT_INGAME:
 			Gui.ChangeGUIScene("MainGameUI")
+			get_tree().get_root().get_node("RootNode").ShowBackground(false)
+			show_viewport.emit(true)
 		CLIENT_STATE_LIST.CLIENT_UNAUTHENTICATED:
 			Gui.ChangeGUIScene("LoginScreen")				
 			maphandler.ClearScenes()
-				
+			get_tree().get_root().get_node("RootNode").ShowBackground(true)
+			show_viewport.emit(false)
+			
 func CheckSettingsExist():
 	var save_dir = "user://"
 	var newsave = FileAccess.open(save_dir, FileAccess.READ)
 	if FileAccess.file_exists(save_dir+"setting.json"):
-		newsave.open(save_dir+"settings.json", FileAccess.WRITE_READ)
-		newsave.store_line(JSON.new().stringify(Settings.DefaultSettingsDict))
+		FileAccess.open(save_dir+"settings.json", FileAccess.WRITE_READ)
+		newsave.store_line(JSON.stringify(Settings.DefaultSettingsDict))
 		newsave.close()
 
 func CheckPersistentUUIDExists():
@@ -74,8 +85,8 @@ func CheckPersistentUUIDExists():
 	var save_file = "persistent.json"
 	var newsave = FileAccess.open(save_dir, FileAccess.READ)
 	if not FileAccess.file_exists(save_dir+save_file):
-		newsave.open(save_dir+"/"+save_file, FileAccess.WRITE_READ)
-		newsave.store_line(JSON.new().stringify(uuid_generator.v4()))
+		FileAccess.open(save_dir+"/"+save_file, FileAccess.WRITE_READ)
+		newsave.store_line(JSON.stringify(uuid_generator.v4()))
 		newsave.close()
 	else:
 		var loadfile = FileAccess.open(save_dir+save_file, FileAccess.READ)

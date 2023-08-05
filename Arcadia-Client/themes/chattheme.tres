@@ -7,6 +7,7 @@
 [ext_resource type="FontFile" uid="uid://v12ky2oersqn" path="res://fonts/titillium-web/TitilliumWeb-Regular.ttf" id="5_w0xh1"]
 
 [resource]
+default_font = ExtResource("5_w0xh1")
 RichTextLabel/fonts/bold_font = ExtResource("1_ofdji")
 RichTextLabel/fonts/bold_italics_font = ExtResource("2_hieko")
 RichTextLabel/fonts/italics_font = ExtResource("3_8qfiq")

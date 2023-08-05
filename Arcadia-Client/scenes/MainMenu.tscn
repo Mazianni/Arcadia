@@ -1,16 +1,22 @@
 [gd_scene load_steps=9 format=3 uid="uid://bo1w0hck26ii1"]
 
 [ext_resource type="Script" path="res://scripts/onload.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://cw43m144jpqgr" path="res://scenes/Maphandler/Maphandler.tscn" id="2_3wnlu"]
 [ext_resource type="Texture2D" uid="uid://di5w5hy1hyemv" path="res://images/background/background2.png" id="3"]
 [ext_resource type="Texture2D" uid="uid://3v627atwatcp" path="res://images/background/background1.png" id="3_rs2vf"]
 [ext_resource type="Texture2D" uid="uid://cuk1762n7fjj6" path="res://images/background/background3.png" id="4"]
 [ext_resource type="Script" path="res://scripts/singletons/autoresize.gd" id="5"]
-[ext_resource type="Script" path="res://scripts/maphandler/maphandler.gd" id="7"]
 [ext_resource type="Theme" uid="uid://xjwshynbp6sr" path="res://themes/button_theme.tres" id="7_ylxsd"]
 [ext_resource type="Texture2D" uid="uid://3upd1n8qlx0b" path="res://fonts/fontawesome-free-6.4.0-desktop/svgs/solid/gear.svg" id="8_jh5cw"]
 
 [node name="RootNode" type="Node"]
 script = ExtResource("1")
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+volume_db = -25.005
+
+[node name="Maphandler" parent="." instance=ExtResource("2_3wnlu")]
+unique_name_in_owner = true
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 script = ExtResource("5")
@@ -37,19 +43,23 @@ region_rect = Rect2(0, 0, 1280, 640)
 
 [node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
 
-[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
-volume_db = -25.005
-
-[node name="Maphandler" type="Node" parent="."]
-unique_name_in_owner = true
-script = ExtResource("7")
-
 [node name="GUI" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
 
+[node name="CanvasLayer" type="CanvasLayer" parent="GUI"]
+layer = 2
+
+[node name="FloatingMessageContainer" type="VBoxContainer" parent="GUI/CanvasLayer"]
+offset_left = 5.0
+offset_top = 3.0
+offset_right = 40.0
+offset_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
 [node name="SettingsButton" type="Button" parent="GUI"]
 custom_minimum_size = Vector2(50, 50)
-anchors_preset = -1
+anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 3.0
@@ -66,15 +76,5 @@ icon = ExtResource("8_jh5cw")
 icon_alignment = 1
 expand_icon = true
 metadata/_edit_use_anchors_ = true
-
-[node name="CanvasLayer" type="CanvasLayer" parent="GUI"]
-layer = 2
-
-[node name="FloatingMessageContainer" type="GridContainer" parent="GUI/CanvasLayer"]
-offset_left = 5.0
-offset_top = 3.0
-offset_right = 40.0
-offset_bottom = 40.0
-theme_override_constants/v_separation = 6
 
 [connection signal="pressed" from="GUI/SettingsButton" to="." method="_on_SettingsButton_pressed"]

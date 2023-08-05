@@ -1,12 +1,11 @@
-class_name ActiveCharacter extends Node
+class_name ActiveCharacter extends PlayerDataContainerBase
 
-@onready var Server = get_tree().get_root().get_node("Server")
 var IsNewCharacter = false
 var BaseSpecies : SpeciesBase
 var ActiveController : PlayerContainer
 var CurrentPosition : Vector2
 var CurrentMap : String
-var CurrentCollider
+var CurrentCollider : PlayerCollider
 var CharacterData : Dictionary = {
 	"uuid":"",
 	"Name":"",
@@ -31,32 +30,40 @@ var CharacterData : Dictionary = {
 	"LastPlayed":0
 }
 
-signal load_success
+signal load_success(pid, map)
 signal load_failed(pid)
+signal creation_successful
+signal collider_created(pid, map)
 
 func _ready():
 	connect("tree_exiting", Callable(self, "OnDeleted"))
-	load_failed.connect(Callable(Server,"ReturnCharacterLoadFailed"))
+	load_failed.connect(Callable(DataRepository.Server,"ReturnCharacterLoadFailed"))
 	load_failed.connect(Callable(self,"OnLoadFailed"))
+	collider_created.connect(Callable(DataRepository.Server, "ReturnCharacterLoaded"))
+	load_success.connect(Callable(self, "OnLoadSuccessful"))
 	if IsNewCharacter != true:
 		LoadJSON(self.name)
 	if not CheckJSONExists(self.name): #check if JSON exists, if not, create and store defaults.
 		IsNewCharacter = true
-	await load_success
-	CreateCollider()
-	load_failed.disconnect(Callable(self,"OnLoadFailed"))
-	load_failed.disconnect(Callable(Server,"ReturnCharacterLoadFailed"))
-	
+
 func OnDeleted():
+	if DataRepository.CurrentState == DataRepository.SERVER_STATE.SERVER_SHUTTING_DOWN:
+		return
 	WriteJSON(CharacterData["uuid"])
-	if CurrentCollider:
+	if CurrentCollider && is_instance_valid(CurrentCollider):
 		CurrentCollider.queue_free()
-	if ActiveController:
+	if ActiveController && is_instance_valid(ActiveController):
 		ActiveController.CurrentActiveCharacter = null
 		
 func OnLoadFailed(pid):
-	Server.SetClientState(DataRepository.CLIENT_STATE_LIST.CLIENT_PREGAME, ActiveController.associated_pid)
+	DataRepository.Server.SetClientState(DataRepository.CLIENT_STATE_LIST.CLIENT_PREGAME, ActiveController.associated_pid)
 	queue_free()
+	
+func OnLoadSuccessful(pid, map):
+	CreateCollider()
+	load_failed.disconnect(Callable(self,"OnLoadFailed"))
+	load_failed.disconnect(Callable(DataRepository.Server,"ReturnCharacterLoadFailed"))
+	load_success.disconnect(Callable(self, "OnLoadSuccessful"))
 	
 func CheckJSONExists(character_name):
 	var save_dir = DataRepository.saves_directory + "/" + str(ActiveController.PlayerData["username"])
@@ -64,7 +71,7 @@ func CheckJSONExists(character_name):
 	var file = FileAccess.open(save_file, FileAccess.WRITE)
 	var json_exists = true
 	if not FileAccess.file_exists(save_file): # This is a new character, and thus loaded defaults as done in the init proc are standard.
-		file.store_line(JSON.new().stringify(CharacterData))
+		file.store_line(JSON.stringify(CharacterData))
 		file.close()
 		json_exists = false
 	return json_exists
@@ -97,28 +104,35 @@ func LoadJSON(character_name):
 	CharacterData = load_dict.duplicate(true)
 	BaseSpecies = DataRepository.races[CharacterData["Species"]]
 	loadfile.close()
-	emit_signal("load_success")
+	print(CharacterData["LastMap"])
+	load_success.emit(ActiveController.associated_pid, CurrentMap)
 		
 func WriteJSON(character_name):
 	var save_dir = DataRepository.saves_directory + "/" + str(ActiveController.PlayerData["username"])
 	var save_file = save_dir+"/"+str(character_name)+".json"
 	var file = FileAccess.open(save_file, FileAccess.WRITE)
 	CharacterData["LastPosition"] = CurrentPosition
-	file.store_line(JSON.new().stringify(CharacterData))
+	file.store_line(JSON.stringify(CharacterData))
 	var err = file.get_error()
 	file.close()
 	if err != OK:
 		Logging.log_error("[FILE] Error encountered during save of character "+CharacterData["Name"]+ " with code "+str(err))
 	
 func CreateCollider():
+	
 	var new_collider = DataRepository.collider_resource.instantiate()
 	new_collider.name = CharacterData["uuid"]
 	new_collider.ControllingCharacter = self
 	CurrentCollider = new_collider
 	if CharacterData["LastMap"]:
-		DataRepository.MapManager.MovePlayerToMapStandalone(new_collider, CharacterData["LastMap"], Helpers.string_to_vector2(CharacterData["LastPosition"]))
-		
+		DataRepository.mapmanager.MovePlayerToMapStandalone(new_collider, CharacterData["LastMap"], Helpers.string_to_vector2(CharacterData["LastPosition"]))
+		CurrentMap = CharacterData["LastMap"]
+	collider_created.emit(ActiveController.associated_pid, CurrentMap)
+	collider_created.disconnect(Callable(DataRepository.Server, "ReturnCharacterLoaded"))
+	
 func CreateNewCharacter(uuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height):
+	var result : bool = true
+	var message : String = "New character "+character_name+" \ncreated successfully"
 	BaseSpecies = DataRepository.races[species_name]
 	CharacterData["uuid"] = name
 	CharacterData["Species"] = species_name
@@ -136,6 +150,6 @@ func CreateNewCharacter(uuid, species_name, character_name, age, hair_color, ski
 	CharacterData["LastMap"] = DataRepository.spawns[BaseSpecies.valid_spawns[0]]["MapName"]
 	CharacterData["LastPosition"] = DataRepository.spawns[BaseSpecies.valid_spawns[0]]["pos"]
 	WriteJSON(uuid)
-	Logging.log_notice("New character by name of "+str(character_name)+" created.")
-
-
+	Logging.log_notice("New character by name of "+str(character_name)+" created successfully.")
+	DataRepository.Server.ReturnNewCharacterCreated(ActiveController.associated_pid, result, message)
+	queue_free()

@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://c42m1mvjav3e1"]
+[gd_scene load_steps=8 format=3 uid="uid://c42m1mvjav3e1"]
 
 [ext_resource type="AudioStream" uid="uid://dkxli8xwxgfyq" path="res://sounds/adminhelp.ogg" id="1"]
 [ext_resource type="Script" path="res://scripts/admin/adminpanel.gd" id="1_5b5er"]
+[ext_resource type="Theme" uid="uid://ccql3hfhmn2kw" path="res://themes/window_theme.tres" id="1_o6bsm"]
 [ext_resource type="FontFile" uid="uid://v12ky2oersqn" path="res://fonts/titillium-web/TitilliumWeb-Regular.ttf" id="2"]
 [ext_resource type="Script" path="res://scripts/tickets/adminticketviewer.gd" id="4"]
 [ext_resource type="Script" path="res://scripts/playernotes/player_notes_viewer.gd" id="5"]
@@ -23,12 +24,14 @@ title = "Administrative Panel"
 position = Vector2i(11, 46)
 size = Vector2i(500, 500)
 popup_window = true
+theme = ExtResource("1_o6bsm")
 script = ExtResource("1_5b5er")
 
-[node name="Control" type="Panel" parent="."]
+[node name="Control" type="ColorRect" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+color = Color(0.160784, 0.152941, 0.152941, 1)
 
 [node name="TabContainer" type="TabContainer" parent="Control"]
 layout_mode = 0
@@ -39,36 +42,7 @@ offset_top = 10.0
 offset_right = -10.0
 offset_bottom = -10.0
 
-[node name="Player Notes" type="TabBar" parent="Control/TabContainer"]
-layout_mode = 2
-script = ExtResource("5")
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Control/TabContainer/Player Notes"]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-
-[node name="NoteTree" type="PanelContainer" parent="Control/TabContainer/Player Notes/HBoxContainer"]
-custom_minimum_size = Vector2(700, 0)
-layout_mode = 2
-
-[node name="ScrollContainer" type="ScrollContainer" parent="Control/TabContainer/Player Notes/HBoxContainer/NoteTree"]
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Control/TabContainer/Player Notes/HBoxContainer/NoteTree/ScrollContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Control/TabContainer/Player Notes/HBoxContainer"]
-layout_mode = 2
-
-[node name="ShowOnlyExistingNotes" type="CheckBox" parent="Control/TabContainer/Player Notes/HBoxContainer/VBoxContainer"]
-layout_mode = 2
-text = "Only show users with existing notes"
-
 [node name="Tickets" type="TabBar" parent="Control/TabContainer"]
-visible = false
 layout_mode = 2
 script = ExtResource("4")
 
@@ -105,6 +79,29 @@ text = "Add Player To Ticket"
 visible = false
 layout_mode = 2
 
+[node name="Player Notes" type="MarginContainer" parent="Control/TabContainer"]
+visible = false
+layout_mode = 2
+script = ExtResource("5")
+
+[node name="MarginContainer" type="MarginContainer" parent="Control/TabContainer/Player Notes"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="VBoxContainer" parent="Control/TabContainer/Player Notes/MarginContainer"]
+layout_mode = 2
+
+[node name="ShowOnlyExistingNotes" type="CheckButton" parent="Control/TabContainer/Player Notes/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Only show users with existing notes"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/TabContainer/Player Notes/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
 [node name="TicketNotif" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("1")
 
@@ -122,6 +119,14 @@ size = Vector2i(300, 300)
 visible = false
 transient = true
 popup_window = true
+
+[node name="ColorRect" type="ColorRect" parent="NewTicketDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.160784, 0.152941, 0.152941, 1)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="NewTicketDialog"]
 anchors_preset = 15
@@ -171,6 +176,14 @@ visible = false
 transient = true
 popup_window = true
 
+[node name="ColorRect" type="ColorRect" parent="AddPlayerToTicketDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.160784, 0.152941, 0.152941, 1)
+
 [node name="VBoxContainer" type="VBoxContainer" parent="AddPlayerToTicketDialog"]
 anchors_preset = 15
 anchor_right = 1.0
@@ -203,6 +216,14 @@ visible = false
 transient = true
 popup_window = true
 
+[node name="ColorRect" type="ColorRect" parent="EditNoteDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.160784, 0.152941, 0.152941, 1)
+
 [node name="VBoxContainer" type="VBoxContainer" parent="EditNoteDialog"]
 anchors_preset = 15
 anchor_right = 1.0
@@ -229,6 +250,14 @@ size = Vector2i(300, 260)
 visible = false
 transient = true
 popup_window = true
+
+[node name="ColorRect" type="ColorRect" parent="AddNoteDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.160784, 0.152941, 0.152941, 1)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="AddNoteDialog"]
 anchors_preset = 15
@@ -260,11 +289,15 @@ text = "Submit Note"
 wait_time = 10.0
 autostart = true
 
+[node name="PlayerNoteRefreshTimer" type="Timer" parent="."]
+wait_time = 2.0
+autostart = true
+
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
-[connection signal="pressed" from="Control/TabContainer/Player Notes/HBoxContainer/VBoxContainer/ShowOnlyExistingNotes" to="Control/TabContainer/Player Notes" method="_on_ShowOnlyExistingNotes_pressed"]
 [connection signal="tab_hovered" from="Control/TabContainer/Tickets" to="Control/TabContainer/Tickets" method="_on_Tickets_tab_hover"]
 [connection signal="pressed" from="Control/TabContainer/Tickets/HBoxContainer/VBoxContainer/NewTicketWithPlayer" to="Control/TabContainer/Tickets" method="_on_NewTicketWithPlayer_pressed"]
 [connection signal="pressed" from="Control/TabContainer/Tickets/HBoxContainer/VBoxContainer/AddPlayerToTicket" to="Control/TabContainer/Tickets" method="_on_AddPlayerToTicket_pressed"]
+[connection signal="pressed" from="Control/TabContainer/Player Notes/MarginContainer/HBoxContainer/ShowOnlyExistingNotes" to="Control/TabContainer/Player Notes" method="_on_ShowOnlyExistingNotes_pressed"]
 [connection signal="about_to_popup" from="NewTicketDialog" to="Control/TabContainer/Tickets" method="_on_NewTicketDialog_about_to_show"]
 [connection signal="close_requested" from="NewTicketDialog" to="." method="_on_new_ticket_dialog_close_requested"]
 [connection signal="about_to_popup" from="AddPlayerToTicketDialog" to="Control/TabContainer/Tickets" method="_on_AddPlayerToTicketDialog_about_to_show"]
@@ -275,3 +308,4 @@ autostart = true
 [connection signal="close_requested" from="AddNoteDialog" to="." method="_on_add_note_dialog_close_requested"]
 [connection signal="pressed" from="AddNoteDialog/VBoxContainer/NoteAddConfirm" to="Control/TabContainer/Player Notes" method="_on_NoteAddConfirm_pressed"]
 [connection signal="timeout" from="TicketRefreshTimer" to="Control/TabContainer/Tickets" method="_on_Timer_timeout"]
+[connection signal="timeout" from="PlayerNoteRefreshTimer" to="Control/TabContainer/Player Notes" method="_on_player_note_refresh_timer_timeout"]

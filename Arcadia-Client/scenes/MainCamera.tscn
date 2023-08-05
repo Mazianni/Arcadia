@@ -1,6 +1,5 @@
-[gd_scene format=2]
+[gd_scene format=3 uid="uid://c6rnuwy0q51kj"]
 
 [node name="Camera2D" type="Camera2D"]
-current = true
-zoom = Vector2( 0.5, 0.5 )
-drag_horizontal_offset = 0.7
+position_smoothing_enabled = true
+position_smoothing_speed = 15.0

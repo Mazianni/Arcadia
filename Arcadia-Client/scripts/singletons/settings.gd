@@ -40,7 +40,7 @@ func SaveSettingsToJSON():
 	var save_dir = "user://"
 	var save_file = "settings.json"
 	var file = FileAccess.open(save_dir+save_file, FileAccess.WRITE)
-	file.store_line(JSON.new().stringify(CurrentSettingsDict))
+	file.store_line(JSON.stringify(CurrentSettingsDict))
 	file.close()	
 	
 func PopupSettings():

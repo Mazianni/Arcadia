@@ -21,7 +21,7 @@ func DrawMsg():
 	var t : String = ""
 	if display_timestamps:
 		t = "["+timestamp+"] "
-	text = msgtext
+	text = t+msgtext
 	var themefont : Font = theme.get_font("mono_font", "RichTextLabel")
 	custom_minimum_size = themefont.get_multiline_string_size(text)
 		

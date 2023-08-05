@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=2 format=3 uid="uid://c0eba5mrytu63"]
 
-[ext_resource path="res://Scripts/ActiveCharacter.gd" type="Script" id=1]
+[ext_resource type="Script" path="res://Scripts/ActiveCharacter.gd" id="1_l7lhd"]
 
-[node name="CharacterRoot" type="Node" groups=["active_characters"]]
-script = ExtResource( 1 )
+[node name="ActiveCharacterBackup" type="Node" groups=["active_characters"]]
+script = ExtResource("1_l7lhd")

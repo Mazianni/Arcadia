@@ -5,7 +5,7 @@ var Server : Node
 func _ready():
 	Server = get_tree().get_root().get_node("Server")
 
-static func string_to_vector2(string := "") -> Vector2:
+func string_to_vector2(string := "") -> Vector2:
 	if string:
 		var new_string: String = string
 		new_string.erase(0, 1)
@@ -31,21 +31,21 @@ func PID2Username(pid:int):
 func GetActiveStaff():
 	var staff_array : Array = []
 	for I in get_tree().get_nodes_in_group("players"):
-		if Admin.HasRank(I):
-			if Admin.CheckPermissions("Is Staff", I):
+		if DataRepository.Admin.HasRank(I):
+			if DataRepository.Admin.CheckPermissions(DataRepository.Admin.RANK_FLAGS.IS_STAFF, I):
 				staff_array.append(I)
 	return staff_array
 	
 func NotifyStaff(message:String):
 	for I in get_tree().get_nodes_in_group("players"):
-		if Admin.HasRank(I):
-			if Admin.CheckPermissions("Manage Tickets", I):
+		if DataRepository.Admin.HasRank(I):
+			if DataRepository.Admin.CheckPermissions(DataRepository.Admin.RANK_FLAGS.MANAGE_TICKETS, I):
 				Server.SendSingleChat(ChatHandler.FormatSimpleMessage(message), int(I.name))
 
 func NotifyStaffUrgent(message:String):
 	for I in get_tree().get_nodes_in_group("players"):
-		if Admin.HasRank(I):
-			if Admin.CheckPermissions("Manage Tickets", I):
+		if DataRepository.Admin.HasRank(I):
+			if DataRepository.Admin.CheckPermissions(DataRepository.Admin.RANK_FLAGS.MANAGE_TICKETS, I):
 				Server.SendSingleChat(ChatHandler.FormatSimpleMessage(message), int(I.name))
 				#Server.GrabAttention() 
 				#TODO make this play a sound to catch people's attention.
@@ -64,7 +64,7 @@ func GetMessageOriginator(username:bool = false, playerid:int = 0):
 		if(username):
 			return 	Server.get_node(str(playerid)).PlayerData["username"]
 		else:
-			return Server.get_node(str(playerid)).ActiveCharacter.CharacterData["Name"]
+			return Server.get_node(str(playerid)).CurrentActiveCharacter.CharacterData["Name"]
 	
 func HandleCommands(input:Dictionary, player_id:int):
 	var command : String

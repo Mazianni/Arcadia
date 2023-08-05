@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://8ks3hdbogq72"]
+
+[ext_resource type="Script" path="res://Scripts/ActiveCharacter.gd" id="1_411dj"]
+
+[node name="ActiveCharacterBackup" type="Node" groups=["active_characters"]]
+script = ExtResource("1_411dj")

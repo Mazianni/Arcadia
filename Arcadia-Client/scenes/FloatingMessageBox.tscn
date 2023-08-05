@@ -32,6 +32,8 @@ anchor_bottom = 1.0
 offset_right = -815.0
 offset_bottom = -573.0
 pivot_offset = Vector2(-655, -354)
+size_flags_horizontal = 6
+size_flags_vertical = 6
 script = ExtResource("2")
 
 [node name="NinePatchRect" type="Panel" parent="."]
@@ -59,7 +61,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="CenterContainer"]
 layout_mode = 2
 theme = ExtResource("3_ouf7p")
-autowrap_mode = 3
+justification_flags = 0
 
 [connection signal="timeout" from="FadeoutTimer" to="." method="_on_Timer_timeout"]
 [connection signal="timeout" from="DeleteTimer" to="." method="_on_DeleteTimer_timeout"]

@@ -31,7 +31,7 @@ func CreateEaseFloatingMessage(message):
 	
 func ChangeGUIScene(newscenename):
 	if newscenename in GUI_Scenes.keys():
-		if current_loaded_GUI:
+		if current_loaded_GUI and is_instance_valid(current_loaded_GUI):	
 			current_loaded_GUI.queue_free()
 		current_loaded_GUI_name = newscenename
 		var newguisceneresource = load(GUI_Scenes[newscenename])

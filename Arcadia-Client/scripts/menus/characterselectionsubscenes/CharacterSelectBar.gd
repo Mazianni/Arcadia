@@ -17,7 +17,11 @@ func _ready():
 	connect("DeleteConfirmed", Callable(originator, "DeleteCharacter"))
 	if is_empty_slot:
 		DeleteButton.hide()
-
+		
+func _exit_tree():
+	disconnect("SelectButtonPressed", Callable(originator, "SelectCharacter"))
+	disconnect("DeleteConfirmed", Callable(originator, "DeleteCharacter"))
+	
 func _on_SelectButton_pressed():
 	emit_signal("SelectButtonPressed", assigned_uuid, is_empty_slot)
 

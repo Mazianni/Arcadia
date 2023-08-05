@@ -1,23 +1,4 @@
-[gd_resource type="Theme" load_steps=3 format=3 uid="uid://bir7klqliay2t"]
-
-[sub_resource type="StyleBoxFlat" id="1"]
-bg_color = Color(0.160784, 0.152941, 0.152941, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.678431, 0, 1)
-border_blend = true
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-expand_margin_left = 2.0
-expand_margin_top = 2.0
-expand_margin_right = 2.0
-expand_margin_bottom = 2.0
-shadow_color = Color(0, 0, 0, 1)
-anti_aliasing_size = 1.142
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://ccql3hfhmn2kw"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rjwib"]
 bg_color = Color(0.160784, 0.152941, 0.152941, 1)
@@ -36,7 +17,6 @@ expand_margin_right = 5.0
 expand_margin_bottom = 5.0
 
 [resource]
-Panel/styles/panel = SubResource("1")
 PanelContainer/colors/test = Color(0, 0, 0, 1)
 PanelContainer/styles/panel = null
 PopupPanel/styles/panel = null

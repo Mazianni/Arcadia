@@ -1,4 +1,4 @@
-extends Node
+class_name PlayerNoteHeader extends Node
 
 @onready var NoteContainerBox = $VBoxContainer/PanelContainer/ScrollContainer/HBoxContainer/VBoxContainer
 @onready var UsernameLabel = $VBoxContainer/Panel/HBoxContainer/Label
@@ -12,6 +12,9 @@ func _ready():
 	
 func AddNode(node2add:Node):
 	NoteContainerBox.add_child(node2add)
+	
+func DrawUsername():
+	UsernameLabel.text = username
 	
 func _on_AddNote_pressed():
 	emit_signal("add_note_button_pressed", username)

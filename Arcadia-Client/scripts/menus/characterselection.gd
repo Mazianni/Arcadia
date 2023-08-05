@@ -3,14 +3,24 @@ extends Node
 var CharacterBarResource = preload("res://scenes/CharacterSelectBar.tscn")
 var CharacterCreationScreenResource = preload("res://scenes/CharacterCreation.tscn")
 
+@onready var barcointainer = $NinePatchRect/CenterContainer/GridContainer
+
 func _ready():
 	Server.connect("character_list_recieved", Callable(self, "RenderSlots"))
+	Globals.character_list_refresh_requested.connect(Callable(self, "RefreshCharacterList"))
 	if Globals.CharacterList.size() == 0:
 		Server.RequestCharacterList()
 	else:
 		RenderSlots()
+		
+func _exit_tree():
+	Server.disconnect("character_list_recieved", Callable(self, "RenderSlots"))
+	Globals.character_list_refresh_requested.disconnect(Callable(self, "RefreshCharacterList"))	
 
 func RenderSlots():
+	if barcointainer.get_children():
+		for i in barcointainer.get_children():
+			i.queue_free()
 	var remaining_slots = 6
 	if Globals.CharacterList.size() > 0:
 		for i in Globals.CharacterList.keys():
@@ -20,7 +30,7 @@ func RenderSlots():
 			newbarinstance.originator = self
 			newbarinstance.is_empty_slot = false
 			newbarinstance.assigned_uuid = i
-			$NinePatchRect/CenterContainer/GridContainer.add_child(newbarinstance)
+			barcointainer.add_child(newbarinstance)
 			remaining_slots -= 1
 		if remaining_slots > 0:
 			for i in remaining_slots:
@@ -30,7 +40,7 @@ func RenderSlots():
 				newbarinstance.originator = self
 				newbarinstance.is_empty_slot = true
 				newbarinstance.assigned_uuid = null
-				$NinePatchRect/CenterContainer/GridContainer.add_child(newbarinstance)
+				barcointainer.add_child(newbarinstance)
 	else:
 		for i in 6:
 			var newbarinstance = CharacterBarResource.instantiate()
@@ -40,13 +50,10 @@ func RenderSlots():
 			newbarinstance.is_empty_slot = true
 			newbarinstance.assigned_uuid = null
 			$NinePatchRect/CenterContainer/GridContainer.add_child(newbarinstance)
-	Server.disconnect("character_list_recieved", Callable(self, "RenderSlots"))
 	
 func SelectCharacter(uuid, is_new):
 	if is_new:
-		var charcreation = CharacterCreationScreenResource.instantiate()
-		self.get_parent().add_child(charcreation)
-		self.queue_free()
+		Gui.ChangeGUIScene("CharacterCreation")
 	else:
 		Server.SelectCharacter(uuid)
 		Globals.character_uuid = uuid

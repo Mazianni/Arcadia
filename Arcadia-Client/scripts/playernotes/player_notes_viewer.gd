@@ -1,10 +1,10 @@
 extends Node
 
-@onready var NoteTree = $HBoxContainer/NoteTree/ScrollContainer/VBoxContainer
+@onready var NoteTree = $MarginContainer/HBoxContainer/VBoxContainer
 @onready var NoteInstance = load("res://scenes/Admin/PlayerNotes/PlayernoteInstance.tscn")
 @onready var NoteHeaderInstance = load("res://scenes/Admin/PlayerNotes/PlayernoteHeader.tscn")
 
-@onready var ShowOnlyUsersWithNotesToggle = $HBoxContainer/VBoxContainer/ShowOnlyExistingNotes
+@onready var ShowOnlyUsersWithNotesToggle : CheckButton = $MarginContainer/HBoxContainer/ShowOnlyExistingNotes
 
 @onready var NoteEditDialog = $"../../../EditNoteDialog"
 @onready var NoteEditDialogTextEdit = $"../../../EditNoteDialog/VBoxContainer/TextEdit"
@@ -13,7 +13,8 @@ extends Node
 @onready var NoteAddDialogTextEdit = $"../../../AddNoteDialog/VBoxContainer/TextEdit"
 @onready var NoteAddDialogTitle = $"../../../AddNoteDialog/VBoxContainer/LineEdit"
 
-var player_notes:Dictionary
+var player_notes:Dictionary = {}
+var player_list:Array = []
 
 var last_edited_note_number
 var last_edited_note_username
@@ -21,37 +22,63 @@ var last_added_note_username
 
 func _ready():
 	Server.connect("player_notes_recieved", Callable(self, "UpdateNotes"))
+	Server.player_list_recieved.connect(Callable(self, "UpdatePlayerList"))
 	Server.RequestNotes()
 	Server.GetPlayerList()
 	
 func UpdateNotes(new_notes:Dictionary):
 	player_notes = new_notes.duplicate(true)
-	var note_render_dict : Dictionary
-	if NoteTree.get_children():
+	var existing_note_headers : Array = []
+	if NoteTree.get_children(): #check for old note headers.
 		for C in NoteTree.get_children():
-			C.queue_free()
-	if ShowOnlyUsersWithNotesToggle.pressed:
-		note_render_dict = player_notes
-	else:
-		note_render_dict = await Server.player_list_recieved
-	for I in note_render_dict.keys():
+			if C.username in player_list:
+				if ShowOnlyUsersWithNotesToggle.button_pressed:
+					if not player_notes.keys().has(C):
+						C.queue_free()
+				else:
+					existing_note_headers.append(C.username)
+					continue
+			else:
+				C.queue_free()
+	for I in player_list: #create new note headers
+		if existing_note_headers.has(I):
+			continue
+		if ShowOnlyUsersWithNotesToggle.button_pressed:
+			if not player_notes.keys().has(I):
+				continue
 		var new_header = NoteHeaderInstance.instantiate()
 		NoteTree.add_child(new_header)
 		new_header.connect("add_note_button_pressed", Callable(self, "AddNotePressed"))
 		new_header.username = I
-		if player_notes[I].keys().has(I):
-			for N in player_notes[I].keys():
+		new_header.DrawUsername()
+	for PN in NoteTree.get_children(): #update all note headers.
+		var header_node : PlayerNoteHeader = PN
+		var existing_nodes : Array = header_node.NoteContainerBox.get_children()
+		var existing_nodes_text : Array
+		for K in existing_nodes:
+			existing_nodes_text.append(K.number)
+		if player_notes.size() == 0:
+			continue
+		if player_notes[header_node.username].keys().size():
+			for N in player_notes[header_node.username].keys():
+				if existing_nodes_text.has(N):
+					var updating_note : PlayerNoteInstance = existing_nodes[N]
+					updating_note.last_edited = player_notes[PN][N]["LastEdited"]
+					updating_note.subject = player_notes[PN][N]["Note"]
+					updating_note.RenderText()
+					continue
 				var new_note = NoteInstance.instantiate()
 				new_note.connect("edit_button_pressed", Callable(self, "NoteEditButtonPressed"))
 				new_note.connect("delete_button_pressed", Callable(self, "NoteRemoveButtonPressed"))
+				new_note.name = N
 				new_note.number = N
-				new_note.title = player_notes[I][N]["Description"]
-				new_note.date = player_notes[I][N]["Date"]
-				new_note.last_edited = player_notes[I][N]["LastEdited"]
-				new_note.subject = player_notes[I][N]["Note"]
-				new_note.creator = player_notes[I][N]["Creator"]
-				new_note.username = player_notes[I]
-				new_header.AddNode(new_note)
+				new_note.title = player_notes[PN][N]["Description"]
+				new_note.date = player_notes[PN][N]["Date"]
+				new_note.last_edited = player_notes[PN][N]["LastEdited"]
+				new_note.subject = player_notes[PN][N]["Note"]
+				new_note.creator = player_notes[PN][N]["Creator"]
+				new_note.username = player_notes[PN]
+				header_node.AddNode(new_note)
 			
 func AddNotePressed(username:String):
 	last_added_note_username = username
@@ -95,24 +122,11 @@ func _on_NoteAddConfirm_pressed():
 func _on_ShowOnlyExistingNotes_pressed():
 	Server.RequestNotes()
 	Server.GetPlayerList()
+
+func _on_player_note_refresh_timer_timeout():
+	Server.RequestNotes()
+	Server.GetPlayerList()
 	
-#func UpdateNotes(new_notes:Dictionary):
-#	player_notes = new_notes.duplicate(true)
-#	var root = NoteTree.create_item()
-#	NoteTree.hide_root = true
-#	for I in player_notes.keys():
-#		var treechild = NoteTree.create_item(root)
-#		var notenumber = 0
-#		treechild.set_text(0, I)
-#		for N in player_notes[I]:
-#			notenumber += 1
-#			var treechild_number = NoteTree.create_item(treechild)
-#			var treechild_creator = NoteTree.create_item(treechild)
-#			var treechild_date = NoteTree.create_item(treechild)
-#			var treechild_desc = NoteTree.create_item(treechild)
-#			treechild_number.set_text(0, "#"+notenumber+" - "+treechild_date.set_text(0, "Added On: "+player_notes[I][N]["Description"]))
-#			treechild_creator.set_text(0, "Added By: "+player_notes[I][N]["Creator"])
-#			treechild_date.set_text(0, "Added On: "+player_notes[I][N]["Date"])
-#			treechild_desc.set_text(0, player_notes[I][N]["Note"])
-
-
+func UpdatePlayerList(new_players:Array):
+	player_list = new_players
+	print(player_list)

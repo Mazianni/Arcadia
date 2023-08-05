@@ -1,4 +1,4 @@
-class_name PlayerContainer extends Node
+class_name PlayerContainer extends PlayerDataContainerBase
 
 var ActiveCharacterPath = preload("res://Scenes/Instances/ActiveCharacter.tscn")
 
@@ -45,12 +45,12 @@ func HandleStateUpdate(client_state):
 			ClientState = DataRepository.CLIENT_STATE_LIST.CLIENT_INGAME
 			
 func OnDeleted():
+	if DataRepository.CurrentState == DataRepository.SERVER_STATE.SERVER_SHUTTING_DOWN:
+		return
 	WriteSaveData()
 
 func CheckSaveDataExists(): #Verify that the directory and JSON file for this player exists; if not, create it with defaults.
 	var save_dir = DataRepository.saves_directory + "/" + str(PlayerData["username"])
-	print(DataRepository.saves_directory)
-	print(save_dir)
 	var dir = DirAccess.open(save_dir)
 	if DirAccess.get_open_error():
 		Logging.log_error("[FILE] Error opening directory "+save_dir)
@@ -61,7 +61,7 @@ func CheckSaveDataExists(): #Verify that the directory and JSON file for this pl
 		Logging.log_notice("Creating save directory for " + str(PlayerData["username"]) + " at dir " + save_dir)
 	if not dir.file_exists(save_dir+"/"+str(PlayerData["username"])+".json"):
 		var newsave = FileAccess.open(save_dir+"/"+str(PlayerData["username"])+".json", FileAccess.WRITE)
-		newsave.store_line(JSON.new().stringify(PlayerData))
+		newsave.store_line(JSON.stringify(PlayerData))
 		Logging.log_notice("Creating save JSON for " + str(PlayerData["username"]))
 		var err = newsave.get_error()
 		newsave.close()
@@ -83,12 +83,13 @@ func WriteSaveData():
 	var save_file = save_dir+"/"+str(PlayerData["username"])+".json"
 	var file = FileAccess.open(save_file, FileAccess.WRITE)
 	var err = file.get_error()
-	file.store_line(JSON.new().stringify(PlayerData))
+	file.store_line(JSON.stringify(PlayerData))
 	if !err:
 		Logging.log_notice("Data for " + str(PlayerData["username"]) + " saved.")
 	else:
 		Logging.log_error("[FILE] Error encountered during save for "+str(PlayerData["username"])+" with code "+str(err))
 	file.close()
+	save_callback.emit(name, "PlayerContainer", PlayerData["username"])
 	
 func DeleteSaveData(charname):
 	Logging.log_notice("Deleting character "+charname+" for "+PlayerData["username"])
@@ -96,9 +97,9 @@ func DeleteSaveData(charname):
 	var save_file = save_dir+"/"+str(charname)+".json"
 	var dir : DirAccess = DirAccess.open(save_dir)
 	dir.remove(save_file)
-	var err = dir.get_open_error()
+	var err = DirAccess.get_open_error()
 	if !err:
-		Logging.log_notice("Data for " + str(PlayerData["username"]) + " Deleted.")
+		Logging.log_notice("Data for " + str(PlayerData["username"])+" character "+charname + " deleted.")
 	else:
 		Logging.log_error("[FILE] Error encountered during save deletion for "+str(PlayerData["username"])+" with code "+str(err))	
 	
@@ -108,11 +109,11 @@ func DeleteCharacter(char_name):
 	WriteSaveData()
 	
 func CreateActiveCharacter(character_name, player_id):
+	Logging.log_notice("Attempting to load existing character for "+str(player_id)+": "+character_name)
 	CurrentActiveCharacter = ActiveCharacterPath.instantiate()
 	CurrentActiveCharacter.name = character_name
 	CurrentActiveCharacter.ActiveController = self
 	self.add_child(CurrentActiveCharacter)
-	Logging.log_notice("Loading existing character for "+str(player_id)+": "+character_name)
 	CurrentActiveCharacter.CharacterData["LastPlayed"] = Time.get_unix_time_from_system()
 	
 func CreateNewActiveCharacter(cuuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height):

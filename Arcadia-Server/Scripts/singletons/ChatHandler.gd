@@ -12,6 +12,24 @@ extends Node
 # "is_admin_msg": true or false #TODO reserved for future use.
 # "output": {"text":"string", "T":"timestampstring","is_emote":true or false, "category":"somestring"}
 # }
+
+var ItalicsRegEx : RegEx = RegEx.new()
+var BoldRegEx : RegEx = RegEx.new()
+var UnderlineRegEx : RegEx = RegEx.new()
+var StrikethroughRegEx : RegEx = RegEx.new()
+var CenterRegEx : RegEx = RegEx.new()
+var RightRegEx : RegEx = RegEx.new()
+var ColorRegex : RegEx = RegEx.new()
+
+func _ready():
+	ItalicsRegEx.compile("\\|||(?=\\S)(.+?)(?=\\S)\\|||")
+	BoldRegEx.compile("\\+++(?=\\S)(.+?)(?=\\S)\\+++")
+	UnderlineRegEx.compile("___(?=\\S)(.+?)(?=\\S)___")
+	StrikethroughRegEx.compile("~~~(?=\\S)(.+?)(?=\\S)~~~")
+	CenterRegEx.compile("===(?=\\S)(.+?)(?=\\S)===")
+	RightRegEx.compile("^^^(?=\\S)(.+?)(?=\\S)^^^")
+	ColorRegex.compile("(#{2}([a-f0-9]{6})#{2})(.*)(#{2}([a-f0-9]{6})#{2})")
+
 func EscapeBBCode(msg:String):
 	return msg.replace("[", "[lb]")
 
@@ -69,9 +87,9 @@ func ParseChat(msg:Dictionary, originator:String, is_global:bool = false, player
 	if newdict["is_emote"]:
 		outputdict["category"] = "IC"
 		
-	if Admin.HasRank(player):
-		if Admin.IsRankValid(player):
-			rank_text = "[color="+Admin.GetRankColor(player)+"]["+Admin.GetRankTitleShort(player)+"][/color] "
+	if DataRepository.Admin.HasRank(player):
+		if DataRepository.Admin.IsRankValid(player):
+			rank_text = "[color="+DataRepository.Admin.GetRankColor(player)+"]["+DataRepository.Admin.GetRankTitleShort(player)+"][/color] "
 	
 	if !is_global:
 		if not newdict["is_emote"]:
@@ -122,13 +140,18 @@ func ParseChat(msg:Dictionary, originator:String, is_global:bool = false, player
 	outputdict["text"] = add_formatting+teststring+end_formatting
 	
 	newdict["output"] = outputdict.duplicate(true)
-	
-	print(newdict)
 
 	return newdict
 	
 func ParseMarkdown(msg:String):
 	var mutated : String 
-	var test_string : String = msg
-	mutated = test_string.format(DataRepository.markdown_array, "|_|")
+
+	mutated = ItalicsRegEx.sub(msg, "[i]$1[/i]", true)
+	mutated = BoldRegEx.sub(mutated, "[b]$1[/b]", true)
+	mutated = UnderlineRegEx.sub(mutated, "[u]$1[/u]", true)
+	mutated = StrikethroughRegEx.sub(mutated, "[s]$1[/s]", true)
+	mutated = CenterRegEx.sub(mutated, "[center]$1[/center]", true)
+	mutated = RightRegEx.sub(mutated, "[right]$1[/right]", true)
+	mutated = ColorRegex.sub(mutated, "[color=$2]$3[/color]", true)
+			
 	return mutated

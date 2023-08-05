@@ -29,6 +29,7 @@ extends Node
 @rpc("any_peer") func ServRPC_IsClientAdmin(): pass
 @rpc("any_peer") func ServRPC_GetCurrentPlayers(): pass
 @rpc("any_peer") func ServRPC_RecieveClientState(client_state): pass
+@rpc("any_peer", "unreliable") func ServRPC_RequestWorldState(): pass
 
 #BOILERPLATE END
 
@@ -54,6 +55,7 @@ signal admin_tickets_recieved(tickets)
 signal player_list_recieved(playerlist)
 signal player_notes_recieved(player_notes)
 signal admin_verified(verified)
+signal world_update_recieved
  
 func _physics_process(delta):
 	client_clock += int(delta*1000) + delta_latency
@@ -136,12 +138,15 @@ func DetermineLatency():
 		delta_latency = (total_latency / latency_array.size()) - latency
 		latency = total_latency/latency_array.size()
 		latency_array.clear()
+		
+@rpc("any_peer", "unreliable") func RequestWorldState():
+	rpc_id(1, "ServRPC_RequestWorldState")
 	
 @rpc("any_peer", "unreliable") func RecieveWorldState(state):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
-	pass
 	maphandler.UpdateWorldState(state)
+	world_update_recieved.emit()
 	
 @rpc("any_peer") func ReturnServerTime(server_time, client_time):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
@@ -177,6 +182,17 @@ func GetRaceList():
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	Globals.RaceList = racelist.duplicate(true)
+	
+@rpc("any_peer") func ClientRPC_ReturnNewCharacterCreated(status, message):
+	if(status):
+		Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_PREGAME) #dump them to the character selection menu
+	var msgcolor : String = "neutral"
+	match status:
+		true:
+			msgcolor = "good"
+		false:
+			msgcolor = "false"
+	Gui.CreateFloatingMessage(message, msgcolor)
 
 #character creation handling end
 
@@ -206,8 +222,7 @@ func DeleteCharacter(char_name):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	maphandler.ChangeMap(worldname)
-	await maphandler.map_loaded
-	Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_INGAME)
+
 	
 @rpc("any_peer") func ClientRPC_ReturnCharacterLoadFailed():
 	Gui.CreateFloatingMessage("The server reported an error loading your character. \nPlease try again or inform a developer.", "bad")
@@ -271,6 +286,8 @@ func CreateAccount(username, password):
 #movement request start
 
 func RequestMovement(vector, direction):
+	if not Globals.client_state == Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
+		return
 	rpc_id(1, "ServRPC_RequestColliderMovement", vector, direction)
 
 #movement request end
@@ -399,5 +416,12 @@ func IsClientAdmin():
 		emit_signal("admin_verified", decision)
 
 #misc end
+
+#map sync start
+
+@rpc("any_peer") func ClientRPC_RecieveMapSync(mapname:String):
+	maphandler.ChangeMap(mapname)
+
+#map sync end
 
 

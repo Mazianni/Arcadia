@@ -23,7 +23,6 @@ func _ready():
 	OnTrackFinished()
 	
 func OnSettingsLoaded():
-	print("dfsih")
 	music_player.set_volume_db(linear_to_db(Settings.CurrentSettingsDict["Music Volume"]))
 	
 func OnTrackFinished(pick_new : bool = false):
@@ -36,7 +35,6 @@ func OnTrackFinished(pick_new : bool = false):
 		OnTrackFinished(true)
 		return
 	last_played_track = new_track
-	print("playing new track " + new_track)
 	music_player.stream = track_lists[current_track_list][new_track]["stream"]
 	music_player.play()
 	message = "Now playing "+new_track+"\nBy "+track_lists[current_track_list][new_track]["author"]

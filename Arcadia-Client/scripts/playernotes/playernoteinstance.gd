@@ -1,4 +1,4 @@
-extends Node
+class_name PlayerNoteInstance extends Node
 
 var number
 var title
@@ -18,13 +18,15 @@ signal edit_button_pressed(number, username)
 signal remove_button_pressed(number, username)
 
 func _ready():
+	RenderText()
+
+func RenderText():
 	TitleLabel.text = "#"+number+" - "+title
 	DateLabel.text = "Time and Date: "+date
 	if last_edited:
 		DateLabel.text += " Last Edited on: "+last_edited
 	CreatorLabel.text = "Added By: "+creator
 	Description.text = subject
-
 
 func _on_ExpandButton_pressed():
 	DescriptionContainer.visible = !DescriptionContainer.visible

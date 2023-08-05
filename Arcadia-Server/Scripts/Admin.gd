@@ -1,6 +1,6 @@
-extends Node
+class_name AdminManager extends SubsystemBase
 
-enum RANK_FLAGS {NONE, MANAGE_TICKETS, IS_STAFF, PLAYER_NOTES}
+enum RANK_FLAGS {NONE, MANAGE_TICKETS, IS_STAFF, PLAYER_NOTES, ALL}
 enum TICKET_FLAGS {TICKET_OPEN, TICKET_STAFF_ASSIGNED, TICKET_CLOSED}
 
 @onready var admin_directory = "user://" + "admin"
@@ -9,6 +9,12 @@ enum TICKET_FLAGS {TICKET_OPEN, TICKET_STAFF_ASSIGNED, TICKET_CLOSED}
 var next_ticket_status_check = 0
 
 var ranks : Dictionary = {
+	"Admin Test Rank":{
+		"RankNameShort" : "Test",
+		"RankNameLong" : "Test Rank",
+		"TagColor" : "#ffa970",
+		"Permissions" : [RANK_FLAGS.ALL]
+	},
 	"Test Rank":{
 		"RankNameShort" : "Test",
 		"RankNameLong" : "Test Rank",
@@ -47,8 +53,13 @@ var ban_dict_skeleton = {
 	"uuid":""
 }
 
-func _ready():
+signal admin_data_loaded
+
+func SubsystemInit(node_name:String):
 	CheckBanDataExists()
+	
+func SubsystemShutdown(node_name:String):
+	subsystem_shutdown.emit(node_name, self)
 	
 func _process(delta):
 	
@@ -61,8 +72,8 @@ func _process(delta):
 					tickets_without_staff += 1
 		for I in get_tree().get_nodes_in_group("players"):
 			if HasRank(I):
-				if CheckPermissions("Manage Tickets", I):
-					Server.SendSingleChat(ChatHandler.FormatSimpleMessage("[There are "+str(tickets_without_staff)+" tickets without a staff member assigned.]"), int(I.name))
+				if CheckPermissions(RANK_FLAGS.MANAGE_TICKETS, I):
+					Server.SendSingleChat(ChatHandler.FormatSimpleMessage("[There are "+str(tickets_without_staff)+" tickets without a staff member assigned.]"), I.associated_pid)
 		
 func CheckBanDataExists():
 	var dir = DirAccess.open(admin_directory)
@@ -73,12 +84,12 @@ func CheckBanDataExists():
 		Logging.log_notice("[ADMIN] Creating save directory for admin data at dir " + admin_directory)
 	if not dir.file_exists(admin_directory+"/"+"ban_data.json"):
 		var newsave = FileAccess.open(admin_directory+"/"+"ban_data.json", FileAccess.WRITE)
-		newsave.store_line(JSON.new().stringify(ban_data))
+		newsave.store_line(JSON.stringify(ban_data))
 		Logging.log_notice("[ADMIN] Creating JSON for ban data.")
 		newsave.close()
 	if not dir.file_exists(admin_directory+"/"+"player_note_data.json"):
 		var newsave = FileAccess.open(admin_directory+"/"+"player_note_data.json", FileAccess.WRITE)
-		newsave.store_line(JSON.new().stringify(player_notes))
+		newsave.store_line(JSON.stringify(player_notes))
 		Logging.log_notice("[ADMIN] Creating JSON for player note data.")
 		newsave.close()
 	LoadBanData()
@@ -93,6 +104,8 @@ func LoadBanData():
 	if(temp):
 		bandict = temp.duplicate(true)
 	loadfile.close()
+	admin_data_loaded.emit()
+	subsystem_start_success.emit(name, self)
 		
 func CheckBanned(username:String, puuid:String, ip:String): # returns false if not banned
 	var result = OK
@@ -137,42 +150,44 @@ func CheckBanned(username:String, puuid:String, ip:String): # returns false if n
 			Logging.log_warning("[ADMIN] New unique UUID added to ban database.")
 	return result
 		
-func IsRankValid(player:Node):
+func IsRankValid(player:PlayerContainer):
 	if player.PlayerData["rank"] in ranks.keys():
 		return true
 	else:
 		return false
 	
-func HasRank(player:Node):
+func HasRank(player:PlayerContainer):
 	if player.PlayerData["rank"]:
 		return true
 	return false
 	
-func GetRank(player:Node):
+func GetRank(player:PlayerContainer):
 	return player.PlayerData["rank"]
 	
-func GetRankColor(player:Node):
+func GetRankColor(player:PlayerContainer):
 	print(player.PlayerData["rank"])
 	if IsRankValid(player):
 		return ranks[GetRank(player)]["TagColor"]
 	Logging.log_error("[RANKS] Invalid Rank supplied to GetRankColor!")
 	return null
 	
-func GetRankTitleShort(player:Node):
+func GetRankTitleShort(player:PlayerContainer):
 	return ranks[GetRank(player)]["RankNameShort"]
 	
-func IsStaff(player:Node):
+func IsStaff(player:PlayerContainer):
 	if HasRank(player):
-		if CheckPermissions("Is Staff", player):
+		if CheckPermissions(RANK_FLAGS.IS_STAFF, player):
+			return true
+		if CheckPermissions(RANK_FLAGS.ALL, player):
 			return true
 	return false
 	
-func RetrievePermissions(player:Node):
+func RetrievePermissions(player:PlayerContainer):
 	if HasRank(player):
 		return ranks[player.PlayerData["rank"]]["Permissions"]
 		
-func CheckPermissions(required: String, player_id:Node):
-	var permission = PermissionString2Enum(required)
+func CheckPermissions(required: int, player_id:PlayerContainer):
+	var permission = required
 	if !permission:
 		Logging.log_error("[RANKS] Permission supplied was null or invalid!")
 		return false
@@ -181,7 +196,9 @@ func CheckPermissions(required: String, player_id:Node):
 	if !IsRankValid(player_id):
 		Logging.log_error("[RANKS] User "+ str(player_id.PlayerData["username"]) +" has an invalid rank:" + str(player_id.PlayerData["rank"]))
 		return false
-	if permission in ranks[GetRank(player_id)]["Permissions"]:
+	if RetrievePermissions(player_id).has(RANK_FLAGS.ALL):
+		return true
+	if ranks[GetRank(player_id)]["Permissions"].has(required):
 		return true
 	return false
 	
@@ -195,6 +212,8 @@ func PermissionString2Enum(input: String):
 			return RANK_FLAGS.IS_STAFF
 		"Player Notes":
 			return RANK_FLAGS.PLAYER_NOTES
+		"All": 
+			return RANK_FLAGS.ALL
 	Logging.log_error("[PERMISSIONS] Invalid Permission "+str(input))
 	
 #tickets
@@ -237,7 +256,7 @@ func CloseTicket(ticket_number:String, pid:int):
 	if tickets[ticket_number]["Status"] != TICKET_FLAGS.TICKET_CLOSED:
 		if Server.has_node(str(pid)):
 			if tickets[ticket_number]["AdminCreated"]:
-				if CheckPermissions("Manage Tickets", Server.get_node(str(pid))):
+				if CheckPermissions(RANK_FLAGS.MANAGE_TICKETS, Server.get_node(str(pid))):
 					tickets[ticket_number]["Status"] = TICKET_FLAGS.TICKET_CLOSED
 					NotifyTicketClosed(ticket_number, true, Helpers.PID2Username(pid))
 					tickets[ticket_number]["Title"] += " [CLOSED]"
@@ -279,7 +298,7 @@ func IsTicketClaimedByStaff(ticket_number:String):
 		if Server.has_node(Helpers.Username2PID(U)):
 			var user = Server.get_node(Helpers.Username2PID(U))
 			if HasRank(user):
-				if CheckPermissions("Manage Tickets", user):
+				if CheckPermissions(RANK_FLAGS.MANAGE_TICKETS, user):
 					return true
 				
 func AddUserToTicket(username:String, ticket_number:String):
@@ -290,7 +309,7 @@ func ClaimTicket(username:String, ticket_number:String):
 	if Server.has_node(Helpers.Username2PID(username)):
 		var user = Server.get_node(Helpers.Username2PID(username))
 		if HasRank(user):
-			if CheckPermissions("Manage Tickets", user):
+			if CheckPermissions(RANK_FLAGS.MANAGE_TICKETS, user):
 				tickets[ticket_number]["AssignedStaff"] += username
 				AddMessageToTicket(user.PlayerData["rank"] + " has been assigned to ticket "+ticket_number, ticket_number,"", true)
 				tickets[ticket_number]["Status"] = TICKET_FLAGS.TICKET_STAFF_ASSIGNED

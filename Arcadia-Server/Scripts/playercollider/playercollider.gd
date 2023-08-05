@@ -1,4 +1,4 @@
-extends CharacterBody2D
+class_name PlayerCollider extends CharacterBody2D
 
 var ControllingCharacter : ActiveCharacter
 var player_state
@@ -22,4 +22,10 @@ func UpdatePlayerState():
 	if ControllingCharacter:
 		ControllingCharacter.CurrentPosition = get_global_position()
 		player_state = {"T":"","P": get_global_position(), "M":ControllingCharacter.CurrentMap, "D":direction}
-		get_tree().get_root().get_node("Server").GeneratePlayerStates(ControllingCharacter.CharacterData["uuid"],player_state)
+		DataRepository.Server.GeneratePlayerStates(ControllingCharacter.CharacterData["uuid"],player_state)
+		
+func GetPlayerState():
+	if ControllingCharacter:
+		ControllingCharacter.CurrentPosition = get_global_position()
+		var pstate : Dictionary = {"T":"","P": get_global_position(), "M":ControllingCharacter.CurrentMap, "D":direction}
+		return pstate

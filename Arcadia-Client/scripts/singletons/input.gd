@@ -2,22 +2,25 @@ extends Node
 
 var request_velocity = Vector2()
 var direction = Vector2()
+var focused = false
 
 func ready() -> void:
 	get_viewport().connect("gui_focus_changed", Callable(self, "_on_focus_changed"))
-
+		
 func _physics_process(delta):
-	pass
-	if Globals.client_state == Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
-		on_movement()
+	on_movement()
 		
 func _on_focus_changed(control:Control) -> void:
 	if control != null:
-		print(control.name)
-		print("shit")
+		focused = true
+		print(control)
+	else:
+		focused = false
 
 func on_movement():
-	print("fart")
+	if focused:
+		return
+		
 	request_velocity = Vector2.ZERO
 	
 	if Globals.MouseOnUi:

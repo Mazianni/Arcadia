@@ -37,29 +37,28 @@ var previewspriteshairpath = "res://sprites/player/hair"
 @onready var doll_body = $PreviewSpriteContainer/Body
 @onready var doll_hair = $PreviewSpriteContainer/Hair
 
-@onready var DetailsPanel = $NinePatchRect/Details
 @onready var DetailsPanelContainer = $NinePatchRect
 @onready var RacePanel = $NinePatchRect2/RaceSelection/RaceContainer
 @onready var RaceSelection = $NinePatchRect2/RaceSelection
 @onready var RaceSelectionContainer = $NinePatchRect2
 
-@onready var BodytypeSelection = $NinePatchRect/Details/GridContainer/BodytypeMenu
-@onready var HairStyleSelection = $NinePatchRect/Details/GridContainer/HairStyleMenu
-@onready var SkinColorSelection = $NinePatchRect/Details/GridContainer/SkinMenu
-@onready var TailStyleSelection = $NinePatchRect/Details/GridContainer/TailMenu
-@onready var AccessoryStyleSelection = $NinePatchRect/Details/GridContainer/AccessoryMenu
-@onready var EyeColorSelection = $NinePatchRect/Details/GridContainer/EyesMenu/EyePicker
-@onready var HairColorSelection = $NinePatchRect/Details/GridContainer/HairColorMenu/HairPicker
-@onready var DirSelection = $NinePatchRect/Details/GridContainer/DirSelect
-@onready var SpawnLocationSelection = $NinePatchRect/Details/GridContainer/SpawnMenu
-@onready var EarStyleSelection = $NinePatchRect/Details/GridContainer/EarMenu
-@onready var AgeInputSlider = $NinePatchRect/Details/GridContainer/AgeInput
-@onready var NameInput = $NameInput
+@onready var BodytypeSelection = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/BodytypeMenu
+@onready var HairStyleSelection = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/HairStyleMenu
+@onready var SkinColorSelection = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/SkinMenu
+@onready var TailStyleSelection = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/TailMenu
+@onready var AccessoryStyleSelection = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/AccessoryMenu
+@onready var EyeColorSelection = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/EyesMenu/EyePicker
+@onready var HairColorSelection = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/HairColorMenu/HairPicker
+@onready var DirSelection = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/DirSelect
+@onready var SpawnLocationSelection = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/SpawnMenu
+@onready var EarStyleSelection = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/EarMenu
+@onready var AgeInputSlider = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/AgeInput
+@onready var NameInput = $NinePatchRect/MarginContainer/VBoxContainer/NameInput
 @onready var CreateConfirmButton = $CreateConfirmButton
-@onready var HeightInputSlider = $NinePatchRect/Details/GridContainer/HeightInput
+@onready var HeightInputSlider = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/HeightInput
 
-@onready var AgeInputLabel = $NinePatchRect/Details/GridContainer/AgeInput/Label2
-@onready var HeightInputLabel = $NinePatchRect/Details/GridContainer/HeightInput/Label2
+@onready var AgeInputLabel = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/AgeInput/Label2
+@onready var HeightInputLabel = $NinePatchRect/MarginContainer/VBoxContainer/GridContainer/HeightInput/Label2
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
