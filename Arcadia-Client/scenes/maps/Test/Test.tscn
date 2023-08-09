@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://bhtytjpixxt12"]
+[gd_scene load_steps=7 format=3 uid="uid://bhtytjpixxt12"]
 
 [ext_resource type="PackedScene" uid="uid://ddw6v7dlf6isa" path="res://scenes/Trees/Tree_Green_A.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://j5k7kq6kigui" path="res://scenes/Trees/Tree_Green_B.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/Trees/Tree_Green_C.tscn" id="4"]
 [ext_resource type="Script" path="res://scripts/player/playerspawner.gd" id="5"]
+[ext_resource type="Script" path="res://addons/wyvernbox/ground/ground_items_manager.gd" id="5_t84nu"]
+[ext_resource type="PackedScene" uid="uid://cjdtl6ek4qp7d" path="res://addons/wyvernbox_prefabs/ground_item_stack_view_2d.tscn" id="6_g2gl4"]
 
 [node name="Map" type="Node2D"]
 script = ExtResource("5")
@@ -87,3 +89,7 @@ position = Vector2(596, 511)
 [node name="Players" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
 [node name="Projectiles" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
+
+[node name="GroundItemsManager" type="Node" parent="."]
+script = ExtResource("5_t84nu")
+item_scene = ExtResource("6_g2gl4")

@@ -35,8 +35,6 @@ func LoadSettingsFromJSON():
 	loadfile.close()
 	
 func SaveSettingsToJSON():
-	print("saving settings")
-	print(CurrentSettingsDict)
 	var save_dir = "user://"
 	var save_file = "settings.json"
 	var file = FileAccess.open(save_dir+save_file, FileAccess.WRITE)

@@ -45,3 +45,7 @@ func MovePlayerToMap(playerNode, OldMap, NewMap, position): #used when transitio
 	playerNode.ControllingCharacter.CurrentMap = NewMap
 	playerNode.ControllingCharacter.CurrentPosition = position
 	DataRepository.Server.SyncClientMap(playerNode.ControllingCharacter.ActiveController.associated_pid, NewMap)
+
+func SerializeGroundItems(mapname):
+	var mapnode : MapBase = get_node(mapname)
+	return mapnode.GroundItems.to_array()

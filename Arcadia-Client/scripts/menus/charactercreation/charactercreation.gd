@@ -150,7 +150,7 @@ func _on_RaceConfirm_pressed():
 	HeightInputSlider.min_value = HeightMinMax["min"]
 	HeightInputSlider.max_value = HeightMinMax["max"]
 	HeightInputSlider.value = HeightMinMax["min"]
-	if Settings.CurrentSettingsDict["Measurement Units"] == "Imperial":
+	if Globals.measurement_units == "Imperial":
 		HeightInputLabel.text = Helpers.metric2imperial(HeightMinMax["min"])
 	else:
 		HeightInputLabel.text = str(HeightMinMax["min"])

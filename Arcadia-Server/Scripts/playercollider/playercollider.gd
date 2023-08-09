@@ -22,7 +22,7 @@ func UpdatePlayerState():
 	if ControllingCharacter:
 		ControllingCharacter.CurrentPosition = get_global_position()
 		player_state = {"T":"","P": get_global_position(), "M":ControllingCharacter.CurrentMap, "D":direction}
-		DataRepository.Server.GeneratePlayerStates(ControllingCharacter.CharacterData["uuid"],player_state)
+		DataRepository.Server.GeneratePlayerStates(ControllingCharacter.CharacterData.uuid,player_state)
 		
 func GetPlayerState():
 	if ControllingCharacter:

@@ -17,13 +17,9 @@ var last_played_track : String
 
 func _ready():
 	add_child(music_player)
+	music_player.bus = "Music"
 	music_player.connect("finished", Callable(self, "OnTrackFinished"))
-	get_tree().get_root().get_node("Settings").connect("settings_loaded", Callable(self, "OnSettingsLoaded"))
-	await get_tree().create_timer(0.01).timeout
 	OnTrackFinished()
-	
-func OnSettingsLoaded():
-	music_player.set_volume_db(linear_to_db(Settings.CurrentSettingsDict["Music Volume"]))
 	
 func OnTrackFinished(pick_new : bool = false):
 	if pick_new:

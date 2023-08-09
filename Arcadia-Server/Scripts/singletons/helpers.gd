@@ -11,10 +11,11 @@ func string_to_vector2(string := "") -> Vector2:
 		new_string.erase(0, 1)
 		new_string.erase(new_string.length() - 1, 1)
 		var array: Array = new_string.split(", ")
-		var vec : Vector2
-		vec.x = float(array[0])
-		vec.y = float(array[1])
-
+		var string1 : String = array[0]
+		var string2 : String = array[1]
+		string1 = string1.replace("(", "")
+		string2 = string2.replace(")", "")
+		var vec : Vector2 = Vector2(float(string1),float(string2))
 		return vec
 
 	return Vector2.ZERO
@@ -25,8 +26,8 @@ func Username2PID(username:String):
 			return int(i)
 			
 func PID2Username(pid:int):
-	if Server.has_node(str(pid)):
-		return Server.get_node(str(pid)).PlayerData["username"]
+	if DataRepository.PlayerMgmt.has_node(str(pid)):
+		return DataRepository.PlayerMgmt.get_node(str(pid)).PlayerData.Username
 		
 func GetActiveStaff():
 	var staff_array : Array = []
@@ -52,19 +53,19 @@ func NotifyStaffUrgent(message:String):
 
 func NotifyUsersInArray(users_to_message:Array, message:String):
 	for I in users_to_message:
-		if Server.has_node(str(Username2PID(I))):
-			var user =  Server.get_node(str(Username2PID(I)))
+		if DataRepository.PlayerMgmt.has_node(str(Username2PID(I))):
+			var user =  DataRepository.PlayerMgmt.get_node(str(Username2PID(I)))
 			Server.SendSingleChat(ChatHandler.FormatSimpleMessage(message), int(user.name))
 				
 func GetMessageOriginator(username:bool = false, playerid:int = 0):
 	if !playerid:
 		Logging.log_error("[HELPER] No PID supplied to GetMessageOriginator()!")
 		return
-	if Server.has_node(str(playerid)):
+	if DataRepository.PlayerMgmt.has_node(str(playerid)):
 		if(username):
-			return 	Server.get_node(str(playerid)).PlayerData["username"]
+			return 	DataRepository.PlayerMgmt.get_node(str(playerid)).PlayerData.Username
 		else:
-			return Server.get_node(str(playerid)).CurrentActiveCharacter.CharacterData["Name"]
+			return DataRepository.PlayerMgmt.get_node(str(playerid)).CurrentActiveCharacter.CharacterData.Name
 	
 func HandleCommands(input:Dictionary, player_id:int):
 	var command : String
@@ -77,26 +78,10 @@ func HandleCommands(input:Dictionary, player_id:int):
 			break
 	return has_command
 	
-func Match2(input:String, to_find:String, start_location:int):
-	if input.length() <= start_location+1:
-		return false
-	if (input[start_location+1] == to_find) && (input[start_location] == to_find):
-		Logging.log_error("triggered" + to_find + str(start_location) + input + input[start_location])
-		return true
-	return false
-	
-func Match3(input:String, to_find:String, start_location:int):
-	if (input.length() <= start_location+1) || (input.length() <= start_location+2):
-		return false
-	if input[start_location] == to_find:
-		if input[start_location+1] == to_find:
-			return true
-	return false
-	
 func GetCurrentPlayerList():
 	var return_array : Array = []
 	for I in get_tree().get_nodes_in_group("players"):
-		return_array.append(I.PlayerData["username"])
+		return_array.append(I.PlayerData.Username)
 	return return_array
 			
 	

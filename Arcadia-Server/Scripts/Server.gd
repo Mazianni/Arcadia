@@ -27,6 +27,7 @@ class_name MainServer extends Node
 @rpc("any_peer", "unreliable") func RequestWorldState(): pass
 @rpc("any_peer") func ClientRPC_ReturnNewCharacterCreated(): pass
 @rpc("any_peer") func ClientRPC_RecieveMapSync(mapname:String): pass
+@rpc("any_peer") func RecieveInventorySync(recieve_dict:Dictionary): pass
 	
 var network : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 var port = 5000
@@ -124,21 +125,24 @@ func GeneratePlayerStates(uuid, state):
 	SendPlayerCharacterList(multiplayer.get_remote_sender_id())
 	
 func SendPlayerCharacterList(player_id):
-	player_id = multiplayer.get_remote_sender_id()
 	var CharacterList : Dictionary
 	var retryload = true
 	if DataRepository.PlayerMgmt.has_node(str(player_id)):
-		if DataRepository.PlayerMgmt.get_node(str(player_id)).HasLoaded:
-			CharacterList = DataRepository.PlayerMgmt.get_node(str(player_id)).PlayerData["character_dict"].duplicate(true)
+		var check_node : PlayerContainer = DataRepository.PlayerMgmt.get_node(str(player_id))
+		if check_node.HasLoaded:
+			CharacterList = DataRepository.PlayerMgmt.get_node(str(player_id)).PlayerData.character_dict.duplicate(true)
 			rpc_id(player_id, "RecieveCharacterList", CharacterList)
 			Logging.log_notice("Sending character list of "+str(player_id)+".")
 		else:
-			var check_pid = await DataRepository.PlayerMgmt.get_node(str(player_id)).loaded
-			if check_pid == str(player_id):
-				CharacterList = DataRepository.PlayerMgmt.get_node(str(player_id)).PlayerData["character_dict"].duplicate(true)
-				rpc_id(player_id, "RecieveCharacterList", CharacterList)
-				Logging.log_notice("Deferred sending character list of "+str(player_id)+".")		
-	
+			DeferredSendCharacterListCallback(check_node)
+			CharacterList = DataRepository.PlayerMgmt.get_node(str(player_id)).PlayerData.character_dict.duplicate(true)
+			rpc_id(player_id, "RecieveCharacterList", CharacterList)
+			Logging.log_notice("Deferred sending character list of "+str(player_id)+".")
+
+func DeferredSendCharacterListCallback(node : PlayerContainer):
+	await node.loaded
+	return true
+		
 @rpc("any_peer") func ServRPC_CreateExistingCharacter(cuuid):
 	var player_id = multiplayer.get_remote_sender_id()
 	if DataRepository.PlayerMgmt.has_node(str(player_id)): #IMPLEMENT blocking code based on server state
@@ -149,7 +153,7 @@ func SendPlayerCharacterList(player_id):
 	var player_id = multiplayer.get_remote_sender_id()
 	var cuuid = uuid_generator.v4()
 	if DataRepository.PlayerMgmt.has_node(str(player_id)):
-			DataRepository.PlayerMgmt.get_node(str(player_id)).CreateNewActiveCharacter(cuuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height)
+			DataRepository.PlayerMgmt.CreateNewCharacter(cuuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height, player_id)
 			
 func ReturnNewCharacterCreated(pid:int, result:bool, message:String):
 	rpc_id(pid, "ClientRPC_ReturnNewCharacterCreated", result, message)
@@ -269,14 +273,13 @@ func AuthenticatePlayer(username, password, player_id, player_uuid):
 			result = true
 			DataRepository.pid_to_username[str(player_id)] = {"username": str(username), "uuid": str(player_uuid)}
 			DataRepository.PlayerMgmt.CreatePlayerContainer(player_id, player_uuid)
-			DataRepository.PlayerMgmt.get_node(str(player_id)).connect("loaded", Callable(self, "SendPlayerCharacterList").bind(player_id))
-			DataRepository.PlayerMgmt.get_node(str(player_id)).PlayerData["lastlogin"] = Time.get_unix_time_from_system()
+			DataRepository.PlayerMgmt.get_node(str(player_id)).PlayerData.last_login = Time.get_unix_time_from_system()
 	else:
 		Logging.log_notice("[AUTH] Running in editor. Authentication not done for "+str(player_id))
 		result = true
 		DataRepository.pid_to_username[str(player_id)] = {"username": str(username), "uuid": str(player_uuid)}
 		DataRepository.PlayerMgmt.CreatePlayerContainer(player_id, player_uuid)
-		DataRepository.PlayerMgmt.get_node(str(player_id)).PlayerData["lastlogin"] = Time.get_unix_time_from_system()	
+		DataRepository.PlayerMgmt.get_node(str(player_id)).PlayerData.last_login = Time.get_unix_time_from_system()	
 	Logging.log_notice("[AUTH] Sending authentication results to user " + str(player_id))
 	return result
 	
@@ -329,7 +332,7 @@ func RequestPersistentUUID(player_id):
 
 @rpc("any_peer") func ServRPC_RecievePersistentUUID(puuid):
 	if DataRepository.PlayerMgmt.has_node(str(multiplayer.get_remote_sender_id())):
-		DataRepository.PlayerMgmt.get_node(str(multiplayer.get_remote_sender_id())).PlayerData["persistent_uuid"] = puuid
+		DataRepository.PlayerMgmt.get_node(str(multiplayer.get_remote_sender_id())).PlayerData.persistent_uuid = puuid
 
 #login end
 
@@ -349,7 +352,7 @@ func RequestPersistentUUID(player_id):
 @rpc("any_peer") func ServRPC_RecieveChat(msg:Dictionary):
 	var playerid = multiplayer.get_remote_sender_id()
 	if msg.size() != 3: #malformed - will cause errors. someone's doing something fucky.
-		Logging.log_error("[CHAT] Malformed chat message from "+str(playerid)+get_node(str(playerid)).PlayerData["Username"] + "contents "+str(msg))
+		Logging.log_error("[CHAT] Malformed chat message from "+str(playerid)+DataRepository.PlayerMgmt.get_node(str(playerid)).PlayerData.Username + "contents "+str(msg))
 		return
 	var NewMsg : Dictionary
 	var originator : String
@@ -376,7 +379,7 @@ func RequestPersistentUUID(player_id):
 func SendGlobalChat(msg:Dictionary, originator, playerid): #used server-side for announcements and such.
 	var global_players : Array = get_tree().get_nodes_in_group("players")
 	for i in global_players:
-		var sending_pid : int = int(Helpers.Username2PID(i.PlayerData["username"]))
+		var sending_pid : int = int(Helpers.Username2PID(i.PlayerData.Username))
 		if DataRepository.PlayerMgmt.has_node(str(sending_pid)):
 			rpc_id(sending_pid, "RecieveChat", msg["output"])
 	
@@ -387,7 +390,7 @@ func SendLocalChat(msg:Dictionary, originator, playerid):
 		var sender_pos : Vector2 = DataRepository.PlayerMgmt.get_node(str(playerid)).CurrentActiveCharacter.CurrentCollider.get_global_position()
 		var character = DataRepository.PlayerMgmt.get_node(str(playerid)).CurrentActiveCharacter
 		var distance : float = sender_pos.distance_to(I.CurrentCollider.get_global_position())
-		var reciever_id = Helpers.Username2PID(I.ActiveController.PlayerData["username"])
+		var reciever_id = Helpers.Username2PID(I.ActiveController.PlayerData.Username)
 		if I.CurrentMap != character.CurrentMap:
 			continue
 		if distance < msg["distance"]:
@@ -530,8 +533,28 @@ func UpdateTicket(pid:int, ticket_number:String, ticket:Dictionary):
 #map sync start
 
 func SyncClientMap(pid:int, mapname:String):
+	if DataRepository.PlayerMgmt.has_node(str(pid)):
+		var playernode : PlayerContainer = DataRepository.PlayerMgmt.get_node(str(pid))
+		if playernode.ClientState != DataRepository.CLIENT_STATE_LIST.CLIENT_INGAME:
+			return
 	rpc_id(pid, "ClientRPC_RecieveMapSync", mapname)
 
 #map sync end
+
+#inventory handling and sync begin
+
+@rpc("any_peer") func ServRPC_RequestInventorySync():
+	var player_id = multiplayer.get_remote_sender_id()
+	var send_dict : Dictionary = DataRepository.PlayerMgmt.SerializePlayerInventories(player_id)
+	SendInventorySync(player_id, send_dict)
+	
+func SendInventorySync(pid:int, sending_dict:Dictionary):
+	rpc_id(pid, "RecieveInventorySync", sending_dict)
+	
+@rpc("any_peer") func ServRPC_RequestItemPickup(item):
+	var player_id = multiplayer.get_remote_sender_id()
+	DataRepository.PlayerMgmt.HandleRequestItemPickup(player_id, item)
+
+#inventory handling and sync end
 
 

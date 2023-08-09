@@ -18,7 +18,9 @@ func _physics_process(delta):
 func GenerateWorldStateForUser(pid:int):
 	if DataRepository.PlayerMgmt.has_node(str(pid)):
 		var playernode : ActiveCharacter = DataRepository.PlayerMgmt.get_node(str(pid)).CurrentActiveCharacter
-		var generated_dict : Dictionary = {"PN" = {}}
+		var generated_dict : Dictionary = {"PN" = {}, "GI" = []}
+		if playernode == null:
+			return
 		for i in world_state:
 			if i == "T":
 				continue
@@ -26,5 +28,6 @@ func GenerateWorldStateForUser(pid:int):
 				generated_dict["PN"] = {}
 				generated_dict["PN"][i] = world_state[i].duplicate(true)
 		generated_dict["T"] = Time.get_unix_time_from_system()
-		generated_dict["PN"][playernode.CharacterData["uuid"]] = playernode.CurrentCollider.GetPlayerState()
+		generated_dict["PN"][playernode.CharacterData.uuid] = playernode.CurrentCollider.GetPlayerState()
+		generated_dict["GI"] = DataRepository.mapmanager.SerializeGroundItems(playernode.CurrentMap)
 		return generated_dict

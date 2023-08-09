@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RestrictedInventory" load_steps=2 format=3 uid="uid://c377wq6x6g24m"]
+
+[ext_resource type="Script" path="res://addons/wyvernbox/inventories/restricted_inventory.gd" id="1_rbvqv"]
+
+[resource]
+resource_local_to_scene = true
+script = ExtResource("1_rbvqv")
+allow_rotation = true
+restricted_to_types = Array[int]([])
+width = 8

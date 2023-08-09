@@ -6,10 +6,12 @@ extends Control
 @onready var AdminButton = $GridContainer/AdminPanelButton
 @onready var TicketViewerResource = load("res://scenes/TicketViewer.tscn")
 @onready var AdminPanelResource = load("res://scenes/Admin/AdminPanel.tscn")
+@onready var InventoryPanelResource = load("res://scenes/Inventory/InventoryPanel.tscn")
 @onready var MarkupDialog = $RPDialog/MarkupDialog
 
-var ticketviewer
-var adminpanel
+var ticketviewer : Window
+var adminpanel : Window
+var inventorypanel : Window
 
 func _ready():
 	ChatManager.HookMainUI($ChatboxContainer/Chatbox/ScrollContainer/ChatOutputContainer)
@@ -76,9 +78,17 @@ func _on_AdminPanelButton_pressed():
 	else:
 		adminpanel.popup()
 
-
 func _on_markup_dialog_close_requested():
 	MarkupDialog.hide()
 
 func _on_rp_dialog_close_requested():
 	RPDialog.hide()
+
+func _on_inventory_button_pressed():
+	if not inventorypanel:
+		inventorypanel = InventoryPanelResource.instantiate()
+		add_child(inventorypanel)
+		inventorypanel.show()
+	else:
+		Server.RequestInventorySync()
+		inventorypanel.show()

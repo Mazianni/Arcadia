@@ -1,106 +1,122 @@
-[gd_scene load_steps=3 format=3 uid="uid://cl0aae0gtdvx4"]
+[gd_scene load_steps=11 format=3 uid="uid://cl0aae0gtdvx4"]
 
 [ext_resource type="Script" path="res://scripts/menus/settings/settings.gd" id="1"]
-[ext_resource type="Theme" uid="uid://bir7klqliay2t" path="res://themes/main_theme.tres" id="2"]
+[ext_resource type="Theme" uid="uid://ccql3hfhmn2kw" path="res://themes/window_theme.tres" id="1_63gw0"]
+[ext_resource type="PackedScene" uid="uid://b7m6l0lvojrsj" path="res://game_settings/components/option_list/option_list.tscn" id="3_hsk3q"]
+[ext_resource type="Texture2D" uid="uid://buotak2dk5n0x" path="res://addons/ggs/assets/game_settings/audio_volume.svg" id="4_3c4vq"]
+[ext_resource type="Script" path="res://game_settings/settings/audio_volume.gd" id="5_4vm1o"]
+[ext_resource type="Texture2D" uid="uid://dar0xtpo48ma0" path="res://addons/ggs/assets/game_settings/_default.svg" id="5_f7fj2"]
+[ext_resource type="PackedScene" uid="uid://ds06mwhee8ygm" path="res://game_settings/components/slider/slider.tscn" id="6_rkyhx"]
+[ext_resource type="Script" path="res://game_settings/settings/unit_selection.gd" id="6_taal0"]
+
+[sub_resource type="Resource" id="Resource_qnmdl"]
+resource_name = "Unit Selection"
+script = ExtResource("6_taal0")
+current = 1
+default = 0
+name = "Unit Selection"
+category = "Units"
+icon = ExtResource("5_f7fj2")
+desc = "Select a measurement system."
+value_type = 2
+value_hint = 0
+value_hint_string = ""
+
+[sub_resource type="Resource" id="Resource_3oj1n"]
+resource_name = "Audio Volume"
+script = ExtResource("5_4vm1o")
+bus_name = "Music"
+current = 4.0
+default = 80.0
+name = "Audio Volume"
+category = "Audio"
+icon = ExtResource("4_3c4vq")
+desc = "Change volume of a specific audio bus."
+value_type = 3
+value_hint = 1
+value_hint_string = "0,100"
 
 [node name="SettingsScreen" type="Window"]
 title = "Settings"
-position = Vector2i(365, 50)
-size = Vector2i(520, 590)
+initial_position = 1
+size = Vector2i(520, 300)
+theme = ExtResource("1_63gw0")
 script = ExtResource("1")
 
-[node name="NinePatchRect" type="Panel" parent="."]
-custom_minimum_size = Vector2(500, 580)
-anchors_preset = 8
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.160784, 0.152941, 0.152941, 1)
+
+[node name="TabContainer" type="TabContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="General" type="TabBar" parent="TabContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="TabContainer/General"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="GridContainer" type="GridContainer" parent="TabContainer/General/MarginContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="SettingsBox2" type="Panel" parent="TabContainer/General/MarginContainer/GridContainer"]
+custom_minimum_size = Vector2(165, 75)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/General/MarginContainer/GridContainer/SettingsBox2"]
+layout_mode = 2
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -256.0
-offset_top = -290.0
-offset_right = 256.0
-offset_bottom = 290.0
-theme = ExtResource("2")
-
-[node name="MarginContainer" type="MarginContainer" parent="NinePatchRect"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+offset_left = -77.0
+offset_top = -30.5
+offset_right = 77.0
+offset_bottom = 30.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
+alignment = 1
 
-[node name="ScrollContainer" type="TabContainer" parent="NinePatchRect/MarginContainer"]
+[node name="Label" type="Label" parent="TabContainer/General/MarginContainer/GridContainer/SettingsBox2/VBoxContainer"]
 layout_mode = 2
-
-[node name="General" type="TabBar" parent="NinePatchRect/MarginContainer/ScrollContainer"]
-layout_mode = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="NinePatchRect/MarginContainer/ScrollContainer/General"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="GridContainer" type="GridContainer" parent="NinePatchRect/MarginContainer/ScrollContainer/General/MarginContainer"]
-layout_mode = 2
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
-
-[node name="UnitSelection" type="Panel" parent="NinePatchRect/MarginContainer/ScrollContainer/General/MarginContainer/GridContainer"]
-custom_minimum_size = Vector2(150, 50)
-layout_mode = 2
-
-[node name="Label" type="Label" parent="NinePatchRect/MarginContainer/ScrollContainer/General/MarginContainer/GridContainer/UnitSelection"]
-layout_mode = 0
-anchor_right = 1.0
-offset_top = 2.0
-offset_bottom = 16.0
 text = "Measurement Units"
 
-[node name="OptionButton" type="OptionButton" parent="NinePatchRect/MarginContainer/ScrollContainer/General/MarginContainer/GridContainer/UnitSelection"]
-layout_mode = 0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 3.0
-offset_top = -32.0
-offset_bottom = -2.0
-
-[node name="Blank" type="Panel" parent="NinePatchRect/MarginContainer/ScrollContainer/General/MarginContainer/GridContainer"]
-custom_minimum_size = Vector2(150, 50)
+[node name="OptionList" parent="TabContainer/General/MarginContainer/GridContainer/SettingsBox2/VBoxContainer" instance=ExtResource("3_hsk3q")]
 layout_mode = 2
+setting = SubResource("Resource_qnmdl")
+apply_on_change = true
 
-[node name="Label" type="Label" parent="NinePatchRect/MarginContainer/ScrollContainer/General/MarginContainer/GridContainer/Blank"]
-layout_mode = 0
-anchor_right = 1.0
-offset_top = 2.0
-offset_bottom = 16.0
+[node name="Btn" parent="TabContainer/General/MarginContainer/GridContainer/SettingsBox2/VBoxContainer/OptionList" index="0"]
+item_count = 2
+popup/item_0/text = "Imperial"
+popup/item_0/id = 0
+popup/item_1/text = "Metric"
+popup/item_1/id = 1
 
-[node name="OptionButton" type="OptionButton" parent="NinePatchRect/MarginContainer/ScrollContainer/General/MarginContainer/GridContainer/Blank"]
-layout_mode = 0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 3.0
-offset_top = -32.0
-offset_bottom = -2.0
-
-[node name="Sound" type="TabBar" parent="NinePatchRect/MarginContainer/ScrollContainer"]
+[node name="Sound" type="TabBar" parent="TabContainer"]
 visible = false
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="NinePatchRect/MarginContainer/ScrollContainer/Sound"]
+[node name="MarginContainer" type="MarginContainer" parent="TabContainer/Sound"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -112,55 +128,53 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="GridContainer" type="GridContainer" parent="NinePatchRect/MarginContainer/ScrollContainer/Sound/MarginContainer"]
+[node name="GridContainer" type="GridContainer" parent="TabContainer/Sound/MarginContainer"]
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 
-[node name="MusicVolume" type="Panel" parent="NinePatchRect/MarginContainer/ScrollContainer/Sound/MarginContainer/GridContainer"]
-custom_minimum_size = Vector2(150, 50)
+[node name="SettingsBox" type="Panel" parent="TabContainer/Sound/MarginContainer/GridContainer"]
+custom_minimum_size = Vector2(110, 60)
 layout_mode = 2
 
-[node name="Label" type="Label" parent="NinePatchRect/MarginContainer/ScrollContainer/Sound/MarginContainer/GridContainer/MusicVolume"]
-layout_mode = 0
-anchor_right = 1.0
-offset_top = 2.0
-offset_bottom = 16.0
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Sound/MarginContainer/GridContainer/SettingsBox"]
+layout_mode = 2
+offset_left = 0.5
+offset_top = 7.0
+offset_right = 110.5
+offset_bottom = 53.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="TabContainer/Sound/MarginContainer/GridContainer/SettingsBox/VBoxContainer"]
+layout_mode = 2
 text = "Music Volume"
 
-[node name="VolumeSlider" type="HSlider" parent="NinePatchRect/MarginContainer/ScrollContainer/Sound/MarginContainer/GridContainer/MusicVolume"]
-layout_mode = 0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 3.0
-offset_top = -32.0
-offset_bottom = -2.0
-max_value = 1.0
-step = 0.05
-allow_greater = true
-allow_lesser = true
-
-[node name="Blank2" type="Panel" parent="NinePatchRect/MarginContainer/ScrollContainer/Sound/MarginContainer/GridContainer"]
-visible = false
-custom_minimum_size = Vector2(150, 50)
+[node name="Slider" parent="TabContainer/Sound/MarginContainer/GridContainer/SettingsBox/VBoxContainer" instance=ExtResource("6_rkyhx")]
 layout_mode = 2
+setting = SubResource("Resource_3oj1n")
+apply_on_change = true
 
-[node name="Label" type="Label" parent="NinePatchRect/MarginContainer/ScrollContainer/Sound/MarginContainer/GridContainer/Blank2"]
-layout_mode = 0
-anchor_right = 1.0
-offset_top = 2.0
-offset_bottom = 16.0
+[node name="SettingsBox2" type="Panel" parent="."]
+visible = false
+custom_minimum_size = Vector2(110, 60)
+offset_left = 18.0
+offset_top = 118.0
+offset_right = 128.0
+offset_bottom = 178.0
 
-[node name="OptionButton" type="OptionButton" parent="NinePatchRect/MarginContainer/ScrollContainer/Sound/MarginContainer/GridContainer/Blank2"]
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsBox2"]
 layout_mode = 0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 3.0
-offset_top = -32.0
-offset_bottom = -2.0
+offset_right = 40.0
+offset_bottom = 40.0
+alignment = 1
+
+[node name="Label" type="Label" parent="SettingsBox2/VBoxContainer"]
+layout_mode = 2
+text = "Music Volume"
 
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
-[connection signal="item_selected" from="NinePatchRect/MarginContainer/ScrollContainer/General/MarginContainer/GridContainer/UnitSelection/OptionButton" to="." method="_on_OptionButton_item_selected"]
-[connection signal="drag_ended" from="NinePatchRect/MarginContainer/ScrollContainer/Sound/MarginContainer/GridContainer/MusicVolume/VolumeSlider" to="." method="_on_VolumeSlider_drag_ended"]
+
+[editable path="TabContainer/General/MarginContainer/GridContainer/SettingsBox2/VBoxContainer/OptionList"]
+[editable path="TabContainer/Sound/MarginContainer/GridContainer/SettingsBox/VBoxContainer/Slider"]

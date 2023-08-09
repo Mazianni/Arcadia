@@ -22,12 +22,12 @@ var RightRegEx : RegEx = RegEx.new()
 var ColorRegex : RegEx = RegEx.new()
 
 func _ready():
-	ItalicsRegEx.compile("\\|||(?=\\S)(.+?)(?=\\S)\\|||")
-	BoldRegEx.compile("\\+++(?=\\S)(.+?)(?=\\S)\\+++")
-	UnderlineRegEx.compile("___(?=\\S)(.+?)(?=\\S)___")
-	StrikethroughRegEx.compile("~~~(?=\\S)(.+?)(?=\\S)~~~")
-	CenterRegEx.compile("===(?=\\S)(.+?)(?=\\S)===")
-	RightRegEx.compile("^^^(?=\\S)(.+?)(?=\\S)^^^")
+	ItalicsRegEx.compile("\\|{3}(?=\\S)(.+?)(?=\\S)\\|{3}")
+	BoldRegEx.compile("\\+{3}(?=\\S)(.+?)(?=\\S)\\+{3}")
+	UnderlineRegEx.compile("_{3}(?=\\S)(.+?)(?=\\S)_{3}")
+	StrikethroughRegEx.compile("~{3}(?=\\S)(.+?)(?=\\S)~{3}")
+	CenterRegEx.compile("={3}(?=\\S)(.+?)(?=\\S)={3}")
+	RightRegEx.compile("\\^{3}(?=\\S)(.+?)(?=\\S)\\^{3}")
 	ColorRegex.compile("(#{2}([a-f0-9]{6})#{2})(.*)(#{2}([a-f0-9]{6})#{2})")
 
 func EscapeBBCode(msg:String):
@@ -135,6 +135,7 @@ func ParseChat(msg:Dictionary, originator:String, is_global:bool = false, player
 		add_formatting = "[color="+DataRepository.category_bbcode_colors["Emote"]+"]"
 		end_formatting = "\n[b]("+str(originator)+")[/b][/color]"
 		
+		
 	teststring = ParseMarkdown(teststring)	
 		
 	outputdict["text"] = add_formatting+teststring+end_formatting
@@ -144,9 +145,9 @@ func ParseChat(msg:Dictionary, originator:String, is_global:bool = false, player
 	return newdict
 	
 func ParseMarkdown(msg:String):
-	var mutated : String 
+	var mutated : String = msg
 
-	mutated = ItalicsRegEx.sub(msg, "[i]$1[/i]", true)
+	mutated = ItalicsRegEx.sub(mutated, "[i]$1[/i]", true)
 	mutated = BoldRegEx.sub(mutated, "[b]$1[/b]", true)
 	mutated = UnderlineRegEx.sub(mutated, "[u]$1[/u]", true)
 	mutated = StrikethroughRegEx.sub(mutated, "[s]$1[/s]", true)

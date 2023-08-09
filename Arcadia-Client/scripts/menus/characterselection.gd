@@ -64,3 +64,4 @@ func DeleteCharacter(uuid):
 func RefreshCharacterList():
 	Server.RequestCharacterList()
 	RenderSlots()
+

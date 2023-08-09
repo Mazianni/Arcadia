@@ -6,10 +6,10 @@ extends Node
 
 @onready var ShowOnlyUsersWithNotesToggle : CheckButton = $MarginContainer/HBoxContainer/ShowOnlyExistingNotes
 
-@onready var NoteEditDialog = $"../../../EditNoteDialog"
+@onready var NoteEditDialog : Window  = $"../../../EditNoteDialog"
 @onready var NoteEditDialogTextEdit = $"../../../EditNoteDialog/VBoxContainer/TextEdit"
 
-@onready var NoteAddDialog = $"../../../AddNoteDialog"
+@onready var NoteAddDialog : Window = $"../../../AddNoteDialog"
 @onready var NoteAddDialogTextEdit = $"../../../AddNoteDialog/VBoxContainer/TextEdit"
 @onready var NoteAddDialogTitle = $"../../../AddNoteDialog/VBoxContainer/LineEdit"
 
@@ -60,29 +60,31 @@ func UpdateNotes(new_notes:Dictionary):
 		if player_notes.size() == 0:
 			continue
 		if player_notes[header_node.username].keys().size():
-			for N in player_notes[header_node.username].keys():
+			for N in player_notes[header_node.username]["Notes"].keys():
 				if existing_nodes_text.has(N):
-					var updating_note : PlayerNoteInstance = existing_nodes[N]
-					updating_note.last_edited = player_notes[PN][N]["LastEdited"]
-					updating_note.subject = player_notes[PN][N]["Note"]
+					var updating_note : PlayerNoteInstance = header_node.NoteContainerBox.get_node(N)
+					updating_note.last_edited = player_notes[header_node.username]["Notes"][N]["LastEdited"]
+					updating_note.subject = player_notes[header_node.username]["Notes"][N]["Note"]
 					updating_note.RenderText()
 					continue
 				var new_note = NoteInstance.instantiate()
 				new_note.connect("edit_button_pressed", Callable(self, "NoteEditButtonPressed"))
-				new_note.connect("delete_button_pressed", Callable(self, "NoteRemoveButtonPressed"))
+				new_note.connect("remove_button_pressed", Callable(self, "NoteRemoveButtonPressed"))
 				new_note.name = N
 				new_note.number = N
-				new_note.title = player_notes[PN][N]["Description"]
-				new_note.date = player_notes[PN][N]["Date"]
-				new_note.last_edited = player_notes[PN][N]["LastEdited"]
-				new_note.subject = player_notes[PN][N]["Note"]
-				new_note.creator = player_notes[PN][N]["Creator"]
-				new_note.username = player_notes[PN]
+				print(player_notes[header_node.username])
+				print(N)
+				new_note.title = player_notes[header_node.username]["Notes"][N]["Description"]
+				new_note.date = player_notes[header_node.username]["Notes"][N]["Date"]
+				new_note.last_edited = player_notes[header_node.username]["Notes"][N]["LastEdited"]
+				new_note.subject = player_notes[header_node.username]["Notes"][N]["Note"]
+				new_note.creator = player_notes[header_node.username]["Notes"][N]["Creator"]
+				new_note.username = header_node.username
 				header_node.AddNode(new_note)
 			
 func AddNotePressed(username:String):
 	last_added_note_username = username
-	NoteAddDialog.window_title = "Add Player Note for " + username
+	NoteAddDialog.title = "Add Player Note for " + username
 	NoteAddDialog.popup()
 	
 func AddNoteConfirmPressed():
@@ -98,8 +100,8 @@ func AddNoteConfirmPressed():
 func NoteEditButtonPressed(number:String, username:String):
 	last_edited_note_number = number
 	last_edited_note_username = username
-	NoteEditDialog.window_title = "Edit Note #"+number+" for "+username
-	NoteEditDialogTextEdit.text = player_notes[username][number]["Note"]
+	NoteEditDialog.title = "Edit Note #"+number+" for "+username
+	NoteEditDialogTextEdit.text = player_notes[username]["Notes"][number]["Note"]
 	NoteEditDialog.popup()
 	
 func NoteEditConfirmPressed():

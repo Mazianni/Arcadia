@@ -31,7 +31,7 @@ func CreatePlayerContainer(player_id, uuid):
 	FillPlayerContainer(new_player_container, player_id, uuid)
 	
 func FillPlayerContainer(player_container, player_id, uuid):
-	player_container.PlayerData["username"] = DataRepository.pid_to_username[str(player_id)]["username"]
+	player_container.PlayerData.Username = DataRepository.pid_to_username[str(player_id)]["username"]
 	DataRepository.Server.RequestPersistentUUID(player_id)
 	
 func SaveAllPlayerData(request_disconnect : bool):
@@ -58,7 +58,7 @@ func SaveAllPlayerData(request_disconnect : bool):
 	Logging.log_notice("[PLAYER MANAGER] ActiveCharacters to save: "+str(ActiveCharacters.size()))
 	for c in ActiveCharacters:
 		var containernode : ActiveCharacter = c
-		containernode.WriteJSON(containernode.CharacterData["uuid"])
+		containernode.WriteJSON(containernode.CharacterData.uuid)
 	await AllPlayerCharactersSavedCallback()
 	Logging.log_notice("[PLAYER MANAGER] All ActiveCharacters saved.")
 	for c in PlayerContainers:
@@ -94,3 +94,57 @@ func AllPlayerContainersSavedCallback():
 func AllPlayerCharactersSavedCallback():
 	await activecharacters_save_complete
 	return true
+	
+# inventory serialization/sync
+
+func SerializePlayerInventories(player_id:int):
+	if has_node(str(player_id)):
+		var player_container : PlayerContainer = get_node(str(player_id))
+		Logging.log_notice("[PLAYER MGMT] Serializing inventory for "+player_container.PlayerData.Username+" character "+player_container.CurrentActiveCharacter.CharacterData.Name)
+		if player_container.CurrentActiveCharacter:
+			var bundle_dict : Dictionary = {
+				"Inventory" = player_container.CurrentActiveCharacter.CharacterInventory.to_array(),
+				"Currency" = player_container.CurrentActiveCharacter.CurrencyStorage.to_array(),
+				"Equipped" = player_container.CurrentActiveCharacter.EquippedInventory.to_array()}
+			return bundle_dict
+			
+func HandleRequestItemPickup(player_id, item):
+	if has_node(str(player_id)):
+		var player_container : PlayerContainer = get_node(str(player_id))
+		if player_container.CurrentActiveCharacter:
+			var map_node : MapBase = DataRepository.mapmanager.get_node(player_container.CurrentActiveCharacter.CurrentMap)
+			for I in map_node.GroundItems.get_children():
+				if I.get_global_position() == item:
+					I.try_pickup(player_container.CurrentActiveCharacter.CharacterInventory)
+
+			
+func CreateNewCharacter(uuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height, pid):
+	var result : bool = true
+	var message : String = "New character "+character_name+" \ncreated successfully"
+	var CharacterData : CharacterDataResource = CharacterDataResource.new()
+	var BaseSpecies = DataRepository.races[species_name]
+	CharacterData.uuid = uuid
+	CharacterData.Species = species_name
+	CharacterData.Name = character_name
+	CharacterData.Age = age
+	CharacterData.Gender = gender
+#	CharacterData["Stats"] = BaseSpecies.base_stats.duplicate(true) #IMPL do this soon
+	CharacterData.hair_style = hair_style
+	CharacterData.hair_color = hair_color
+	CharacterData.skin_color = skin_color
+	CharacterData.ear_style = ear_style
+	CharacterData.tail_style = tail_style
+	CharacterData.accessory_one_style = accessory_one_style
+	CharacterData.height = height
+	CharacterData.LastMap = DataRepository.spawns[BaseSpecies.valid_spawns[0]]["MapName"]
+	CharacterData.LastPosition = DataRepository.spawns[BaseSpecies.valid_spawns[0]]["pos"]
+	CharacterData.CharacterInventory = DataRepository.player_inventory_resource.duplicate(true)
+	CharacterData.EquippedInventory = DataRepository.player_restricted_inv_resource.duplicate(true)
+	CharacterData.CurrencyStorage = DataRepository.player_currency_inv_resource.duplicate(true)
+	var save_dir = DataRepository.saves_directory + "/" + str(Helpers.PID2Username((pid)))
+	var save_file = save_dir+"/"+str(uuid)+".tres"
+	CharacterData.WriteSave(save_file)
+	Logging.log_notice("New character by name of "+str(character_name)+" created successfully.")
+	DataRepository.Server.ReturnNewCharacterCreated(pid, result, message)
+	get_node(str(pid)).PlayerData.character_dict[uuid] = character_name
+	get_node(str(pid)).WriteSaveData()

@@ -1,8 +1,21 @@
-extends Node
+class_name MapBase extends Node
 
 var player_spawn = preload("res://scenes/PlayerTemplate.tscn")
 var controllable_player_spawn = preload("res://scenes/PlayerObject.tscn")
 var camera_scene = preload("res://scenes/MainCamera.tscn")
+
+@onready var GroundItems : GroundItemManager = $GroundItemsManager
+
+func _ready():
+	GroundItems.item_clicked.connect(Callable(self, "RequestItemPickup"))
+
+func RequestItemPickup(item):
+	Server.RequestItemPickup(item.get_global_position())
+	
+func SyncGroundItems(recieve_array:Array):
+	for X in GroundItems.get_children():
+		X.queue_free()
+	GroundItems.load_from_array(recieve_array)
 	
 func SpawnNewPlayer(player_id, spawn_position, is_main):
 	var new_player = player_spawn.instantiate()

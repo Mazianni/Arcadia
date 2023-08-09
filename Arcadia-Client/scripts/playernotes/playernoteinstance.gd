@@ -8,11 +8,11 @@ var creator
 var username
 var last_edited
 
-@onready var TitleLabel = $VBoxContainer/Title/Label
+@onready var TitleLabel = $VBoxContainer/Title/HBoxContainer/Label
 @onready var DateLabel = $VBoxContainer/Date/Label
 @onready var CreatorLabel = $VBoxContainer/Creator/Label
 @onready var Description = $VBoxContainer/Description/ScrollContainer/Label
-@onready var DescriptionContainer = $VBoxContainer/Description
+@onready var DescriptionContainer = $VBoxContainer/Description/ScrollContainer
 
 signal edit_button_pressed(number, username)
 signal remove_button_pressed(number, username)

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CurrencyInventory" load_steps=2 format=3 uid="uid://gmjaup37idit"]
+
+[ext_resource type="Script" path="res://addons/wyvernbox/inventories/currency_inventory.gd" id="1_0wy0y"]
+
+[resource]
+resource_local_to_scene = true
+script = ExtResource("1_0wy0y")
+restricted_to_types = Array[Resource("res://addons/wyvernbox/crafting/item_like.gd")]([null, null, null, null, null, null, null, null])
+max_stack = 99999999
+width = 8

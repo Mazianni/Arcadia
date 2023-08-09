@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://bo1w0hck26ii1"]
+[gd_scene load_steps=12 format=3 uid="uid://bo1w0hck26ii1"]
 
 [ext_resource type="Script" path="res://scripts/onload.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://cw43m144jpqgr" path="res://scenes/Maphandler/Maphandler.tscn" id="2_3wnlu"]
@@ -6,20 +6,37 @@
 [ext_resource type="Texture2D" uid="uid://3v627atwatcp" path="res://images/background/background1.png" id="3_rs2vf"]
 [ext_resource type="Texture2D" uid="uid://cuk1762n7fjj6" path="res://images/background/background3.png" id="4"]
 [ext_resource type="Script" path="res://scripts/singletons/autoresize.gd" id="5"]
+[ext_resource type="Script" path="res://scenes/Background/mainmenu_daynight.gd" id="7_2jgba"]
 [ext_resource type="Theme" uid="uid://xjwshynbp6sr" path="res://themes/button_theme.tres" id="7_ylxsd"]
 [ext_resource type="Texture2D" uid="uid://3upd1n8qlx0b" path="res://fonts/fontawesome-free-6.4.0-desktop/svgs/solid/gear.svg" id="8_jh5cw"]
+[ext_resource type="Shader" path="res://resources/shaders/star.gdshader" id="10_nk848"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yy05u"]
+shader = ExtResource("10_nk848")
+shader_parameter/bg_color = Color(0, 0, 0, 0)
 
 [node name="RootNode" type="Node"]
 script = ExtResource("1")
 
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
 volume_db = -25.005
+bus = &"Music"
 
 [node name="Maphandler" parent="." instance=ExtResource("2_3wnlu")]
 unique_name_in_owner = true
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 script = ExtResource("5")
+
+[node name="Timer" type="Timer" parent="ParallaxBackground"]
+wait_time = 30.0
+one_shot = true
+
+[node name="ColorRect" type="ColorRect" parent="ParallaxBackground"]
+material = SubResource("ShaderMaterial_yy05u")
+offset_right = 1152.0
+offset_bottom = 347.0
+color = Color(0, 0, 0, 0)
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
 motion_mirroring = Vector2(640, 0)
@@ -41,7 +58,9 @@ scale = Vector2(1, 0.892188)
 texture = ExtResource("4")
 region_rect = Rect2(0, 0, 1280, 640)
 
-[node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
+[node name="CanvasModulate" type="CanvasModulate" parent="ParallaxBackground"]
+z_index = -1
+script = ExtResource("7_2jgba")
 
 [node name="GUI" type="CanvasLayer" parent="."]
 unique_name_in_owner = true

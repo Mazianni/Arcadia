@@ -40,8 +40,11 @@ enum SERVER_CONNECTION_STATE {DISCONNECTED, CONNECTED}
 enum CURRENT_SCENE {SCENE_LOGIN, SCENE_SELECTION, SCENE_CREATION, SCENE_PLAYING}
 enum MESSAGE_CATEGORY {IC, OOC, LOOC, ADMIN, ETC}
 
+var measurement_units : String = "Imperial"
+
 signal character_list_refresh_requested
 signal show_viewport(show)
+signal scene_changed(scene_enum)
 
 func _ready():
 	uuid = uuid_generator.v4()
@@ -71,6 +74,7 @@ func SetClientState(new_state):
 			maphandler.ClearScenes()
 			get_tree().get_root().get_node("RootNode").ShowBackground(true)
 			show_viewport.emit(false)
+	scene_changed.emit(new_state)
 			
 func CheckSettingsExist():
 	var save_dir = "user://"

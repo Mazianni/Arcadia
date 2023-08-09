@@ -70,6 +70,8 @@ func _process(delta):
 			if tickets[I]["Status"] == TICKET_FLAGS.TICKET_OPEN:
 				if !IsTicketClaimedByStaff(I):
 					tickets_without_staff += 1
+		if tickets_without_staff == 0:
+			return
 		for I in get_tree().get_nodes_in_group("players"):
 			if HasRank(I):
 				if CheckPermissions(RANK_FLAGS.MANAGE_TICKETS, I):
@@ -151,21 +153,21 @@ func CheckBanned(username:String, puuid:String, ip:String): # returns false if n
 	return result
 		
 func IsRankValid(player:PlayerContainer):
-	if player.PlayerData["rank"] in ranks.keys():
+	if player.PlayerData.Rank in ranks.keys():
 		return true
 	else:
 		return false
 	
 func HasRank(player:PlayerContainer):
-	if player.PlayerData["rank"]:
+	if player.PlayerData.Rank:
 		return true
 	return false
 	
 func GetRank(player:PlayerContainer):
-	return player.PlayerData["rank"]
+	return player.PlayerData.Rank
 	
 func GetRankColor(player:PlayerContainer):
-	print(player.PlayerData["rank"])
+	print(player.PlayerData.Rank)
 	if IsRankValid(player):
 		return ranks[GetRank(player)]["TagColor"]
 	Logging.log_error("[RANKS] Invalid Rank supplied to GetRankColor!")
@@ -184,7 +186,7 @@ func IsStaff(player:PlayerContainer):
 	
 func RetrievePermissions(player:PlayerContainer):
 	if HasRank(player):
-		return ranks[player.PlayerData["rank"]]["Permissions"]
+		return ranks[player.PlayerData.Rank]["Permissions"]
 		
 func CheckPermissions(required: int, player_id:PlayerContainer):
 	var permission = required
@@ -194,7 +196,7 @@ func CheckPermissions(required: int, player_id:PlayerContainer):
 	if !GetRank(player_id):
 		return false #user has no rank
 	if !IsRankValid(player_id):
-		Logging.log_error("[RANKS] User "+ str(player_id.PlayerData["username"]) +" has an invalid rank:" + str(player_id.PlayerData["rank"]))
+		Logging.log_error("[RANKS] User "+ str(player_id.PlayerData.Username) +" has an invalid rank:" + str(player_id.PlayerData.Rank))
 		return false
 	if RetrievePermissions(player_id).has(RANK_FLAGS.ALL):
 		return true
@@ -295,8 +297,10 @@ func GetAllTickets():
 	
 func IsTicketClaimedByStaff(ticket_number:String):
 	for U in tickets[ticket_number]["Usernames"]:
-		if Server.has_node(Helpers.Username2PID(U)):
-			var user = Server.get_node(Helpers.Username2PID(U))
+		if U == tickets[ticket_number]["Creator"]:
+			continue
+		if DataRepository.PlayerMgmt.has_node(Helpers.Username2PID(U)):
+			var user = DataRepository.PlayerMgmt.get_node(Helpers.Username2PID(U))
 			if HasRank(user):
 				if CheckPermissions(RANK_FLAGS.MANAGE_TICKETS, user):
 					return true
@@ -311,7 +315,7 @@ func ClaimTicket(username:String, ticket_number:String):
 		if HasRank(user):
 			if CheckPermissions(RANK_FLAGS.MANAGE_TICKETS, user):
 				tickets[ticket_number]["AssignedStaff"] += username
-				AddMessageToTicket(user.PlayerData["rank"] + " has been assigned to ticket "+ticket_number, ticket_number,"", true)
+				AddMessageToTicket(user.PlayerData.Username + " has been assigned to ticket "+ticket_number, ticket_number,"", true)
 				tickets[ticket_number]["Status"] = TICKET_FLAGS.TICKET_STAFF_ASSIGNED
 				UpdateTicketMessages(ticket_number)
 
@@ -357,9 +361,10 @@ func AddPlayerNote(username:String, title:String, note:String, player_id:int):
 	new_note_dict["Description"] = title
 	new_note_dict["Date"] = Time.get_date_string_from_system()
 	new_note_dict["Note"] = note
-	if player_notes.keys.has(username):
+	if player_notes.keys().has(username):
 		player_notes[username]["Notes"][str(player_notes[username].size())] = new_note_dict
 	else:
+		player_notes[username] = {"Notes"={}}
 		player_notes[username]["Notes"]["1"] = new_note_dict
 	Logging.log_notice(Helpers.PID2Username(player_id) + "has added a new player note for "+username)
 

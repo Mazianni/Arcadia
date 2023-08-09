@@ -30,6 +30,8 @@ extends Node
 @rpc("any_peer") func ServRPC_GetCurrentPlayers(): pass
 @rpc("any_peer") func ServRPC_RecieveClientState(client_state): pass
 @rpc("any_peer", "unreliable") func ServRPC_RequestWorldState(): pass
+@rpc("any_peer") func ServRPC_RequestInventorySync(): pass
+@rpc("any_peer") func ServRPC_RequestItemPickup(): pass
 
 #BOILERPLATE END
 
@@ -191,7 +193,7 @@ func GetRaceList():
 		true:
 			msgcolor = "good"
 		false:
-			msgcolor = "false"
+			msgcolor = "bad"
 	Gui.CreateFloatingMessage(message, msgcolor)
 
 #character creation handling end
@@ -221,6 +223,7 @@ func DeleteCharacter(char_name):
 @rpc("any_peer") func LoadWorld(worldname):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
+	print("sdadas")
 	maphandler.ChangeMap(worldname)
 
 	
@@ -423,5 +426,18 @@ func IsClientAdmin():
 	maphandler.ChangeMap(mapname)
 
 #map sync end
+
+#inventory sync / manipulation start
+
+func RequestInventorySync():
+	rpc_id(1, "ServRPC_RequestInventorySync")
+
+@rpc("any_peer") func RecieveInventorySync(recieve_dict:Dictionary):
+	InventoryManager.DeserializePlayerInventories(recieve_dict)
+	
+func RequestItemPickup(item):
+	rpc_id(1, "ServRPC_RequestItemPickup", item)
+
+#inventory sync / manipulation  end
 
 

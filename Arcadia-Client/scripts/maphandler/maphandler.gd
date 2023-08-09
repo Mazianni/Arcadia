@@ -40,6 +40,7 @@ func _physics_process(delta):
 	Server.RequestWorldState()
 
 func ProcessWorldUpdate():
+	var map_node : MapBase
 	if current_map_reference.name != current_map: #map name not set yet - invalid condition.
 		current_map_reference.name = current_map
 	if Globals.client_state != Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
@@ -54,6 +55,7 @@ func ProcessWorldUpdate():
 		if world_state_buffer.size() > 10:
 			world_state_buffer.remove_at(0)
 		if world_state_buffer.size() > 2:
+			map_node = main_node.get_node(str(current_map))
 			var interpolation_factor = float(render_time - world_state_buffer[1]["T"]) / float(world_state_buffer[2]["T"] - world_state_buffer[1]["T"])
 			for player in world_state_buffer[2]["PN"].keys():
 				if str(player) == "T":
@@ -70,6 +72,7 @@ func ProcessWorldUpdate():
 						main_node.get_node(str(current_map)).SpawnNewPlayer(player, world_state_buffer[2]["PN"][player]["P"], true)
 					else:
 						main_node.get_node(str(current_map)).SpawnNewPlayer(player, world_state_buffer[2]["PN"][player]["P"], false)
+			main_node.get_node(str(current_map)).SyncGroundItems(world_state_buffer[1]["GI"])
 		elif render_time > world_state_buffer[1].T:
 			var extrapolation_factor = float(render_time - world_state_buffer[0]["T"]) / float(world_state_buffer[1]["T"] - world_state_buffer[0]["T"]) - 1.00
 			for player in world_state_buffer[1]["PN"].keys():
@@ -79,11 +82,13 @@ func ProcessWorldUpdate():
 					continue
 				if world_state_buffer[0]["PN"][player]["M"] != current_map:
 					continue
+				map_node = main_node.get_node(str(current_map))
 				if main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players").has_node(str(player)):
 					var position_delta = (world_state_buffer[1]["PN"][player]["P"] - world_state_buffer[0]["PN"][player]["P"])
 					var new_position = world_state_buffer[1]["PN"][player]["P"] + (position_delta * extrapolation_factor)
 					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).MovePlayer(new_position)
-
+			main_node.get_node(str(current_map)).SyncGroundItems(world_state_buffer[0]["GI"])
+			
 func ChangeMap(mapname):
 	var path = "res://scenes/maps/"
 	print(path+str(mapname)+"/"+str(mapname)+".tscn")
