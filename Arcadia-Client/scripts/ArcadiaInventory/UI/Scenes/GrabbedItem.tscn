@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://csrhes60gwn5"]
+
+[ext_resource type="Script" path="res://scripts/ArcadiaInventory/UI/GrabbedItem.gd" id="1_6g7t2"]
+
+[node name="GrabbedItem" type="Sprite2D" groups=["grabbed_item"]]
+self_modulate = Color(1, 1, 1, 0.607843)
+z_index = 999
+z_as_relative = false
+y_sort_enabled = true
+script = ExtResource("1_6g7t2")

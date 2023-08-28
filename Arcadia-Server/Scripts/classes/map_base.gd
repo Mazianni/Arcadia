@@ -7,8 +7,6 @@ var warpers : Dictionary = {} # format as "warper name" : {"destination":"mapnam
 var default_spawn_map : bool = true
 var default_spawn_location : Vector2 = Vector2(300,300)
 
-@onready var GroundItems : GroundItemManager = $GroundItemsManager
-
 func GenerateWarpers():
 	if warpers.size():
 		Logging.log_notice("Generating warpers for map "+str(map_name))

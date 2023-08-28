@@ -1,0 +1,186 @@
+[gd_scene load_steps=4 format=3 uid="uid://l1j0i8tgatyr"]
+
+[ext_resource type="Script" path="res://scripts/ArcadiaInventory/UI/EquipmentUI.gd" id="1_4n0tc"]
+[ext_resource type="PackedScene" uid="uid://dono4go25vc82" path="res://scripts/ArcadiaInventory/UI/Scenes/RenderSlot.tscn" id="2_rls1x"]
+[ext_resource type="Theme" uid="uid://clivtwnt13g1y" path="res://themes/SpellScreen/SpellScreenToggles.tres" id="3_cthx2"]
+
+[node name="EquipmentInventory" type="Control"]
+custom_minimum_size = Vector2(217, 258)
+layout_mode = 3
+anchor_right = 0.188368
+anchor_bottom = 0.398148
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+script = ExtResource("1_4n0tc")
+metadata/_edit_use_anchors_ = true
+
+[node name="TabContainer" type="TabContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Clothes" type="CenterContainer" parent="TabContainer"]
+layout_mode = 2
+
+[node name="ClothingGrid" type="GridContainer" parent="TabContainer/Clothes"]
+layout_mode = 2
+columns = 3
+
+[node name="Blank" type="Control" parent="TabContainer/Clothes/ClothingGrid"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+
+[node name="Head" parent="TabContainer/Clothes/ClothingGrid" instance=ExtResource("2_rls1x")]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Clothes/ClothingGrid/Head"]
+layout_mode = 2
+theme = ExtResource("3_cthx2")
+text = "Hat"
+horizontal_alignment = 1
+
+[node name="Blank2" type="Control" parent="TabContainer/Clothes/ClothingGrid"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+
+[node name="Left Ring" parent="TabContainer/Clothes/ClothingGrid" instance=ExtResource("2_rls1x")]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Clothes/ClothingGrid/Left Ring"]
+layout_mode = 2
+theme = ExtResource("3_cthx2")
+theme_override_font_sizes/font_size = 10
+text = "L. Ring"
+horizontal_alignment = 1
+
+[node name="Shirt" parent="TabContainer/Clothes/ClothingGrid" instance=ExtResource("2_rls1x")]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Clothes/ClothingGrid/Shirt"]
+layout_mode = 2
+theme = ExtResource("3_cthx2")
+text = "Shirt"
+horizontal_alignment = 1
+
+[node name="Right Ring" parent="TabContainer/Clothes/ClothingGrid" instance=ExtResource("2_rls1x")]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Clothes/ClothingGrid/Right Ring"]
+layout_mode = 2
+theme = ExtResource("3_cthx2")
+theme_override_font_sizes/font_size = 10
+text = "R. Ring"
+horizontal_alignment = 1
+
+[node name="Blank3" type="Control" parent="TabContainer/Clothes/ClothingGrid"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+
+[node name="Pants" parent="TabContainer/Clothes/ClothingGrid" instance=ExtResource("2_rls1x")]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Clothes/ClothingGrid/Pants"]
+layout_mode = 2
+theme = ExtResource("3_cthx2")
+theme_override_font_sizes/font_size = 13
+text = "Pants"
+horizontal_alignment = 1
+
+[node name="Blank4" type="Control" parent="TabContainer/Clothes/ClothingGrid"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+
+[node name="Blank5" type="Control" parent="TabContainer/Clothes/ClothingGrid"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+
+[node name="Shoes" parent="TabContainer/Clothes/ClothingGrid" instance=ExtResource("2_rls1x")]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Clothes/ClothingGrid/Shoes"]
+layout_mode = 2
+theme = ExtResource("3_cthx2")
+theme_override_font_sizes/font_size = 13
+text = "Shoes"
+horizontal_alignment = 1
+
+[node name="Armor" type="CenterContainer" parent="TabContainer"]
+visible = false
+layout_mode = 2
+
+[node name="ArmorGrid" type="GridContainer" parent="TabContainer/Armor"]
+layout_mode = 2
+columns = 3
+
+[node name="Blank" type="Control" parent="TabContainer/Armor/ArmorGrid"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+
+[node name="Helmet" parent="TabContainer/Armor/ArmorGrid" instance=ExtResource("2_rls1x")]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Armor/ArmorGrid/Helmet"]
+layout_mode = 2
+theme = ExtResource("3_cthx2")
+theme_override_font_sizes/font_size = 13
+text = "Helm"
+horizontal_alignment = 1
+
+[node name="Blank2" type="Control" parent="TabContainer/Armor/ArmorGrid"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+
+[node name="Blank6" type="Control" parent="TabContainer/Armor/ArmorGrid"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+
+[node name="Chestpiece" parent="TabContainer/Armor/ArmorGrid" instance=ExtResource("2_rls1x")]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Armor/ArmorGrid/Chestpiece"]
+layout_mode = 2
+theme = ExtResource("3_cthx2")
+theme_override_font_sizes/font_size = 13
+text = "Chest"
+horizontal_alignment = 1
+
+[node name="Blank7" type="Control" parent="TabContainer/Armor/ArmorGrid"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+
+[node name="Blank3" type="Control" parent="TabContainer/Armor/ArmorGrid"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+
+[node name="Greaves" parent="TabContainer/Armor/ArmorGrid" instance=ExtResource("2_rls1x")]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Armor/ArmorGrid/Greaves"]
+layout_mode = 2
+theme = ExtResource("3_cthx2")
+theme_override_font_sizes/font_size = 10
+text = "Greaves"
+horizontal_alignment = 1
+
+[node name="Blank4" type="Control" parent="TabContainer/Armor/ArmorGrid"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+
+[node name="Blank5" type="Control" parent="TabContainer/Armor/ArmorGrid"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+
+[node name="Boots" parent="TabContainer/Armor/ArmorGrid" instance=ExtResource("2_rls1x")]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Armor/ArmorGrid/Boots"]
+layout_mode = 2
+theme = ExtResource("3_cthx2")
+theme_override_font_sizes/font_size = 13
+text = "Boots"
+horizontal_alignment = 1

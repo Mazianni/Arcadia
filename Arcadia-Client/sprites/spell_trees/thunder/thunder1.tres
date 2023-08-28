@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://c1bcduu177f48"]
+
+[ext_resource type="Texture2D" uid="uid://c8xjqme5p6eib" path="res://sprites/spell_trees/thunder/thunder_magic_spritesheet.png" id="1_bqx7w"]
+
+[resource]
+atlas = ExtResource("1_bqx7w")
+region = Rect2(0, 32, 32, 32)

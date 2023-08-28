@@ -10,20 +10,20 @@ enum MESSAGE_TYPE {NORMAL, YELL}
 @onready var uuid_generator = load("res://uuid.gd")
 @onready var collider_resource = load("res://Scenes/Instances/player/PlayerCollider.tscn")
 @onready var warper_resource = load("res://Scenes/MapObjects/Warper.tscn")
-@onready var player_inventory_resource = load("res://Resources/player_inventory.tres")
-@onready var player_restricted_inv_resource = load("res://Resources/player_equipment_inv.tres")
-@onready var player_currency_inv_resource = load("res://Resources/player_currency_inv.tres")
 @onready var Server : MainServer = get_tree().get_root().get_node("Server")
 @onready var stateprocessing : StateProcessor
 @onready var mapmanager : MapManager
 @onready var Admin : AdminManager
 @onready var PlayerMgmt : PlayerManager 
+@onready var InventoryMgmt : InventoryManager
 
 var serverversion = "0.1a"
 var saves_directory : String
 var CurrentState 
 var MapManager : Node
 var db : SQLite
+
+var max_distance_inv_interact : int = 100
 
 var races : Dictionary = {
 	"Human" : load("res://Resources/Races/human.tres")
@@ -43,33 +43,13 @@ var category_bbcode_colors : Dictionary = {
 	"LOOC" : "#81b1eb",
 	"ADMIN":"#c685ff"
 }
+
+
 var approved_users_for_races : Dictionary = {} #format is initial key: "username" : {"race1":"false"}
 var pid_to_username : Dictionary = {}
 var hair_styles : Dictionary = {}
-var character_data_skeleton : Dictionary = {
-	"uuid":"",
-	"Name":"",
-	"Species":"",
-	"Age":"",
-	"Gender":"",
-	"Stats":{
-		
-	},
-	"Inventory": [],
-	"EquippedInventory": [],
-	"CurrencyStorage": [],
-	"hair_style":"",
-	"hair_color":"",
-	"ear_style":"",
-	"tail_style":"",
-	"accessory_one_style":"",
-	"skin_color":"",
-	"height":0,
-	"LastMap":"",
-	"LastPosition": Vector2(0,0),
-	"LastPlayed":0
-}
 var default_emote_range : int = 350
+var default_tick_rate : int = 1 #seconds
 
 
 func _ready():
@@ -94,6 +74,9 @@ func ConnectSubsystem(nodename:String, node:Node):
 		"PlayerManager":
 			PlayerMgmt = node
 			Logging.log_notice("[DATA REPOSITORY] Subsystem "+node.name+" connected to PLAYERMANAGER.")
+		"InventoryMgmt":
+			InventoryMgmt = node
+			Logging.log_notice("[DATA REPOSITORY] Subsystem "+node.name+" connected to INVENTORYMANAGER.")
 
 func SetServerState(new_state):
 	CurrentState = new_state

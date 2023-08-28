@@ -30,8 +30,6 @@ extends Node
 @rpc("any_peer") func ServRPC_GetCurrentPlayers(): pass
 @rpc("any_peer") func ServRPC_RecieveClientState(client_state): pass
 @rpc("any_peer", "unreliable") func ServRPC_RequestWorldState(): pass
-@rpc("any_peer") func ServRPC_RequestInventorySync(): pass
-@rpc("any_peer") func ServRPC_RequestItemPickup(): pass
 
 #BOILERPLATE END
 
@@ -91,13 +89,14 @@ func _OnConnectionFailed():
 		
 func _OnConnectionSucceeded():
 	print("Connection Succcessful.")
-	rpc_id(1, "ServRPC_FetchServerTime", Time.get_unix_time_from_system())
+	rpc_id(1, "ServRPC_FetchServerTime", Time.get_unix_time_from_system()*1000)
 	var timer = Timer.new()
 	timer.wait_time = 0.5
 	timer.autostart = true
 	timer.timeout.connect(DetermineLatency)
 	self.add_child(timer)
 	Globals.client_state = Globals.SERVER_CONNECTION_STATE.CONNECTED
+	CombatHandler.ClientCombatHandler_RequestSpellTrees()
 	
 func _OnServerDisconnected(): #todo make this return to the login screen.
 	Globals.client_state = Globals.SERVER_CONNECTION_STATE.DISCONNECTED
@@ -122,19 +121,19 @@ func SendPlayerState(state):
 	
 func DetermineLatency():
 	if multiplayer.multiplayer_peer:
-		rpc_id(1, "ServRPC_DetermineLatency", Time.get_unix_time_from_system())
+		rpc_id(1, "ServRPC_DetermineLatency", Time.get_unix_time_from_system()*1000)
 	
 @rpc("any_peer") func ReturnLatency(client_time):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
-	latency_array.append((Time.get_unix_time_from_system() - client_time) / 2)
+	latency_array.append((Time.get_unix_time_from_system()*1000 - client_time) / 2)
 	if latency_array.size() == 9:
 		var total_latency = 0
 		latency_array.sort()
 		var mid_point = latency_array[4]
 		for i in range (latency_array.size()-1,-1,-1):
 			if latency_array[i] > (2 * mid_point) and latency_array[i] > 20:
-				latency_array.remove(i)
+				latency_array.erase(i)
 			else:
 				total_latency += latency_array[i]
 		delta_latency = (total_latency / latency_array.size()) - latency
@@ -429,14 +428,8 @@ func IsClientAdmin():
 
 #inventory sync / manipulation start
 
-func RequestInventorySync():
-	rpc_id(1, "ServRPC_RequestInventorySync")
-
-@rpc("any_peer") func RecieveInventorySync(recieve_dict:Dictionary):
-	InventoryManager.DeserializePlayerInventories(recieve_dict)
-	
-func RequestItemPickup(item):
-	rpc_id(1, "ServRPC_RequestItemPickup", item)
+@rpc("any_peer") func ClientRPC_BindNetworkedInventories(inventory):
+	InventoryManager.BindNetworkInventory(inventory)
 
 #inventory sync / manipulation  end
 

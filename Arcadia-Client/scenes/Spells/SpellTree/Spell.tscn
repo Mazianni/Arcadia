@@ -1,0 +1,63 @@
+[gd_scene load_steps=3 format=3 uid="uid://dgfb7hexghlx3"]
+
+[ext_resource type="Script" path="res://scripts/menus/spells/spell.gd" id="1_cyvnb"]
+[ext_resource type="Theme" uid="uid://bg36ipi7o7es5" path="res://themes/SpellScreen/SpellLabelThemeUnlocked.tres" id="2_a20p8"]
+
+[node name="Spell" type="Control" groups=["spells"]]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("1_cyvnb")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 57.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control" type="Control" parent="VBoxContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+texture_filter = 6
+layout_mode = 2
+theme = ExtResource("2_a20p8")
+text = "Test"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="."]
+modulate = Color(0.223529, 0.223529, 0.223529, 1)
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]

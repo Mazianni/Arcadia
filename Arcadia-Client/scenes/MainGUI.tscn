@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://b86spviqend3g"]
+[gd_scene load_steps=12 format=3 uid="uid://b86spviqend3g"]
 
 [ext_resource type="Script" path="res://scripts/menus/mousehandling/detecttext.gd" id="2"]
 [ext_resource type="Script" path="res://scripts/menus/mousehandling/detect_uiclick.gd" id="3"]
@@ -8,8 +8,13 @@
 [ext_resource type="Texture2D" uid="uid://xi07at00qdyj" path="res://fonts/fontawesome-free-6.4.0-desktop/svgs/solid/a.svg" id="6_owyr8"]
 [ext_resource type="Texture2D" uid="uid://bbq0s7i5wiuol" path="res://fonts/fontawesome-free-6.4.0-desktop/svgs/solid/warehouse.svg" id="6_p074g"]
 [ext_resource type="Theme" uid="uid://ccql3hfhmn2kw" path="res://themes/window_theme.tres" id="7_221ny"]
+[ext_resource type="Texture2D" uid="uid://cfjafhp8ch8mc" path="res://fonts/fontawesome-free-6.4.0-desktop/svgs/solid/m.svg" id="7_xm3wq"]
+[ext_resource type="PackedScene" uid="uid://3w4ubqgjin6e" path="res://scenes/ResourceBars/ResourceBar.tscn" id="10_nkqgd"]
+[ext_resource type="PackedScene" uid="uid://bfn4347bhmu4l" path="res://scenes/Hotbar/Hotbar.tscn" id="11_vjojr"]
 
 [node name="MainGUI" type="Control"]
+z_as_relative = false
+y_sort_enabled = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,6 +23,103 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("3")
+
+[node name="StatusBars" type="Control" parent="."]
+layout_mode = 1
+anchor_left = 0.000868056
+anchor_right = 0.664063
+anchor_bottom = 0.12963
+grow_horizontal = 2
+mouse_filter = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="CenterContainer" type="CenterContainer" parent="StatusBars"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ResourceBar" parent="StatusBars/CenterContainer" instance=ExtResource("10_nkqgd")]
+layout_mode = 2
+
+[node name="SubviewRegion" type="Control" parent="."]
+layout_mode = 1
+anchor_right = 0.667
+anchor_bottom = 1.0
+offset_right = -0.384033
+mouse_filter = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="GridContainer" type="GridContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.666
+anchor_top = 0.006
+anchor_right = 0.666
+anchor_bottom = 0.006
+offset_left = -55.232
+offset_top = 0.112
+offset_right = -1.23199
+offset_bottom = 638.112
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("5_4f8sw")
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 6
+
+[node name="TicketsButton" type="Button" parent="GridContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+tooltip_text = "Tickets"
+theme = ExtResource("5_4f8sw")
+theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_disabled_color = Color(1, 1, 1, 1)
+icon = ExtResource("5_8rgo8")
+expand_icon = true
+
+[node name="InventoryButton" type="Button" parent="GridContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+tooltip_text = "Tickets"
+theme = ExtResource("5_4f8sw")
+theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_disabled_color = Color(1, 1, 1, 1)
+icon = ExtResource("6_p074g")
+expand_icon = true
+
+[node name="SpellsButton" type="Button" parent="GridContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+tooltip_text = "Tickets"
+theme = ExtResource("5_4f8sw")
+theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_disabled_color = Color(1, 1, 1, 1)
+icon = ExtResource("7_xm3wq")
+expand_icon = true
+
+[node name="AdminPanelButton" type="Button" parent="GridContainer"]
+visible = false
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme = ExtResource("5_4f8sw")
+icon = ExtResource("6_owyr8")
+icon_alignment = 1
+expand_icon = true
 
 [node name="RPDialog" type="Window" parent="."]
 title = "RP Box"
@@ -105,60 +207,6 @@ text = "[table=2]
 [cell]Right[/cell][cell]^^^[/cell]
 [/table]"
 fit_content = true
-
-[node name="GridContainer" type="GridContainer" parent="."]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.666
-anchor_top = 0.006
-anchor_right = 0.666
-anchor_bottom = 0.006
-offset_left = -55.232
-offset_top = 0.112
-offset_right = -1.23199
-offset_bottom = 638.112
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("5_4f8sw")
-theme_override_constants/h_separation = 0
-theme_override_constants/v_separation = 6
-
-[node name="TicketsButton" type="Button" parent="GridContainer"]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-tooltip_text = "Tickets"
-theme = ExtResource("5_4f8sw")
-theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_focus_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_disabled_color = Color(1, 1, 1, 1)
-icon = ExtResource("5_8rgo8")
-expand_icon = true
-
-[node name="InventoryButton" type="Button" parent="GridContainer"]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-tooltip_text = "Tickets"
-theme = ExtResource("5_4f8sw")
-theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_focus_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_disabled_color = Color(1, 1, 1, 1)
-icon = ExtResource("6_p074g")
-expand_icon = true
-
-[node name="AdminPanelButton" type="Button" parent="GridContainer"]
-visible = false
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-theme = ExtResource("5_4f8sw")
-icon = ExtResource("6_owyr8")
-icon_alignment = 1
-expand_icon = true
 
 [node name="ChatboxContainer" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -259,14 +307,34 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 focus_mode = 2
 
+[node name="DialogContainer" type="Node" parent="."]
+
+[node name="Hotbar" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.332
+anchor_top = 0.957
+anchor_right = 0.332
+anchor_bottom = 0.957
+offset_left = -383.464
+offset_top = -28.136
+offset_right = 384.536
+offset_bottom = 27.864
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Hotbar" parent="Hotbar" instance=ExtResource("11_vjojr")]
+layout_mode = 2
+
+[connection signal="pressed" from="GridContainer/TicketsButton" to="." method="_on_TicketsButton_pressed"]
+[connection signal="pressed" from="GridContainer/InventoryButton" to="." method="_on_inventory_button_pressed"]
+[connection signal="pressed" from="GridContainer/SpellsButton" to="." method="_on_spells_button_pressed"]
+[connection signal="pressed" from="GridContainer/AdminPanelButton" to="." method="_on_AdminPanelButton_pressed"]
 [connection signal="close_requested" from="RPDialog" to="." method="_on_rp_dialog_close_requested"]
 [connection signal="mouse_exited" from="RPDialog/MarginContainer/RPBox/TextEdit" to="." method="_on_TextEdit_mouse_exited"]
 [connection signal="pressed" from="RPDialog/MarginContainer/RPBox/ButtonContainer/SubmitButton" to="." method="_on_SubmitButton_pressed"]
 [connection signal="pressed" from="RPDialog/MarginContainer/RPBox/ButtonContainer/MarkupButton" to="." method="_on_MarkupButton_pressed"]
 [connection signal="close_requested" from="RPDialog/MarkupDialog" to="." method="_on_markup_dialog_close_requested"]
-[connection signal="pressed" from="GridContainer/TicketsButton" to="." method="_on_TicketsButton_pressed"]
-[connection signal="pressed" from="GridContainer/InventoryButton" to="." method="_on_inventory_button_pressed"]
-[connection signal="pressed" from="GridContainer/AdminPanelButton" to="." method="_on_AdminPanelButton_pressed"]
 [connection signal="tab_changed" from="ChatboxContainer/Chatbox/ChatSelect/ChatSelectTabs" to="." method="_on_ChatSelectTabs_tab_changed"]
 [connection signal="pressed" from="ChatboxContainer/Chatbox/ChatInput/RP" to="." method="_on_RP_pressed"]
 [connection signal="mouse_exited" from="ChatboxContainer/Chatbox/ChatInput/OneLineChat" to="." method="_on_OneLineChat_mouse_exited"]

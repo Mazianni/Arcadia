@@ -1,0 +1,10 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://bakig06d7e27b"]
+
+[ext_resource type="FontFile" uid="uid://bma5gan1gem4t" path="res://fonts/Uechi Gothic.ttf" id="1_50kwu"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1ecst"]
+
+[resource]
+TabContainer/font_sizes/font_size = 60
+TabContainer/fonts/font = ExtResource("1_50kwu")
+TabContainer/styles/panel = SubResource("StyleBoxEmpty_1ecst")

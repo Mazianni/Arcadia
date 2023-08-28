@@ -10,6 +10,8 @@ var PlayerContainersSaved : int = 0
 var ActiveCharactersSaved : int = 0
 
 @onready var player_container_scene = preload("res://Scenes/Instances/PlayerContainer.tscn")
+@onready var inventory_resource = preload("res://Resources/Inventory/player_inv_base.tres")
+@onready var equip_inv_resource = preload("res://Resources/Inventory/player_equip_base.tres")
 
 signal playercontainers_save_complete()
 signal activecharacters_save_complete()
@@ -96,27 +98,6 @@ func AllPlayerCharactersSavedCallback():
 	return true
 	
 # inventory serialization/sync
-
-func SerializePlayerInventories(player_id:int):
-	if has_node(str(player_id)):
-		var player_container : PlayerContainer = get_node(str(player_id))
-		Logging.log_notice("[PLAYER MGMT] Serializing inventory for "+player_container.PlayerData.Username+" character "+player_container.CurrentActiveCharacter.CharacterData.Name)
-		if player_container.CurrentActiveCharacter:
-			var bundle_dict : Dictionary = {
-				"Inventory" = player_container.CurrentActiveCharacter.CharacterInventory.to_array(),
-				"Currency" = player_container.CurrentActiveCharacter.CurrencyStorage.to_array(),
-				"Equipped" = player_container.CurrentActiveCharacter.EquippedInventory.to_array()}
-			return bundle_dict
-			
-func HandleRequestItemPickup(player_id, item):
-	if has_node(str(player_id)):
-		var player_container : PlayerContainer = get_node(str(player_id))
-		if player_container.CurrentActiveCharacter:
-			var map_node : MapBase = DataRepository.mapmanager.get_node(player_container.CurrentActiveCharacter.CurrentMap)
-			for I in map_node.GroundItems.get_children():
-				if I.get_global_position() == item:
-					I.try_pickup(player_container.CurrentActiveCharacter.CharacterInventory)
-
 			
 func CreateNewCharacter(uuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height, pid):
 	var result : bool = true
@@ -128,7 +109,6 @@ func CreateNewCharacter(uuid, species_name, character_name, age, hair_color, ski
 	CharacterData.Name = character_name
 	CharacterData.Age = age
 	CharacterData.Gender = gender
-#	CharacterData["Stats"] = BaseSpecies.base_stats.duplicate(true) #IMPL do this soon
 	CharacterData.hair_style = hair_style
 	CharacterData.hair_color = hair_color
 	CharacterData.skin_color = skin_color
@@ -138,11 +118,20 @@ func CreateNewCharacter(uuid, species_name, character_name, age, hair_color, ski
 	CharacterData.height = height
 	CharacterData.LastMap = DataRepository.spawns[BaseSpecies.valid_spawns[0]]["MapName"]
 	CharacterData.LastPosition = DataRepository.spawns[BaseSpecies.valid_spawns[0]]["pos"]
-	CharacterData.CharacterInventory = DataRepository.player_inventory_resource.duplicate(true)
-	CharacterData.EquippedInventory = DataRepository.player_restricted_inv_resource.duplicate(true)
-	CharacterData.CurrencyStorage = DataRepository.player_currency_inv_resource.duplicate(true)
+	CharacterData.MainInventory = inventory_resource.duplicate(true)
+	CharacterData.MainInventory._init()
+	CharacterData.MainInventory.GenerateUnique()
+	CharacterData.EquipmentInventory = equip_inv_resource.duplicate(true)
+	CharacterData.EquipmentInventory._init()
+	CharacterData.EquipmentInventory.GenerateUnique()
+	CharacterData.CoinInventory = inventory_resource.duplicate(true)
+	CharacterData.CoinInventory._init()
+	CharacterData.CoinInventory.GenerateUnique()
 	var save_dir = DataRepository.saves_directory + "/" + str(Helpers.PID2Username((pid)))
-	var save_file = save_dir+"/"+str(uuid)+".tres"
+	var save_file = save_dir+"/"+str(uuid)+"/"+str(uuid)+".tres"
+	var dir_check = DirAccess.open(save_dir)
+	if not dir_check.dir_exists(str(uuid)):
+		dir_check.make_dir(str(uuid))
 	CharacterData.WriteSave(save_file)
 	Logging.log_notice("New character by name of "+str(character_name)+" created successfully.")
 	DataRepository.Server.ReturnNewCharacterCreated(pid, result, message)

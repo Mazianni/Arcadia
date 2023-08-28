@@ -24,6 +24,12 @@ Helpers="*res://Scripts/singletons/helpers.gd"
 ChatHandler="*res://Scripts/singletons/ChatHandler.gd"
 SaveHandler="*res://Scripts/singletons/SaveHandler.gd"
 SubsystemManager="*res://Scripts/singletons/SubsystemManager.gd"
+InventoryDataRepository="*res://Scripts/ArcadiaInventory/Singleton/InventoryDataManager.gd"
+InventoryPredicate="*res://Scripts/ArcadiaInventory/NetworkedPredicate/ServerPredicate.gd"
+ItemSkeletonRepository="*res://Scripts/ArcadiaInventory/Singleton/ItemSkeletonRepository.gd"
+BetterTerrain="*res://addons/better-terrain/BetterTerrain.gd"
+CombatHandler="*res://Scripts/singletons/CombatHandler.gd"
+AbilityHolder="*res://Scripts/singletons/AbilityHolder.gd"
 
 [debug]
 
@@ -34,7 +40,7 @@ gdscript/warnings/return_value_discarded=false
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/Todo_Manager/plugin.cfg", "res://addons/wyvernbox/editor/plugin.cfg")
+enabled=PackedStringArray("res://addons/Todo_Manager/plugin.cfg", "res://addons/better-terrain/plugin.cfg")
 
 [gui]
 
@@ -68,9 +74,15 @@ inventory_filter={
 ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="Main Layer"
+2d_physics/layer_2="Projectiles"
+
 [physics]
 
-common/physics_fps=20
+common/physics_ticks_per_second=20
+common/physics_fps=60
 common/enable_pause_aware_picking=true
 common/physics_interpolation=true
 

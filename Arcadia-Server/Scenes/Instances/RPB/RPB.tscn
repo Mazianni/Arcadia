@@ -1,0 +1,71 @@
+[gd_scene load_steps=5 format=3 uid="uid://c7g58ro06f1ln"]
+
+[ext_resource type="Script" path="res://Scripts/classes/RPB/RPB.gd" id="1_58a6j"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_voqvt"]
+size = Vector2(20, 600)
+
+[sub_resource type="Gradient" id="Gradient_ies0s"]
+offsets = PackedFloat32Array(0, 0.473186, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.729467, 0, 0.193248, 1, 1, 1, 1, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_v32vb"]
+size = Vector2(621, 20)
+
+[node name="RPB" type="Node2D"]
+script = ExtResource("1_58a6j")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="LeftWall" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-300.5, 0)
+shape = SubResource("RectangleShape2D_voqvt")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="StaticBody2D/LeftWall"]
+amount = 800
+local_coords = true
+emission_shape = 3
+emission_rect_extents = Vector2(12, 300)
+gravity = Vector2(0, 0)
+scale_amount_min = 0.0
+scale_amount_max = 6.49
+color_ramp = SubResource("Gradient_ies0s")
+
+[node name="RightWall" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(300.5, 0)
+shape = SubResource("RectangleShape2D_voqvt")
+
+[node name="CPUParticles2D2" type="CPUParticles2D" parent="StaticBody2D/RightWall"]
+amount = 800
+emission_shape = 3
+emission_rect_extents = Vector2(12, 300)
+gravity = Vector2(0, 0)
+scale_amount_min = 0.0
+scale_amount_max = 6.49
+color_ramp = SubResource("Gradient_ies0s")
+
+[node name="BottomWall" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(0, 310)
+shape = SubResource("RectangleShape2D_v32vb")
+
+[node name="CPUParticles2D2" type="CPUParticles2D" parent="StaticBody2D/BottomWall"]
+amount = 800
+emission_shape = 3
+emission_rect_extents = Vector2(310, 12)
+gravity = Vector2(0, 0)
+scale_amount_min = 0.0
+scale_amount_max = 6.49
+color_ramp = SubResource("Gradient_ies0s")
+
+[node name="TopWall" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(0, -310)
+shape = SubResource("RectangleShape2D_v32vb")
+
+[node name="CPUParticles2D2" type="CPUParticles2D" parent="StaticBody2D/TopWall"]
+amount = 800
+emission_shape = 3
+emission_rect_extents = Vector2(310, 12)
+gravity = Vector2(0, 0)
+scale_amount_min = 0.0
+scale_amount_max = 6.49
+color_ramp = SubResource("Gradient_ies0s")

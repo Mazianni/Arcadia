@@ -2,6 +2,9 @@ extends Node
 
 @onready var maphandler = get_tree().get_root().get_node("RootNode/Maphandler")
 
+var player_spawn = preload("res://scenes/PlayerTemplate.tscn")
+
+
 enum RANK_FLAGS {NONE, MANAGE_TICKETS, IS_STAFF}
 enum TICKET_FLAGS {TICKET_OPEN, TICKET_STAFF_ASSIGNED, TICKET_CLOSED}
 
@@ -21,6 +24,8 @@ var DirectionsList : Dictionary = {
 	3 : "north",
 	4 : "west"
 }
+var ability_trees : Dictionary
+var known_spells : Array
 
 var uuid_generator = preload("res://uuid.gd")
 var uuid
@@ -29,6 +34,7 @@ var character_uuid
 var client_state
 var serverconn
 var currentscene
+var inventory_uuids : Dictionary
 
 var is_client_admin = false #you may think you're very clever by setting this to true. you're not.
 
@@ -42,9 +48,13 @@ enum MESSAGE_CATEGORY {IC, OOC, LOOC, ADMIN, ETC}
 
 var measurement_units : String = "Imperial"
 
+var selected_player : Node
+
 signal character_list_refresh_requested
 signal show_viewport(show)
 signal scene_changed(scene_enum)
+signal create_main_player_obj
+signal player_selected(node)
 
 func _ready():
 	uuid = uuid_generator.v4()
@@ -53,6 +63,11 @@ func _ready():
 	CheckSettingsExist()
 	CheckPersistentUUIDExists()
 	Settings.LoadSettingsFromJSON()
+	
+func SetSelectedPlayer(node):
+	selected_player = node
+	player_selected.emit(node)
+	
 	
 func SetClientState(new_state):
 	client_state = new_state
@@ -67,8 +82,10 @@ func SetClientState(new_state):
 			show_viewport.emit(false)
 		CLIENT_STATE_LIST.CLIENT_INGAME:
 			Gui.ChangeGUIScene("MainGameUI")
+			InventoryPredicate.ClientPredicate_RequestSelfInventoryUUIDs()
 			get_tree().get_root().get_node("RootNode").ShowBackground(false)
 			show_viewport.emit(true)
+			create_main_player_obj.emit()
 		CLIENT_STATE_LIST.CLIENT_UNAUTHENTICATED:
 			Gui.ChangeGUIScene("LoginScreen")				
 			maphandler.ClearScenes()

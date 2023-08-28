@@ -8,7 +8,7 @@ class_name SpeciesBase extends Resource
 @export var race_icon: String
 @export var racial_spell_tree: String = "NONE"
 @export var requires_approval: bool = false
-@export var base_stats: Dictionary = {"Vigor": 10, "Ability": 10, "Deftness": 10, "Willpower": 10}
+@export var base_stats: Dictionary = {"Vitality": 10, "Attunement": 10, "Dexterity": 10, "Endurance": 10}
 @export var default_skin_colors: Dictionary = {}
 @export var heightminmax: Dictionary = {"max": 175, "min" : 120}
 @export var default_ear_styles: Array = []

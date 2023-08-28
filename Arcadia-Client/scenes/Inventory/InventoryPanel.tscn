@@ -1,55 +1,16 @@
-[gd_scene load_steps=11 format=3 uid="uid://npilgo0dfpcs"]
+[gd_scene load_steps=4 format=3 uid="uid://cdysqyx8pspo8"]
 
 [ext_resource type="Theme" uid="uid://ccql3hfhmn2kw" path="res://themes/window_theme.tres" id="1_bjlv3"]
-[ext_resource type="Script" path="res://addons/wyvernbox/inventory_view.gd" id="2_61uw8"]
 [ext_resource type="Script" path="res://scripts/menus/inventory/inventorypanel.gd" id="2_g6ojq"]
-[ext_resource type="Theme" uid="uid://cakbdiympnnj6" path="res://themes/angluar_panel_box.tres" id="2_o8fq5"]
-[ext_resource type="PackedScene" uid="uid://co5ok1mm2s7vu" path="res://addons/wyvernbox_prefabs/item_stack_view.tscn" id="3_06x55"]
-[ext_resource type="Theme" uid="uid://ct384odpdduql" path="res://themes/chattheme.tres" id="3_eeudx"]
-[ext_resource type="PackedScene" uid="uid://b7jlucsddt6dg" path="res://addons/wyvernbox_prefabs/inventory_cell.tscn" id="9_2f3ad"]
-
-[sub_resource type="Gradient" id="2"]
-
-[sub_resource type="GradientTexture2D" id="1"]
-gradient = SubResource("2")
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(4.85, 0.5)
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_aaihg"]
-viewport_path = NodePath("ColorRect/MarginContainer/VBoxContainer/MainInventoryPanel/MarginContainer/SubViewport")
+[ext_resource type="PackedScene" uid="uid://l1j0i8tgatyr" path="res://scripts/ArcadiaInventory/UI/Scenes/SubInventory/EquipmentInventory.tscn" id="3_8ah6e"]
 
 [node name="InventoryPanel" type="Window"]
 title = "Inventories"
 initial_position = 1
-size = Vector2i(300, 300)
-visible = false
+size = Vector2i(450, 450)
+wrap_controls = true
 theme = ExtResource("1_bjlv3")
 script = ExtResource("2_g6ojq")
-
-[node name="MainInventory" type="Control" parent="."]
-custom_minimum_size = Vector2(280, 224)
-layout_mode = 3
-anchors_preset = 0
-offset_left = 7.0
-offset_top = 166.0
-offset_right = 287.0
-offset_bottom = 390.0
-script = ExtResource("2_61uw8")
-item_scene = ExtResource("3_06x55")
-cell_size = Vector2(28, 28)
-grid_background = NodePath("../ColorRect/MarginContainer/VBoxContainer/MainInventoryPanel/MarginContainer/BG")
-grid_resize_cell = NodePath("../ColorRect/MarginContainer/VBoxContainer/MainInventoryPanel/MarginContainer/SubViewport")
-autosave_intensity = 0
-
-[node name="Cells" type="GridContainer" parent="MainInventory"]
-layout_mode = 0
-columns = 8
-
-[node name="Cell" parent="MainInventory/Cells" instance=ExtResource("9_2f3ad")]
-custom_minimum_size = Vector2(28, 28)
-layout_mode = 2
-texture = SubResource("1")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 anchors_preset = 15
@@ -57,78 +18,24 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 color = Color(0.160784, 0.152941, 0.152941, 1)
 
-[node name="Panel" type="Panel" parent="ColorRect"]
-visible = false
+[node name="CenterContainer" type="CenterContainer" parent="ColorRect"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("2_o8fq5")
 
-[node name="MarginContainer" type="MarginContainer" parent="ColorRect"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 3
-theme_override_constants/margin_top = 3
-theme_override_constants/margin_right = 3
-theme_override_constants/margin_bottom = 3
-
-[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/CenterContainer"]
 layout_mode = 2
-theme_override_constants/separation = 0
 
-[node name="MainInventoryLabel" type="Label" parent="ColorRect/MarginContainer/VBoxContainer"]
+[node name="EquipmentInventory" parent="ColorRect/CenterContainer/VBoxContainer" instance=ExtResource("3_8ah6e")]
 layout_mode = 2
-theme = ExtResource("3_eeudx")
-text = "Main Inventory"
-vertical_alignment = 1
-
-[node name="MainInventoryPanel" type="Panel" parent="ColorRect/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(296, 0)
-layout_mode = 2
-size_flags_vertical = 3
-theme = ExtResource("2_o8fq5")
-
-[node name="MarginContainer" type="MarginContainer" parent="ColorRect/MarginContainer/VBoxContainer/MainInventoryPanel"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -145.0
-offset_top = -61.0
-offset_right = 145.0
-offset_bottom = 61.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="SubViewport" type="SubViewport" parent="ColorRect/MarginContainer/VBoxContainer/MainInventoryPanel/MarginContainer"]
-size = Vector2i(28, 28)
-
-[node name="Cell" parent="ColorRect/MarginContainer/VBoxContainer/MainInventoryPanel/MarginContainer/SubViewport" instance=ExtResource("9_2f3ad")]
-custom_minimum_size = Vector2(0, 0)
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="BG" type="TextureRect" parent="ColorRect/MarginContainer/VBoxContainer/MainInventoryPanel/MarginContainer"]
-visible = false
-custom_minimum_size = Vector2(280, 224)
-layout_mode = 2
-mouse_filter = 2
-texture = SubResource("ViewportTexture_aaihg")
-stretch_mode = 1
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]

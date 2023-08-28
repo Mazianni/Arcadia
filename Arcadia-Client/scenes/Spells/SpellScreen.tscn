@@ -1,0 +1,270 @@
+[gd_scene load_steps=14 format=3 uid="uid://c6nrnrefmcd66"]
+
+[ext_resource type="Theme" uid="uid://bir7klqliay2t" path="res://themes/main_theme.tres" id="1_4vv7i"]
+[ext_resource type="Shader" path="res://resources/shaders/star.gdshader" id="1_mtxc0"]
+[ext_resource type="Script" path="res://scripts/menus/spells/spellscreen.gd" id="2_gdgok"]
+[ext_resource type="Theme" uid="uid://b4hv18818s74o" path="res://themes/SpellScreen/SpellScreenTextThemeVolition.tres" id="4_qw0lj"]
+[ext_resource type="Theme" uid="uid://bakig06d7e27b" path="res://themes/SpellScreen/SpellScreenTabBar.tres" id="4_vqolm"]
+[ext_resource type="Theme" uid="uid://clivtwnt13g1y" path="res://themes/SpellScreen/SpellScreenToggles.tres" id="5_0cya1"]
+[ext_resource type="Theme" uid="uid://bvctr5y1hjwdx" path="res://themes/SpellScreen/SpellScreenTextThemeCognition.tres" id="5_h2i4j"]
+[ext_resource type="Shader" uid="uid://c747umxbqu1yc" path="res://resources/shaders/testshader2.tres" id="5_q7hgr"]
+[ext_resource type="Theme" uid="uid://dae4cekprcvfh" path="res://themes/SpellScreen/SpellScreenTextThemeErudition.tres" id="6_xbt3e"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4wred"]
+shader = ExtResource("1_mtxc0")
+shader_parameter/bg_color = null
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cap2f"]
+resource_local_to_scene = true
+shader = ExtResource("5_q7hgr")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wy0ib"]
+resource_local_to_scene = true
+shader = ExtResource("5_q7hgr")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kvui8"]
+resource_local_to_scene = true
+shader = ExtResource("5_q7hgr")
+
+[node name="SpellScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_4vv7i")
+script = ExtResource("2_gdgok")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_4wred")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 140
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 140
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer"]
+layout_mode = 2
+theme = ExtResource("4_vqolm")
+tab_alignment = 1
+tabs_visible = false
+
+[node name="Volition" type="VBoxContainer" parent="MarginContainer/TabContainer"]
+layout_mode = 2
+
+[node name="VolitionText" type="CenterContainer" parent="MarginContainer/TabContainer/Volition"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/TabContainer/Volition/VolitionText"]
+layout_mode = 2
+
+[node name="Previous" type="Button" parent="MarginContainer/TabContainer/Volition/VolitionText/HBoxContainer"]
+layout_mode = 2
+theme = ExtResource("5_0cya1")
+text = "<"
+flat = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainer/Volition/VolitionText/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = -20
+
+[node name="Volition" type="Label" parent="MarginContainer/TabContainer/Volition/VolitionText/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("4_qw0lj")
+theme_override_font_sizes/font_size = 80
+text = "Volition"
+
+[node name="Label" type="Label" parent="MarginContainer/TabContainer/Volition/VolitionText/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "To dare is to do."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Next" type="Button" parent="MarginContainer/TabContainer/Volition/VolitionText/HBoxContainer"]
+layout_mode = 2
+text = ">"
+flat = true
+
+[node name="VolitionContainer" type="MarginContainer" parent="MarginContainer/TabContainer/Volition"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 20
+metadata/_edit_use_anchors_ = true
+
+[node name="Volition" type="ColorRect" parent="MarginContainer/TabContainer/Volition/VolitionContainer"]
+material = SubResource("ShaderMaterial_cap2f")
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.584314, 0, 0.145098, 1)
+
+[node name="VolitionBound" type="CenterContainer" parent="MarginContainer/TabContainer/Volition/VolitionContainer"]
+layout_mode = 2
+
+[node name="Cognition" type="VBoxContainer" parent="MarginContainer/TabContainer"]
+visible = false
+layout_mode = 2
+
+[node name="CognitionText" type="CenterContainer" parent="MarginContainer/TabContainer/Cognition"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/TabContainer/Cognition/CognitionText"]
+layout_mode = 2
+
+[node name="Previous" type="Button" parent="MarginContainer/TabContainer/Cognition/CognitionText/HBoxContainer"]
+layout_mode = 2
+text = "<"
+flat = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainer/Cognition/CognitionText/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = -10
+
+[node name="Cognition" type="Label" parent="MarginContainer/TabContainer/Cognition/CognitionText/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("5_h2i4j")
+theme_override_font_sizes/font_size = 80
+text = "Cognition"
+
+[node name="Label" type="Label" parent="MarginContainer/TabContainer/Cognition/CognitionText/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Balance in all things."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Next" type="Button" parent="MarginContainer/TabContainer/Cognition/CognitionText/HBoxContainer"]
+layout_mode = 2
+text = ">"
+flat = true
+
+[node name="CognitionContainer" type="MarginContainer" parent="MarginContainer/TabContainer/Cognition"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 20
+metadata/_edit_use_anchors_ = true
+
+[node name="Cognition" type="ColorRect" parent="MarginContainer/TabContainer/Cognition/CognitionContainer"]
+modulate = Color(1, 1, 1, 0.588235)
+material = SubResource("ShaderMaterial_wy0ib")
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.294118, 0.27451, 0.431373, 1)
+
+[node name="CognitionBound" type="CenterContainer" parent="MarginContainer/TabContainer/Cognition/CognitionContainer"]
+layout_mode = 2
+
+[node name="Erudition" type="VBoxContainer" parent="MarginContainer/TabContainer"]
+visible = false
+layout_mode = 2
+
+[node name="EruditionText" type="CenterContainer" parent="MarginContainer/TabContainer/Erudition"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/TabContainer/Erudition/EruditionText"]
+layout_mode = 2
+
+[node name="Previous" type="Button" parent="MarginContainer/TabContainer/Erudition/EruditionText/HBoxContainer"]
+layout_mode = 2
+text = "<"
+flat = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainer/Erudition/EruditionText/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = -20
+
+[node name="Erudition" type="Label" parent="MarginContainer/TabContainer/Erudition/EruditionText/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("6_xbt3e")
+theme_override_font_sizes/font_size = 80
+text = "Erudition
+"
+
+[node name="Label" type="Label" parent="MarginContainer/TabContainer/Erudition/EruditionText/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Knowledge is power."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Next" type="Button" parent="MarginContainer/TabContainer/Erudition/EruditionText/HBoxContainer"]
+layout_mode = 2
+text = ">"
+flat = true
+
+[node name="EruditionContainer" type="MarginContainer" parent="MarginContainer/TabContainer/Erudition"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="Erudition" type="ColorRect" parent="MarginContainer/TabContainer/Erudition/EruditionContainer"]
+modulate = Color(1, 1, 1, 0.588235)
+material = SubResource("ShaderMaterial_kvui8")
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.545098, 0.717647, 1)
+
+[node name="EruditionBound" type="CenterContainer" parent="MarginContainer/TabContainer/Erudition/EruditionContainer"]
+layout_mode = 2
+
+[node name="TreeContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="Button2" type="Button" parent="."]
+layout_mode = 0
+offset_left = 132.0
+offset_right = 200.0
+offset_bottom = 92.0
+text = "Refresh"
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_right = 111.0
+offset_bottom = 92.0
+text = "Exit"
+
+[node name="PopupMenu" type="PopupMenu" parent="." groups=["spell_popup"]]
+size = Vector2i(28, 8)
+
+[connection signal="pressed" from="MarginContainer/TabContainer/Volition/VolitionText/HBoxContainer/Previous" to="." method="_on_previous_pressed"]
+[connection signal="pressed" from="MarginContainer/TabContainer/Volition/VolitionText/HBoxContainer/Next" to="." method="_on_next_pressed"]
+[connection signal="pressed" from="MarginContainer/TabContainer/Cognition/CognitionText/HBoxContainer/Previous" to="." method="_on_previous_pressed"]
+[connection signal="pressed" from="MarginContainer/TabContainer/Cognition/CognitionText/HBoxContainer/Next" to="." method="_on_next_pressed"]
+[connection signal="pressed" from="MarginContainer/TabContainer/Erudition/EruditionText/HBoxContainer/Previous" to="." method="_on_previous_pressed"]
+[connection signal="pressed" from="MarginContainer/TabContainer/Erudition/EruditionText/HBoxContainer/Next" to="." method="_on_next_pressed"]
+[connection signal="pressed" from="Button2" to="." method="_on_button_2_pressed"]
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="id_pressed" from="PopupMenu" to="." method="_on_popup_menu_id_pressed"]
+[connection signal="popup_hide" from="PopupMenu" to="." method="_on_popup_menu_popup_hide"]

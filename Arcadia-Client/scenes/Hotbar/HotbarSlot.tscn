@@ -1,0 +1,64 @@
+[gd_scene load_steps=3 format=3 uid="uid://dyfovqlkhuxp3"]
+
+[ext_resource type="Theme" uid="uid://d0x3qtmcx8lcf" path="res://themes/Plain.tres" id="1_74hrm"]
+[ext_resource type="Theme" uid="uid://bg36ipi7o7es5" path="res://themes/SpellScreen/SpellLabelThemeUnlocked.tres" id="1_x4by1"]
+
+[node name="HotbarSlot" type="ColorRect"]
+custom_minimum_size = Vector2(34, 34)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -18.0
+offset_top = -18.0
+offset_right = 18.0
+offset_bottom = 18.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_74hrm")
+color = Color(0.215686, 0.215686, 0.215686, 1)
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.34902, 0.34902, 0.34902, 1)
+
+[node name="TextureRect" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Hotkey" type="Label" parent="."]
+texture_filter = 6
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -3.0
+offset_top = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_x4by1")
+text = "x"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EquipmentInventory" load_steps=2 format=3 uid="uid://btv21yv82137j"]
+
+[ext_resource type="Script" path="res://Scripts/ArcadiaInventory/Inventory/Subtypes/EquipmentGrid.gd" id="1_820os"]
+
+[resource]
+script = ExtResource("1_820os")
+max_slots = 0
+uuid = ""
+slots = {}
+width = 0
+height = 0
+ethereal = false
+locked = false

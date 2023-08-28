@@ -27,7 +27,7 @@ class_name MainServer extends Node
 @rpc("any_peer", "unreliable") func RequestWorldState(): pass
 @rpc("any_peer") func ClientRPC_ReturnNewCharacterCreated(): pass
 @rpc("any_peer") func ClientRPC_RecieveMapSync(mapname:String): pass
-@rpc("any_peer") func RecieveInventorySync(recieve_dict:Dictionary): pass
+@rpc("any_peer") func ClientRPC_BindNetworkedInventories(inventory): pass
 	
 var network : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 var port = 5000
@@ -82,6 +82,9 @@ func _Peer_Connected(player_id):
 func _Peer_Disconnected(player_id):
 	Logging.log_notice("User "+str(player_id)+" Disconnected")
 	if DataRepository.PlayerMgmt.has_node(str(player_id)):
+		var player_node : PlayerContainer = DataRepository.PlayerMgmt.get_node(str(player_id))
+		if player_node.CurrentActiveCharacter:
+			player_node.CurrentActiveCharacter.WriteJSON(player_node.CurrentActiveCharacter.CharacterData.uuid)
 		await get_tree().create_timer(0.2).timeout
 		player_state_collection.erase(player_id)
 		rpc_id(0, "DespawnPlayer", player_id)
@@ -111,7 +114,7 @@ func GeneratePlayerStates(uuid, state):
 	
 @rpc("any_peer") func ServRPC_FetchServerTime(client_time):
 	var player_id = multiplayer.get_remote_sender_id()
-	rpc_id(player_id, "ReturnServerTime", Time.get_unix_time_from_system(), client_time)
+	rpc_id(player_id, "ReturnServerTime", Time.get_unix_time_from_system()*1000, client_time)
 	
 @rpc("any_peer") func ServRPC_DetermineLatency(client_time):
 	var player_id = multiplayer.get_remote_sender_id()	
@@ -543,17 +546,8 @@ func SyncClientMap(pid:int, mapname:String):
 
 #inventory handling and sync begin
 
-@rpc("any_peer") func ServRPC_RequestInventorySync():
-	var player_id = multiplayer.get_remote_sender_id()
-	var send_dict : Dictionary = DataRepository.PlayerMgmt.SerializePlayerInventories(player_id)
-	SendInventorySync(player_id, send_dict)
-	
-func SendInventorySync(pid:int, sending_dict:Dictionary):
-	rpc_id(pid, "RecieveInventorySync", sending_dict)
-	
-@rpc("any_peer") func ServRPC_RequestItemPickup(item):
-	var player_id = multiplayer.get_remote_sender_id()
-	DataRepository.PlayerMgmt.HandleRequestItemPickup(player_id, item)
+func BindClientInventory(pid, inventory):
+	rpc_id(pid, "ClientRPC_BindNetworkedInventories", inventory)
 
 #inventory handling and sync end
 

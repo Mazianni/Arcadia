@@ -1,15 +1,17 @@
-[gd_scene load_steps=12 format=3 uid="uid://bo1w0hck26ii1"]
+[gd_scene load_steps=14 format=3 uid="uid://bo1w0hck26ii1"]
 
 [ext_resource type="Script" path="res://scripts/onload.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://cw43m144jpqgr" path="res://scenes/Maphandler/Maphandler.tscn" id="2_3wnlu"]
+[ext_resource type="AudioStream" uid="uid://n8yvnoax543q" path="res://sounds/kenney_rpgaudio/Audio/cloth4.ogg" id="2_rm0ua"]
 [ext_resource type="Texture2D" uid="uid://di5w5hy1hyemv" path="res://images/background/background2.png" id="3"]
+[ext_resource type="AudioStream" uid="uid://djoihrfwojghx" path="res://sounds/kenney_rpgaudio/Audio/bookOpen.ogg" id="3_d1np3"]
 [ext_resource type="Texture2D" uid="uid://3v627atwatcp" path="res://images/background/background1.png" id="3_rs2vf"]
 [ext_resource type="Texture2D" uid="uid://cuk1762n7fjj6" path="res://images/background/background3.png" id="4"]
+[ext_resource type="AudioStream" uid="uid://cyu1f4p35abbj" path="res://sounds/kenney_rpgaudio/Audio/bookClose.ogg" id="4_8je4t"]
 [ext_resource type="Script" path="res://scripts/singletons/autoresize.gd" id="5"]
 [ext_resource type="Script" path="res://scenes/Background/mainmenu_daynight.gd" id="7_2jgba"]
-[ext_resource type="Theme" uid="uid://xjwshynbp6sr" path="res://themes/button_theme.tres" id="7_ylxsd"]
-[ext_resource type="Texture2D" uid="uid://3upd1n8qlx0b" path="res://fonts/fontawesome-free-6.4.0-desktop/svgs/solid/gear.svg" id="8_jh5cw"]
 [ext_resource type="Shader" path="res://resources/shaders/star.gdshader" id="10_nk848"]
+[ext_resource type="PackedScene" uid="uid://bl5km8jpcltet" path="res://scenes/Menus/EscMenu.tscn" id="12_55ujl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yy05u"]
 shader = ExtResource("10_nk848")
@@ -18,12 +20,57 @@ shader_parameter/bg_color = Color(0, 0, 0, 0)
 [node name="RootNode" type="Node"]
 script = ExtResource("1")
 
+[node name="Audio" type="Node" parent="."]
+
+[node name="ItemPickup" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("2_rm0ua")
+
+[node name="InventoryOpen" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("3_d1np3")
+
+[node name="InventoryClose" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("4_8je4t")
+volume_db = -16.7
+
+[node name="ItemDrop" type="AudioStreamPlayer" parent="Audio"]
+
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
 volume_db = -25.005
 bus = &"Music"
 
 [node name="Maphandler" parent="." instance=ExtResource("2_3wnlu")]
 unique_name_in_owner = true
+
+[node name="GUI" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="EscMenu" parent="GUI" instance=ExtResource("12_55ujl")]
+visible = false
+
+[node name="CanvasLayer" type="Control" parent="GUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FloatingMessageContainer" type="VBoxContainer" parent="GUI/CanvasLayer"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = 40.0
+offset_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 script = ExtResource("5")
@@ -61,39 +108,3 @@ region_rect = Rect2(0, 0, 1280, 640)
 [node name="CanvasModulate" type="CanvasModulate" parent="ParallaxBackground"]
 z_index = -1
 script = ExtResource("7_2jgba")
-
-[node name="GUI" type="CanvasLayer" parent="."]
-unique_name_in_owner = true
-
-[node name="CanvasLayer" type="CanvasLayer" parent="GUI"]
-layer = 2
-
-[node name="FloatingMessageContainer" type="VBoxContainer" parent="GUI/CanvasLayer"]
-offset_left = 5.0
-offset_top = 3.0
-offset_right = 40.0
-offset_bottom = 40.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="SettingsButton" type="Button" parent="GUI"]
-custom_minimum_size = Vector2(50, 50)
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 3.0
-offset_top = -27.0
-offset_right = 53.0
-offset_bottom = 23.0
-grow_horizontal = 0
-grow_vertical = 0
-scale = Vector2(0.5, 0.5)
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme = ExtResource("7_ylxsd")
-icon = ExtResource("8_jh5cw")
-icon_alignment = 1
-expand_icon = true
-metadata/_edit_use_anchors_ = true
-
-[connection signal="pressed" from="GUI/SettingsButton" to="." method="_on_SettingsButton_pressed"]

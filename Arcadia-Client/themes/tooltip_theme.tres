@@ -1,0 +1,48 @@
+[gd_resource type="Theme" load_steps=4 format=3 uid="uid://dtleynnqc8han"]
+
+[sub_resource type="StyleBoxFlat" id="1"]
+bg_color = Color(0.160784, 0.152941, 0.152941, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.678431, 0, 1)
+border_blend = true
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+shadow_color = Color(0, 0, 0, 1)
+shadow_size = 1
+shadow_offset = Vector2(1, 1)
+anti_aliasing_size = 1.142
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3rrij"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rjwib"]
+bg_color = Color(0.160784, 0.152941, 0.152941, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.678431, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+expand_margin_left = 5.0
+expand_margin_top = 5.0
+expand_margin_right = 5.0
+expand_margin_bottom = 5.0
+
+[resource]
+Panel/styles/panel = SubResource("1")
+PanelContainer/colors/test = Color(0, 0, 0, 1)
+PanelContainer/styles/panel = null
+PopupPanel/styles/panel = null
+TooltipPanel/styles/panel = SubResource("StyleBoxEmpty_3rrij")
+Window/styles/embedded_border = SubResource("StyleBoxFlat_rjwib")

@@ -9,27 +9,27 @@
 [ext_resource type="PackedScene" uid="uid://ds06mwhee8ygm" path="res://game_settings/components/slider/slider.tscn" id="6_rkyhx"]
 [ext_resource type="Script" path="res://game_settings/settings/unit_selection.gd" id="6_taal0"]
 
-[sub_resource type="Resource" id="Resource_qnmdl"]
+[sub_resource type="Resource" id="Resource_rr8pu"]
 resource_name = "Unit Selection"
 script = ExtResource("6_taal0")
-current = 1
+current = 0
 default = 0
 name = "Unit Selection"
-category = "Units"
+category = "General"
 icon = ExtResource("5_f7fj2")
 desc = "Select a measurement system."
 value_type = 2
 value_hint = 0
 value_hint_string = ""
 
-[sub_resource type="Resource" id="Resource_3oj1n"]
+[sub_resource type="Resource" id="Resource_qfjk0"]
 resource_name = "Audio Volume"
 script = ExtResource("5_4vm1o")
 bus_name = "Music"
-current = 4.0
+current = 0.0
 default = 80.0
 name = "Audio Volume"
-category = "Audio"
+category = "Sound"
 icon = ExtResource("4_3c4vq")
 desc = "Change volume of a specific audio bus."
 value_type = 3
@@ -102,14 +102,13 @@ text = "Measurement Units"
 
 [node name="OptionList" parent="TabContainer/General/MarginContainer/GridContainer/SettingsBox2/VBoxContainer" instance=ExtResource("3_hsk3q")]
 layout_mode = 2
-setting = SubResource("Resource_qnmdl")
-apply_on_change = true
+setting = SubResource("Resource_rr8pu")
 
 [node name="Btn" parent="TabContainer/General/MarginContainer/GridContainer/SettingsBox2/VBoxContainer/OptionList" index="0"]
 item_count = 2
-popup/item_0/text = "Imperial"
+popup/item_0/text = "Metric"
 popup/item_0/id = 0
-popup/item_1/text = "Metric"
+popup/item_1/text = "Imperial"
 popup/item_1/id = 1
 
 [node name="Sound" type="TabBar" parent="TabContainer"]
@@ -153,7 +152,7 @@ text = "Music Volume"
 
 [node name="Slider" parent="TabContainer/Sound/MarginContainer/GridContainer/SettingsBox/VBoxContainer" instance=ExtResource("6_rkyhx")]
 layout_mode = 2
-setting = SubResource("Resource_3oj1n")
+setting = SubResource("Resource_qfjk0")
 apply_on_change = true
 
 [node name="SettingsBox2" type="Panel" parent="."]

@@ -1,9 +1,9 @@
-[gd_resource type="Resource" load_steps=2 format=2]
+[gd_resource type="Resource" script_class="SpeciesBase" load_steps=2 format=3 uid="uid://m875vo7txdck"]
 
-[ext_resource path="res://Scripts/classes/race_base.gd" type="Script" id=1]
+[ext_resource type="Script" path="res://Scripts/classes/race_base.gd" id="1"]
 
 [resource]
-script = ExtResource( 1 )
+script = ExtResource("1")
 race_name = "Human"
 race_description_short = "Humans are mid-sized, mostly-hairless creatures, often with a skin color ranging from extremely pigmented skin to non-pigmented skin with a wide variety of distinctive features, such as hair color, eye color, stature, and voice. One of the most adaptable species on Arcadia, humans can be found in effectively all climates, and while not particularly gifted in the realm of magic, humans are noted for being clever and adapting the physical world to their needs, and innovating where they cannot adapt."
 race_description_extended = "[indent][b]Humanity[/b][/indent] is perhaps the third-oldest species on Arcadia, descended from Tiaos's initial creation. They were never particularly touched by any one Divine, and were never intended to fill a particular niche, being a productive of evolution. In this void, Humans have instead developed to adapt themselves to their enviroment, and are capable of thriving in a wide variety of climates ranging from temperate forests to the hottest deserts.
@@ -13,10 +13,10 @@ race_icon = "human_base"
 racial_spell_tree = "NONE"
 requires_approval = false
 base_stats = {
-"Ability": 10,
-"Deftness": 10,
-"Vigor": 10,
-"Willpower": 10
+"Attunement": 10,
+"Dexterity": 10,
+"Endurance": 10,
+"Vitality": 10
 }
 default_skin_colors = {
 "Fair": "#ffffff",
@@ -30,7 +30,7 @@ heightminmax = {
 "max": 175,
 "min": 120
 }
-default_ear_styles = [ "None" ]
-default_tail_styles = [ "None" ]
-default_accessory_one_styles = [ "None" ]
-valid_spawns = [ "Default" ]
+default_ear_styles = ["None"]
+default_tail_styles = ["None"]
+default_accessory_one_styles = ["None"]
+valid_spawns = ["Default"]

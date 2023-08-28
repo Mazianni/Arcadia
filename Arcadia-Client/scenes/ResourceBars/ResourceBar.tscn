@@ -1,0 +1,71 @@
+[gd_scene load_steps=4 format=3 uid="uid://3w4ubqgjin6e"]
+
+[ext_resource type="Script" path="res://scripts/ResourceBar/ResourceBar.gd" id="1_3vew1"]
+[ext_resource type="Texture2D" uid="uid://c6ekqdrtcmk1k" path="res://images/statusbars/hbar_back.png" id="1_edemh"]
+[ext_resource type="Texture2D" uid="uid://d4hif125o80be" path="res://images/statusbars/hbar_base.png" id="1_tan6u"]
+
+[node name="ResourceBar" type="Control"]
+custom_minimum_size = Vector2(200, 25)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -3.5
+offset_right = -852.0
+offset_bottom = -626.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3vew1")
+
+[node name="BackgroundBar" type="TextureProgressBar" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+nine_patch_stretch = true
+texture_under = ExtResource("1_edemh")
+
+[node name="ChangeBarGood" type="TextureProgressBar" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+nine_patch_stretch = true
+texture_progress = ExtResource("1_tan6u")
+tint_progress = Color(0.305882, 0.862745, 0, 1)
+
+[node name="ChangeBarBad" type="TextureProgressBar" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+nine_patch_stretch = true
+texture_progress = ExtResource("1_tan6u")
+tint_progress = Color(0.788235, 0, 0.0156863, 1)
+
+[node name="BaseBar" type="TextureProgressBar" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+nine_patch_stretch = true
+texture_progress = ExtResource("1_tan6u")
+tint_progress = Color(0.0470588, 0.6, 1, 1)
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1

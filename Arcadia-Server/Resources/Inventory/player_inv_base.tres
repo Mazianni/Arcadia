@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="InventoryBase" load_steps=2 format=3 uid="uid://cmxpfi3m8l307"]
+
+[ext_resource type="Script" path="res://Scripts/ArcadiaInventory/Inventory/InventoryBase.gd" id="1_xs4kh"]
+
+[resource]
+resource_local_to_scene = true
+script = ExtResource("1_xs4kh")
+max_slots = 0
+uuid = ""
+slots = {}
+width = 10
+height = 6
+ethereal = false
+locked = false

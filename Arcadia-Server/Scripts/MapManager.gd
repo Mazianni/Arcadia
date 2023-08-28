@@ -33,6 +33,7 @@ func LoadMaps():
 func MovePlayerToMapStandalone(playerNode : PlayerCollider, NewMap, position): #used when spawning a new player collider.
 	Logging.log_notice("Moving player to map "+str(NewMap)+".")
 	get_node(NewMap).AddPlayerChild(playerNode)
+	playerNode.CurrentMap = NewMap
 	playerNode.ControllingCharacter.CurrentMap = NewMap
 	playerNode.ControllingCharacter.CurrentPosition = position
 	playerNode.position = position
@@ -42,10 +43,15 @@ func MovePlayerToMap(playerNode, OldMap, NewMap, position): #used when transitio
 	Logging.log_notice("Moving player to map "+str(NewMap)+" from "+str(OldMap)+".")
 	get_node(OldMap).RemovePlayerChild(playerNode)
 	get_node(NewMap).AddPlayerChild(playerNode)
+	playerNode.CurrentMap = NewMap
 	playerNode.ControllingCharacter.CurrentMap = NewMap
 	playerNode.ControllingCharacter.CurrentPosition = position
 	DataRepository.Server.SyncClientMap(playerNode.ControllingCharacter.ActiveController.associated_pid, NewMap)
 
-func SerializeGroundItems(mapname):
-	var mapnode : MapBase = get_node(mapname)
-	return mapnode.GroundItems.to_array()
+func GenerateMapGroundItemDict(map_name : String):
+	var map : MapBase = get_node(map_name)
+	return map.GenerateGroundItemDict()
+	
+func GenerateMapObjects(map_name : String):
+	var map : MapBase = get_node(map_name)
+	return map.GenerateMapObjects()

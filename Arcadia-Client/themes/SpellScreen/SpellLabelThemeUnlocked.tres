@@ -1,0 +1,10 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://bg36ipi7o7es5"]
+
+[ext_resource type="FontFile" uid="uid://v12ky2oersqn" path="res://fonts/titillium-web/TitilliumWeb-Regular.ttf" id="1_o1h3v"]
+
+[resource]
+Label/colors/font_outline_color = Color(0.117647, 0.117647, 0.117647, 1)
+Label/colors/font_shadow_color = Color(0, 0, 0, 0.603922)
+Label/constants/shadow_outline_size = 3
+Label/font_sizes/font_size = 16
+Label/fonts/font = ExtResource("1_o1h3v")

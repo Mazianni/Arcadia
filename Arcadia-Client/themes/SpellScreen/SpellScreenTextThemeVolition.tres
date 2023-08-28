@@ -1,0 +1,8 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://b4hv18818s74o"]
+
+[ext_resource type="FontFile" uid="uid://bma5gan1gem4t" path="res://fonts/Uechi Gothic.ttf" id="1_2jbvj"]
+
+[resource]
+Label/colors/font_outline_color = Color(0, 0, 0, 1)
+Label/colors/font_shadow_color = Color(1, 0, 0, 1)
+Label/fonts/font = ExtResource("1_2jbvj")

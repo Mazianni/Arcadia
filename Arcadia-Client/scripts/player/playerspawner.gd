@@ -1,31 +1,42 @@
+
 class_name MapBase extends Node
-
-var player_spawn = preload("res://scenes/PlayerTemplate.tscn")
-var controllable_player_spawn = preload("res://scenes/PlayerObject.tscn")
-var camera_scene = preload("res://scenes/MainCamera.tscn")
-
-@onready var GroundItems : GroundItemManager = $GroundItemsManager
-
-func _ready():
-	GroundItems.item_clicked.connect(Callable(self, "RequestItemPickup"))
-
-func RequestItemPickup(item):
-	Server.RequestItemPickup(item.get_global_position())
+@onready var ground_item_scene_resource = load("res://Scripts/ArcadiaInventory/Item/Ground/GroundItem2D.tscn")
 	
-func SyncGroundItems(recieve_array:Array):
-	for X in GroundItems.get_children():
-		X.queue_free()
-	GroundItems.load_from_array(recieve_array)
+var ground_items : Array = []
+	
+func AddPlayerNodeToMap(player_node : PlayerObject, position : Vector2):
+	get_node("PrimarySort/ObjectSortContainer/Players").add_child(player_node)
 	
 func SpawnNewPlayer(player_id, spawn_position, is_main):
-	var new_player = player_spawn.instantiate()
+	var new_player : PlayerObject = Globals.player_spawn.instantiate()
 	new_player.position = spawn_position
 	new_player.name = str(player_id)
 	get_node("PrimarySort/ObjectSortContainer/Players").add_child(new_player)
-	if is_main:
-		var camera = camera_scene.instantiate()
-		new_player.add_child(camera)
 		
 func DespawnPlayer(player_id):
 	await get_tree().create_timer(0.2).timeout
 	get_node("PrimarySort/ObjectSortContainer/Players"+player_id).queue_free()
+	
+func GetGroundItem(uuid : String):
+	if get_node("PrimarySort/ObjectSortContainer/Objects").has_node(uuid):
+		return get_node("PrimarySort/ObjectSortContainer/Objects").get_node(uuid)
+	
+func AddGroundItem(item : Dictionary, uuid : String, position:Vector2):
+	var new_node = ground_item_scene_resource.instantiate()
+	new_node.held_item = item
+	new_node.CurrentMap = self.name
+	new_node.CurrentMapRef = self
+	new_node.uuid = uuid
+	new_node.position = position
+	new_node.name = uuid
+	get_node("PrimarySort/ObjectSortContainer/Objects").add_child(new_node)
+	ground_items.append(new_node)
+	
+func AddMapObject(obj:Node):
+	get_node("PrimarySort/ObjectSortContainer/Structures").add_child(obj)
+	
+func HasMapObject(id:String):
+	return get_node("PrimarySort/ObjectSortContainer/Structures").has_node(id)
+	
+func GetMapObjects():
+	return get_node("PrimarySort/ObjectSortContainer/Structures").get_children()

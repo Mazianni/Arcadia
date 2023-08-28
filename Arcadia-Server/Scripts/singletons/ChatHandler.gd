@@ -51,12 +51,16 @@ func IsMsgOOC(msg:Dictionary):
 		return true	
 	return false
 	
-func FormatSimpleMessage(msg:String):
+func FormatSimpleMessage(msg:String, distance:=100):
 	var outputdict : Dictionary = {}
-	outputdict["is_emote"] = false
-	outputdict["T"] = Time.get_time_string_from_system(true)
+	var nested : Dictionary = {}
+	nested["text"] = ParseMarkdown(msg)
+	nested["category"] = "ETC"
+	nested["is_emote"] = false
+	nested["T"] = Time.get_time_string_from_system(true)
 	outputdict["category"] = "ETC"
-	outputdict["text"] = msg
+	outputdict["distance"] = distance
+	outputdict["output"] = nested
 	return outputdict
 	
 #Welcome to string concatenation hell.

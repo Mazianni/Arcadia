@@ -1,27 +1,11 @@
-[gd_scene load_steps=17 format=3 uid="uid://d18tenosuhl7d"]
+[gd_scene load_steps=12 format=3 uid="uid://d18tenosuhl7d"]
 
 [ext_resource type="Texture2D" uid="uid://dp6mwnwjb5xvd" path="res://Scenes/MainLev_autotiling.png" id="1"]
 [ext_resource type="PackedScene" path="res://Scenes/Trees/Tree_Green_C.tscn" id="2"]
-[ext_resource type="Resource" uid="uid://d4ibtv16wnn3i" path="res://example/wyvernbox/item_types/materials/feather.tres" id="2_tx7ng"]
 [ext_resource type="PackedScene" path="res://Scenes/Trees/Tree_Green_B.tscn" id="3"]
-[ext_resource type="Resource" uid="uid://yv01djbvah0i" path="res://example/wyvernbox/item_types/materials/metalscrap_copper.tres" id="3_ykax2"]
 [ext_resource type="PackedScene" path="res://Scenes/Trees/Tree_Green_A.tscn" id="4"]
-[ext_resource type="Script" path="res://addons/wyvernbox/item_instantiator.gd" id="4_i8kd4"]
 [ext_resource type="Script" path="res://Scenes/maps/Test/test.gd" id="5"]
-[ext_resource type="Script" path="res://addons/wyvernbox/ground/ground_items_manager.gd" id="6_6lc7a"]
-[ext_resource type="PackedScene" uid="uid://cjdtl6ek4qp7d" path="res://addons/wyvernbox_prefabs/ground_item_stack_view_2d.tscn" id="7_gx001"]
-
-[sub_resource type="Resource" id="Resource_edkv4"]
-script = ExtResource("4_i8kd4")
-items_to_add = Array[Resource("res://addons/wyvernbox/crafting/item_like.gd")]([ExtResource("2_tx7ng"), ExtResource("2_tx7ng"), ExtResource("3_ykax2")])
-item_repeat_ranges = Array[Vector2]([Vector2(1, 1), Vector2(1, 1), Vector2(1, 1)])
-item_chances = Array[float]([100.0, 100.0, 100.0])
-repeat_post_chance = true
-randomize_locations = true
-delay_between_items = 0.0
-spread_distance = 32.0
-spread_cone_degrees = 360.0
-spread_angle_degrees = 0.0
+[ext_resource type="PackedScene" uid="uid://cuqf2ej60wfi0" path="res://Scenes/MapObjects/Chest.tscn" id="6_e4qeh"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lnxkp"]
 texture = ExtResource("1")
@@ -44,7 +28,6 @@ sources/3 = SubResource("TileSetAtlasSource_276qr")
 
 [node name="Map" type="Node2D"]
 script = ExtResource("5")
-loot_table = SubResource("Resource_edkv4")
 
 [node name="PrimarySort" type="Node2D" parent="."]
 
@@ -122,10 +105,9 @@ position = Vector2(596, 511)
 
 [node name="Structures" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
+[node name="Chest" parent="PrimarySort/ObjectSortContainer/Structures" instance=ExtResource("6_e4qeh")]
+position = Vector2(100, 200)
+
 [node name="Players" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
 [node name="Projectiles" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
-
-[node name="GroundItemsManager" type="Node" parent="."]
-script = ExtResource("6_6lc7a")
-item_scene = ExtResource("7_gx001")

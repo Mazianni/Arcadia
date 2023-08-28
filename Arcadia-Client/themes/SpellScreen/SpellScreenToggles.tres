@@ -1,0 +1,6 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://clivtwnt13g1y"]
+
+[ext_resource type="FontFile" uid="uid://c6e5pcw0f4xh1" path="res://fonts/titillium-web/TitilliumWeb-Bold.ttf" id="1_p8r63"]
+
+[resource]
+Label/fonts/font = ExtResource("1_p8r63")
