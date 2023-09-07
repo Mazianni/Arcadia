@@ -57,6 +57,9 @@ func CheckSaveDataExists(): #Verify that the directory and JSON file for this pl
 func LoadSaveData():
 	var save_dir = DataRepository.saves_directory + "/" + str(PlayerData.Username)
 	var save_file = save_dir+"/"+str(PlayerData.Username)+".tres"
+	var dir_check = DirAccess.open(save_dir)
+	if not dir_check or not dir_check.file_exists(save_file):
+		return
 	ResourceLoader.load_threaded_request(save_file, "", ResourceLoader.CACHE_MODE_IGNORE)
 	PlayerData = ResourceLoader.load_threaded_get(save_file)
 

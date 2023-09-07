@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityBase" load_steps=2 format=3 uid="uid://uoes4774ryq7"]
+
+[ext_resource type="Script" path="res://Scripts/classes/abilities/ability.gd" id="1_yuet8"]
+
+[resource]
+script = ExtResource("1_yuet8")
+ability_name = "Voidrend"
+endurance_cost = 0
+point_cost = 10
+texture = "thunder/thunder3.tres"
+requires_spells = Array[String](["Thunder Strike", "Infernal Smite"])
+flags = []
+mastery = false
+position_in_tree = Vector2(0, -100)
+gcd_exempt = false
+cooldown = 10

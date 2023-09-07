@@ -83,6 +83,17 @@ func GetCurrentPlayerList():
 	for I in get_tree().get_nodes_in_group("players"):
 		return_array.append(I.PlayerData.Username)
 	return return_array
+	
+func GetPlayersInRange(origin, given_distance:int):
+	var return_array : Array = []
+	for i in get_tree().get_nodes_in_group("PlayerCollider"):
+		if i.CurrentMap != origin.CurrentMap:
+			continue
+		var distance : float = origin.CurrentCollider.get_global_position().distance_to(i.get_global_position())
+		if distance > given_distance:
+			continue
+		return_array.append(i)
+	return return_array
 			
 	
 			

@@ -19,6 +19,7 @@ func _ready():
 	add_child(music_player)
 	music_player.bus = "Music"
 	music_player.connect("finished", Callable(self, "OnTrackFinished"))
+	await get_tree().create_timer(0.5).timeout
 	OnTrackFinished()
 	
 func OnTrackFinished(pick_new : bool = false):
@@ -36,5 +37,4 @@ func OnTrackFinished(pick_new : bool = false):
 	message = "Now playing "+new_track+"\nBy "+track_lists[current_track_list][new_track]["author"]
 	if(track_lists[current_track_list][new_track]["url"]):
 		message += "\n"+track_lists[current_track_list][new_track]["url"]
-	print(message)
 	Gui.CreateEaseFloatingMessage(message)

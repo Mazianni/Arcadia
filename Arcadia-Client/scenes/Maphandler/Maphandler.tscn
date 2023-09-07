@@ -17,5 +17,8 @@ metadata/_edit_use_anchors_ = true
 
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
 handle_input_locally = false
+physics_object_picking = true
 size = Vector2i(772, 648)
 render_target_update_mode = 0
+
+[node name="TransitionModulate" type="CanvasModulate" parent="SubViewportContainer"]

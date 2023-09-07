@@ -1,0 +1,49 @@
+[gd_scene load_steps=8 format=3 uid="uid://ci5rnwqywmgy2"]
+
+[ext_resource type="Script" path="res://scripts/singletons/autoresize.gd" id="1_dkx7y"]
+[ext_resource type="Shader" path="res://resources/shaders/star.gdshader" id="2_or4um"]
+[ext_resource type="Texture2D" uid="uid://3v627atwatcp" path="res://images/background/background1.png" id="3_b15w0"]
+[ext_resource type="Texture2D" uid="uid://di5w5hy1hyemv" path="res://images/background/background2.png" id="4_ge81g"]
+[ext_resource type="Texture2D" uid="uid://cuk1762n7fjj6" path="res://images/background/background3.png" id="5_dw74x"]
+[ext_resource type="Script" path="res://scenes/Background/mainmenu_daynight.gd" id="6_ydhwl"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yy05u"]
+shader = ExtResource("2_or4um")
+shader_parameter/bg_color = Color(0, 0, 0, 0)
+
+[node name="ParallaxBackground" type="ParallaxBackground"]
+script = ExtResource("1_dkx7y")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 30.0
+one_shot = true
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_yy05u")
+offset_right = 1152.0
+offset_bottom = 347.0
+color = Color(0, 0, 0, 0)
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="."]
+motion_mirroring = Vector2(640, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxLayer"]
+position = Vector2(311, 325.5)
+scale = Vector2(1, 1.02656)
+texture = ExtResource("3_b15w0")
+region_rect = Rect2(0, 0, 1280, 640)
+
+[node name="Sprite2" type="Sprite2D" parent="ParallaxLayer"]
+position = Vector2(311, 334)
+texture = ExtResource("4_ge81g")
+region_rect = Rect2(0, 0, 1280, 640)
+
+[node name="Sprite3" type="Sprite2D" parent="ParallaxLayer"]
+position = Vector2(311, 368.5)
+scale = Vector2(1, 0.892188)
+texture = ExtResource("5_dw74x")
+region_rect = Rect2(0, 0, 1280, 640)
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+z_index = -1
+script = ExtResource("6_ydhwl")

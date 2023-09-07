@@ -31,6 +31,8 @@ class_name CharacterDataResource extends Resource
 @export var ability_points : int = 0
 @export var skill_points : int = 0
 @export var unlocked_abilities : Array[String] = []
+@export var hotbar_bindings : Dictionary
+@export var active_effects : Dictionary
 
 func WriteSave(path):
 	ResourceSaver.save(self, path)

@@ -1,0 +1,71 @@
+[gd_scene load_steps=11 format=3 uid="uid://cmr72psvhyxfi"]
+
+[ext_resource type="Texture2D" uid="uid://ny0piticsmxq" path="res://sprites/mapobjects/castle/light1a.png" id="1_k13gq"]
+[ext_resource type="Texture2D" uid="uid://ci83spnlvmh1r" path="res://sprites/particles/01_Simple/feather_circle.png" id="2_3boy7"]
+[ext_resource type="Script" path="res://scripts/MapObjects/Camp/Torch.gd" id="2_m3pst"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6krm1"]
+atlas = ExtResource("1_k13gq")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_svxfa"]
+atlas = ExtResource("1_k13gq")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mvgit"]
+atlas = ExtResource("1_k13gq")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_72lqq"]
+atlas = ExtResource("1_k13gq")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lrh0d"]
+atlas = ExtResource("1_k13gq")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7d0c0"]
+atlas = ExtResource("1_k13gq")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_nyymv"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6krm1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_svxfa")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mvgit")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_72lqq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lrh0d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7d0c0")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Torch1" type="AnimatedSprite2D"]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_nyymv")
+autoplay = "default"
+frame_progress = 0.968209
+speed_scale = 2.0
+script = ExtResource("2_m3pst")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+z_index = -30
+color = Color(0.839216, 0.470588, 0.0941176, 1)
+energy = 0.75
+range_z_max = 0
+texture = ExtResource("2_3boy7")
+texture_scale = 0.48

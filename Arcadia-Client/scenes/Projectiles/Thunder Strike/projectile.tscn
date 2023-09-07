@@ -1,0 +1,64 @@
+[gd_scene load_steps=5 format=3 uid="uid://briiokecg3lbl"]
+
+[ext_resource type="Script" path="res://scripts/projectiles/projectile.gd" id="1_xkmxl"]
+[ext_resource type="Texture2D" uid="uid://ci83spnlvmh1r" path="res://sprites/particles/01_Simple/feather_circle.png" id="2_cqwcd"]
+
+[sub_resource type="Gradient" id="Gradient_y1bkv"]
+offsets = PackedFloat32Array(0, 0.520076, 1)
+colors = PackedColorArray(0, 0, 0, 0.027451, 0.288724, 0.63945, 3.85046e-07, 1, 1, 1, 1, 0.117647)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_cugjq"]
+
+[node name="projectile" type="RigidBody2D"]
+gravity_scale = 0.0
+script = ExtResource("1_xkmxl")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+amount = 60
+texture = ExtResource("2_cqwcd")
+emission_shape = 1
+emission_sphere_radius = 12.0
+direction = Vector2(1, 1)
+spread = 180.0
+gravity = Vector2(0, 0)
+scale_amount_min = 0.0
+scale_amount_max = 0.05
+color_ramp = SubResource("Gradient_y1bkv")
+
+[node name="CPUParticles2D2" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 400
+lifetime = 0.5
+one_shot = true
+randomness = 0.35
+texture = ExtResource("2_cqwcd")
+emission_shape = 1
+emission_sphere_radius = 12.0
+direction = Vector2(1, 1)
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 50.0
+initial_velocity_max = 50.0
+damping_min = 30.0
+damping_max = 30.0
+scale_amount_min = 0.0
+scale_amount_max = 0.05
+color_ramp = SubResource("Gradient_y1bkv")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_cugjq")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 10.0
+one_shot = true
+autostart = true
+
+[node name="Line2D" type="Line2D" parent="."]
+points = PackedVector2Array(0, -50, 0, 0)
+width = 1.0
+default_color = Color(0.745098, 0, 0.266667, 1)
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

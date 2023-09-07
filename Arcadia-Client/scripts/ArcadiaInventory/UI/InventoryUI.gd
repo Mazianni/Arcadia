@@ -10,6 +10,8 @@ var slots_created : bool = false
 @onready var PrimaryGrid : GridContainer = $GridContainer
 @onready var RenderSlotResource = load("res://scripts/ArcadiaInventory/UI/Scenes/RenderSlot.tscn")
 
+signal emit_size(newsize)
+
 func _ready():
 	InventoryPredicate.inventory_recieved.connect(Callable(self, "CheckInventoryUpdate"))
 	InventoryPredicate.ClientPredicate_RequestInventoryContents(inv_id)
@@ -42,8 +44,9 @@ func RenderInventory():
 		RenderNode.held_item = held_contents[inv_id][i].duplicate(true)
 		RenderNode.UpdateAppearance()
 	
-	custom_minimum_size = Vector2(held_contents["x"]*40, held_contents["y"]*40)
-
+	custom_minimum_size = Vector2(held_contents["x"]*45, held_contents["y"]*45)
+	emit_size.emit(custom_minimum_size)
+	
 func OpenInventory(inventory_uuid : String):
 	pass
 	

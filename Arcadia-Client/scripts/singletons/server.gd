@@ -171,7 +171,7 @@ func DetermineLatency():
 		return
 	if Globals.client_state != Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
 		return
-	get_node("../RootNode/MapHandler/SubViewportContainer/SubViewport/GameRender2D").DespawnPlayer(player_id)
+	#get_node("../RootNode/MapHandler/SubViewportContainer/SubViewport/GameRender2D").DespawnPlayer(player_id)
 #end player spawning
 
 #character creation handling start
@@ -423,7 +423,19 @@ func IsClientAdmin():
 
 @rpc("any_peer") func ClientRPC_RecieveMapSync(mapname:String):
 	maphandler.ChangeMap(mapname)
-
+	
+@rpc("any_peer") func ClientRPC_SetWarpingTrue():
+	Globals.warping = true
+	var camera : Camera2D = get_tree().get_first_node_in_group("main_camera")
+	maphandler.TriggerTransition()
+	camera.position_smoothing_enabled = false
+	get_tree().create_timer(0.1).timeout.connect(Callable(self, "UnsetWarpingTrue"))
+	
+func UnsetWarpingTrue():
+	Globals.warping = false
+	var camera : Camera2D = get_tree().get_first_node_in_group("main_camera")
+	camera.position_smoothing_enabled = true
+	
 #map sync end
 
 #inventory sync / manipulation start

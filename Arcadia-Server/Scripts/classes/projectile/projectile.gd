@@ -2,22 +2,56 @@ extends RigidBody2D
 
 var target : Node2D
 var rot_power : int = 0.5
-var base_speed : Vector2 = Vector2(20, 20)
+var uuid : String
+var ability_name : String
+var caster : Node
+
+func _ready():
+	uuid = DataRepository.uuid_generator.v4()
+	name = uuid
+	
+func GetMapProjectileData():
+	var return_dict : Dictionary = {
+		"type" : ability_name,
+		"pos": get_global_position(),
+		"rot": rotation
+	}
+	return return_dict
 
 func _physics_process(delta):
 	
-	var angle : float = get_angle_to(target.get_global_position())
-	if angle > 180:
-		apply_torque(float(rot_power))
-	if angle < 180:
-		apply_torque(-float(rot_power))
+	if target && is_instance_valid(target):
+		#rotation = lerp(rotation, get_angle_to(target.get_global_position()), 0.5)
+		rotation = lerp(rotation,get_global_position().angle_to_point(target.get_global_position()), 0.1)
+		apply_central_force(Vector2(cos(rotation), sin(rotation))*200)
 
-func Cast(trg):
+		
+func Cast(casting_node, trg):
 	target = trg
-	apply_central_impulse(base_speed.rotated(get_angle_to(target.get_global_position())))
+	caster = casting_node
+	if target:
+		var vector : Vector2 = target.get_global_position() - get_global_position()
+		vector = vector.normalized()
+		apply_central_impulse(vector*500)
+	else:
+		apply_central_impulse(casting_node.direction*200)
 
 func _on_body_entered(body):
-	queue_free()
+	end_projectile()
 	
 func _on_timer_timeout():
+	end_projectile()
+	
+func end_projectile():
+	linear_velocity = Vector2.ZERO
+	angular_velocity = 0
+	var tween = create_tween()
+	$CPUParticles2D.emitting = false
+	tween.tween_property(self, "modulate", Color(1,1,1,0),1)
+	await tween.finished
 	queue_free()
+
+func _on_hitbox_body_entered(body):
+	if body == caster:
+		return
+	end_projectile()

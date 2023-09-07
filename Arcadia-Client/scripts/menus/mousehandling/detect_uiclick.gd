@@ -126,4 +126,5 @@ func UpdateStatusBars(dict : Dictionary):
 		if i == Globals.character_uuid:
 			my_dict = dict[i].duplicate(true)
 	health_bar.UpdateBar(my_dict["HP"])
+
 	

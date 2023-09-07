@@ -47629,3 +47629,10 @@ sources/8 = SubResource("TileSetAtlasSource_rhyl6")
 pattern_0 = SubResource("TileMapPattern_2kq61")
 pattern_1 = SubResource("TileMapPattern_iwmof")
 script = ExtResource("2")
+metadata/_better_terrain = {
+"decoration": ["Decoration", Color(0.411765, 0.411765, 0.411765, 1), 3, [], {
+"path": "res://addons/better-terrain/icons/Decoration.svg"
+}],
+"terrains": [],
+"version": "0.2"
+}

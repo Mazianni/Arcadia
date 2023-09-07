@@ -1,0 +1,30 @@
+[gd_resource type="ParticleProcessMaterial" load_steps=3 format=3 uid="uid://djppt5w0solpc"]
+
+[sub_resource type="Gradient" id="Gradient_6qa2s"]
+offsets = PackedFloat32Array(0, 0.75, 0.980519, 1)
+colors = PackedColorArray(0, 0, 0, 0.682353, 0.435294, 0, 0.454902, 0.682353, 0.584314, 0, 0.52549, 0, 0.584314, 0, 0.392157, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_5dax1"]
+gradient = SubResource("Gradient_6qa2s")
+use_hdr = true
+
+[resource]
+lifetime_randomness = 0.16
+emission_shape = 3
+emission_box_extents = Vector3(500, 100, 1)
+particle_flag_disable_z = true
+spread = 97.77
+gravity = Vector3(0, 15, 0)
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+radial_accel_min = -7.0
+radial_accel_max = -7.0
+color_ramp = SubResource("GradientTexture1D_5dax1")
+turbulence_enabled = true
+turbulence_noise_strength = 0.0
+turbulence_noise_scale = 0.0
+turbulence_noise_speed_random = 0.0
+turbulence_influence_min = 0.0
+turbulence_influence_max = 0.0
+sub_emitter_mode = 2
+sub_emitter_amount_at_end = 1

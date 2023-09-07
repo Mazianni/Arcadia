@@ -1,8 +1,12 @@
 class_name MapManager extends SubsystemBase
 
-var MapsToLoad : Dictionary = {"Test" : load("res://Scenes/maps/Test/Test.tscn")} #formatted as "mapname" : path_to_map.tscn
+var MapsToLoad : Dictionary = {
+	"Test" : load("res://Scenes/maps/Test/Test.tscn"),
+	"Test2" : load("res://Scenes/maps/Test2/Test2.tscn")
+	} #formatted as "mapname" : path_to_map.tscn
 var NumLoaded : int = 0
 var DefaultSpawnMap
+var RecentWarps : Array
 
 func SubsystemInit(node_name:String):
 	LoadMaps()
@@ -19,8 +23,6 @@ func LoadMaps():
 			var new_instance = MapsToLoad[i].instantiate()
 			self.add_child(new_instance)
 			new_instance.name = new_instance.map_name
-			new_instance.GenerateWarpers()
-			new_instance.z_index = NumLoaded
 			NumLoaded += 1	
 			Logging.log_notice("[MAP] Map "+ new_instance.map_name+ " Loaded. "+str(NumLoaded)+"/"+str(MapsToLoad.size()))
 			if new_instance.default_spawn_map:
@@ -41,12 +43,20 @@ func MovePlayerToMapStandalone(playerNode : PlayerCollider, NewMap, position): #
 
 func MovePlayerToMap(playerNode, OldMap, NewMap, position): #used when transitioning between maps via warpers.
 	Logging.log_notice("Moving player to map "+str(NewMap)+" from "+str(OldMap)+".")
+	DataRepository.Server.SetClientWarping(playerNode.ControllingCharacter.ActiveController.associated_pid)
+	await get_tree().create_timer(0.1).timeout
+	playerNode.position = position
+	RecentWarps.append(playerNode.name)
 	get_node(OldMap).RemovePlayerChild(playerNode)
 	get_node(NewMap).AddPlayerChild(playerNode)
 	playerNode.CurrentMap = NewMap
 	playerNode.ControllingCharacter.CurrentMap = NewMap
 	playerNode.ControllingCharacter.CurrentPosition = position
 	DataRepository.Server.SyncClientMap(playerNode.ControllingCharacter.ActiveController.associated_pid, NewMap)
+	get_tree().create_timer(0.05).timeout.connect(Callable(self, "RemoveNodeFromRecentWarps").bind(playerNode.name))
+
+func RemoveNodeFromRecentWarps(node_name):
+	RecentWarps.erase(node_name)
 
 func GenerateMapGroundItemDict(map_name : String):
 	var map : MapBase = get_node(map_name)
@@ -55,3 +65,7 @@ func GenerateMapGroundItemDict(map_name : String):
 func GenerateMapObjects(map_name : String):
 	var map : MapBase = get_node(map_name)
 	return map.GenerateMapObjects()
+	
+func GenerateMapProjectiles(map_name : String):
+	var map : MapBase = get_node(map_name)
+	return map.GenerateMapProjectiles()

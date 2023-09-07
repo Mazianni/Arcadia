@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://e03stgeeecu4"]
+
+[ext_resource type="Script" path="res://Scripts/classes/abilities/thunder/heal.gd" id="1_3irfr"]
+
+[resource]
+script = ExtResource("1_3irfr")
+ability_name = "Heal"
+endurance_cost = 0
+point_cost = 10
+texture = "thunder/heal.png"
+requires_spells = Array[String]([])
+flags = []
+mastery = false
+position_in_tree = Vector2(300, 0)
+gcd_exempt = false
+cooldown = 10

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://cnxn1l5raiml3"]
+
+[ext_resource type="Script" path="res://Scripts/classes/abilities/thunder/thunder_strike.gd" id="1_1ycdu"]
+
+[resource]
+script = ExtResource("1_1ycdu")
+ability_name = "Thunder Strike"
+endurance_cost = 0
+point_cost = 10
+texture = "thunder/thunder1.tres"
+requires_spells = Array[String]([])
+flags = []
+mastery = false
+position_in_tree = Vector2(-100, 100)

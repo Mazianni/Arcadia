@@ -1,0 +1,89 @@
+[gd_scene load_steps=12 format=3 uid="uid://7tiycxc70yu7"]
+
+[ext_resource type="Material" uid="uid://djppt5w0solpc" path="res://resources/particles/new_particle_process_material.tres" id="1_6omoe"]
+[ext_resource type="Texture2D" uid="uid://ciqyf4pfcglym" path="res://sprites/particles/02_Basic/Rings/ring_01_feathered.png" id="2_ibfc5"]
+
+[sub_resource type="Environment" id="Environment_wijhx"]
+background_mode = 3
+glow_enabled = true
+
+[sub_resource type="Gradient" id="Gradient_6euuv"]
+offsets = PackedFloat32Array(0, 0.36039, 0.873377)
+colors = PackedColorArray(1, 1, 1, 0.317647, 1, 1, 1, 0.368627, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_x5s0p"]
+gradient = SubResource("Gradient_6euuv")
+
+[sub_resource type="Curve" id="Curve_iqjgc"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_wgely"]
+curve = SubResource("Curve_iqjgc")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_q3jio"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 0, 0)
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+scale_min = 0.05
+scale_max = 0.2
+scale_curve = SubResource("CurveTexture_wgely")
+color = Color(1, 1, 1, 0.152941)
+color_ramp = SubResource("GradientTexture1D_x5s0p")
+
+[sub_resource type="Gradient" id="Gradient_6kdis"]
+offsets = PackedFloat32Array(0.194805, 0.353896, 0.542208, 0.772727, 1)
+colors = PackedColorArray(0.603216, 0.109063, 0.907305, 1, 0.374118, 0.0028066, 0.344888, 1, 0.53132, 0.53132, 0.53132, 1, 0.991869, 0.530698, 0.86071, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_25e0g"]
+gradient = SubResource("Gradient_6kdis")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_bwdyt"]
+emission_shape = 1
+emission_sphere_radius = 128.0
+particle_flag_disable_z = true
+gravity = Vector3(0, 0, 0)
+orbit_velocity_min = 0.01
+orbit_velocity_max = 0.03
+radial_accel_min = -1.0
+radial_accel_max = -1.0
+color_ramp = SubResource("GradientTexture1D_25e0g")
+
+[node name="particletest" type="Node2D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_wijhx")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1280.0
+offset_bottom = 800.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+position = Vector2(590, -256)
+amount = 50
+sub_emitter = NodePath("../rings")
+process_material = ExtResource("1_6omoe")
+lifetime = 13.0
+trail_enabled = true
+trail_lifetime = 0.23
+
+[node name="rings" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 1000
+process_material = SubResource("ParticleProcessMaterial_q3jio")
+texture = ExtResource("2_ibfc5")
+lifetime = 5.0
+
+[node name="GPUParticles2D2" type="GPUParticles2D" parent="."]
+position = Vector2(596, 634)
+scale = Vector2(4, 4)
+amount = 2500
+process_material = SubResource("ParticleProcessMaterial_bwdyt")
+lifetime = 10.73

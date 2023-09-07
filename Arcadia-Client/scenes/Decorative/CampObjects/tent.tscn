@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://0b0vmsyq6qnb"]
+
+[ext_resource type="Texture2D" uid="uid://b54a7cmd70lwa" path="res://sprites/mapobjects/camp/tent.tres" id="1_j2wn8"]
+
+[node name="tent" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_j2wn8")

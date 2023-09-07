@@ -7,8 +7,11 @@ var current_map_reference
 var interpolation_offset = 0
 var interpolation_offset_base = 16.99
 var MainPlayerObject : PlayerObject
-var MapObjectResourceDictionary = {
+var MapObjectResourceDictionary : Dictionary = {
 	"Chest":preload("res://scenes/MapObjects/Chest.tscn")
+}
+var MapProjectileResourceDictionary : Dictionary = {
+	"Thunder Strike":preload("res://scenes/Projectiles/Thunder Strike/projectile.tscn")
 }
 
 signal map_loaded
@@ -77,7 +80,6 @@ func ProcessWorldUpdate():
 					continue
 				if main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/").has_node(str(player)):
 					#var newpos = lerp(main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).get_global_position(),world_state_buffer[2]["PN"][player]["P"], interpolation_factor)
-					
 					var newpos = lerp(world_state_buffer[1]["PN"][player]["P"],world_state_buffer[2]["PN"][player]["P"], interpolation_factor)
 					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).MovePlayer(newpos)
 					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).UpdateSprite(world_state_buffer[1]["PN"][player]["D"],world_state_buffer[1]["PN"][player]["MV"])
@@ -91,11 +93,14 @@ func ProcessWorldUpdate():
 					var newpos = lerp(world_state_buffer[1]["GN"][ground_item]["P"],world_state_buffer[2]["GN"][ground_item]["P"], interpolation_factor)
 					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Objects/"+str(ground_item)).position = newpos
 				else:
-					main_node.get_node(str(current_map)).AddGroundItem(world_state_buffer[1]["GN"][ground_item]["D"], ground_item, world_state_buffer[1]["GN"][ground_item]["P"])
+					main_node.get_node(str(current_map)).AddGroundItem(world_state_buffer[2]["GN"][ground_item]["D"], ground_item, world_state_buffer[2]["GN"][ground_item]["P"])
 			for old_ground_item in main_node.get_node(str(current_map)).ground_items:
 				if is_instance_valid(old_ground_item):
 					if old_ground_item.uuid not in world_state_buffer[1]["GN"].keys():
 						old_ground_item.free()
+			for i in current_map_reference.GetMapPlayers():
+				if not i.name in world_state_buffer[2]["PN"].keys():
+					current_map_reference.DespawnPlayer(i.name)
 		elif render_time > world_state_buffer[1].T:
 			var extrapolation_factor = float(render_time - world_state_buffer[0]["T"]) / float(world_state_buffer[1]["T"] - world_state_buffer[0]["T"]) - 1.00
 			for player in world_state_buffer[1]["PN"].keys():
@@ -112,6 +117,7 @@ func ProcessWorldUpdate():
 					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).MovePlayer(new_position)
 					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).UpdateSprite(world_state_buffer[1]["PN"][player]["D"], world_state_buffer[1]["PN"][player]["MV"])
 		HandleMapObjects(world_state_buffer[1])
+		HandleMapProjectiles(world_state_buffer[1])
 		
 func ChangeMap(mapname):
 	var path = "res://scenes/maps/"
@@ -123,6 +129,9 @@ func ChangeMap(mapname):
 		return
 	var newmapinstance = newmapres.instantiate()
 	newmapinstance.name = mapname
+	if current_map_reference:
+		current_map_reference.get_node("PrimarySort/ObjectSortContainer/Players").remove_child(MainPlayerObject)
+		newmapinstance.AddPlayerNodeToMap(MainPlayerObject, world_state_buffer[1]["PN"][Globals.character_uuid]["P"])
 	mainviewport.add_child(newmapinstance)
 	if current_map_reference:
 		current_map_reference.queue_free()
@@ -131,8 +140,18 @@ func ChangeMap(mapname):
 	map_loaded.emit()
 	map_changed_to.emit(current_map_reference)
 	
+func TriggerTransition():
+	var tween = create_tween()
+	tween.tween_property($SubViewportContainer/TransitionModulate, "color", Color.BLACK, 0.1)
+	get_tree().create_timer(0.3).timeout.connect(Callable(self, "FinishTransition"))
+
+func FinishTransition():
+	var tween = create_tween()
+	tween.tween_property($SubViewportContainer/TransitionModulate, "color", Color.WHITE, 0.1)
+	
 func MapLoadedFirstTime():
-	Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_INGAME)
+	if Globals.client_state != Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
+		Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_INGAME)
 	
 func HandleMapObjects(world_state : Dictionary):
 	for i in world_state["MO"].keys():
@@ -148,6 +167,25 @@ func HandleMapObjects(world_state : Dictionary):
 	for i in current_map_reference.GetMapObjects():
 		if not world_state["MO"].has(i.name):
 			i.queue_free()
+			
+func HandleMapProjectiles(world_state : Dictionary):
+	for i in world_state["PR"].keys():
+		if current_map_reference.HasMapProjectile(i):
+			continue
+		var subdict : Dictionary = world_state["PR"][i].duplicate(true)
+		if subdict.has("type"):
+			if MapProjectileResourceDictionary.has(subdict["type"]):
+				var new_scene = MapProjectileResourceDictionary[subdict["type"]].instantiate()
+				new_scene.name = i
+				new_scene.position = subdict["pos"]
+				current_map_reference.AddMapProjectile(new_scene)
+	for i in current_map_reference.GetMapProjectiles():
+		if not world_state["PR"].has(i.name):
+			i.end_projectile()
+		if is_instance_valid(i) && world_state["PR"].has(i.name):
+			i.position = world_state["PR"][i.name]["pos"]
+			i.rotation = world_state["PR"][i.name]["rot"]
+	
 
 func ClearScenes():
 	world_state_buffer.clear()

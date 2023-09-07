@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://clemvahfl4681"]
+
+[ext_resource type="Shader" path="res://resources/shaders/starfield.gdshader" id="1_t10dk"]
+
+[resource]
+shader = ExtResource("1_t10dk")
+shader_parameter/mouse = Vector2(0, 0)
+shader_parameter/time = 0.0
+shader_parameter/speed2 = 0.2

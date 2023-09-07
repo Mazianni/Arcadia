@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AbilityTreeBase" load_steps=6 format=3 uid="uid://b6igr3usuvglo"]
+
+[ext_resource type="Resource" uid="uid://bdi4cxc3m5yqv" path="res://Resources/Spells/Thunder/infernal_smite.tres" id="1_18tdo"]
+[ext_resource type="Script" path="res://Scripts/classes/abilities/ability_tree.gd" id="1_py2nb"]
+[ext_resource type="Resource" uid="uid://cnxn1l5raiml3" path="res://Resources/Spells/Thunder/thunder_strike.tres" id="2_d0uu2"]
+[ext_resource type="Resource" uid="uid://uoes4774ryq7" path="res://Resources/Spells/Thunder/voidrend.tres" id="3_scwlf"]
+[ext_resource type="Resource" uid="uid://e03stgeeecu4" path="res://Resources/Spells/Thunder/heal.tres" id="4_5uf6a"]
+
+[resource]
+script = ExtResource("1_py2nb")
+name = "Thunder Magic"
+master_class = "Cognition"
+texture = "thundermagic.png"
+position_in_tree = Vector2(200, 200)
+description_short = "This is a test."
+description_long = "This is a longer test."
+shadow_color = Color(0.266667, 0, 0.427451, 1)
+hidden = false
+abilities = Array[Resource]([ExtResource("1_18tdo"), ExtResource("2_d0uu2"), ExtResource("3_scwlf"), ExtResource("4_5uf6a")])

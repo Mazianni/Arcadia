@@ -1,0 +1,78 @@
+[gd_scene load_steps=5 format=3 uid="uid://dpuhfnnp12j0v"]
+
+[ext_resource type="Material" uid="uid://d3ynliiqr8mpu" path="res://resources/shaders/warning_stripes.tres" id="1_cubdd"]
+
+[sub_resource type="Animation" id="Animation_8fcfj"]
+resource_name = "flash"
+length = 2.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4, 0.8, 1.2, 1.6, 2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0.54902), Color(1, 1, 1, 1), Color(1, 1, 1, 0.54902), Color(1, 1, 1, 1), Color(1, 1, 1, 0.54902)]
+}
+
+[sub_resource type="Animation" id="Animation_hruff"]
+resource_name = "fadein"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0.77451)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_8b5ee"]
+_data = {
+"fadein": SubResource("Animation_hruff"),
+"flash": SubResource("Animation_8fcfj")
+}
+
+[node name="warning_box" type="Node2D"]
+modulate = Color(1, 1, 1, 0.77451)
+
+[node name="ColorRect2" type="ColorRect" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -17.0
+offset_top = -17.0
+offset_right = 17.0
+offset_bottom = 17.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.984314, 0.0941176, 0.266667, 1)
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = ExtResource("1_cubdd")
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_8b5ee")
+}

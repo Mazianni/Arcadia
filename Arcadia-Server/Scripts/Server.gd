@@ -28,6 +28,7 @@ class_name MainServer extends Node
 @rpc("any_peer") func ClientRPC_ReturnNewCharacterCreated(): pass
 @rpc("any_peer") func ClientRPC_RecieveMapSync(mapname:String): pass
 @rpc("any_peer") func ClientRPC_BindNetworkedInventories(inventory): pass
+@rpc("any_peer") func ClientRPC_SetWarpingTrue(): pass
 	
 var network : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 var port = 5000
@@ -85,9 +86,9 @@ func _Peer_Disconnected(player_id):
 		var player_node : PlayerContainer = DataRepository.PlayerMgmt.get_node(str(player_id))
 		if player_node.CurrentActiveCharacter:
 			player_node.CurrentActiveCharacter.WriteJSON(player_node.CurrentActiveCharacter.CharacterData.uuid)
-		await get_tree().create_timer(0.2).timeout
-		player_state_collection.erase(player_id)
-		rpc_id(0, "DespawnPlayer", player_id)
+		await get_tree().create_timer(0.1).timeout
+		if player_state_collection.has(player_node.CurrentActiveCharacter.name):
+			player_state_collection.erase(player_node.CurrentActiveCharacter.name)
 		DataRepository.remove_pid_assoc(player_id)
 		if DataRepository.CurrentState == DataRepository.SERVER_STATE.SERVER_SHUTTING_DOWN:
 			return #server is shutting down, don't dispose of nodes until all saves are completed.
@@ -244,9 +245,17 @@ func CheckPlayerApprovedForRace(username, race):
 				Logging.log_notice("[AUTH] Connection from PID" + str(player_id) + " failed: Banned user.")
 			ERR_PARSE_ERROR:
 				Logging.log_error("[AUTH] Login attempt from PID" + str(player_id) + " failed: Malformed login information.")
-				message = "Connection Rejected: Malformed Request!"
+				message = "Connection Rejected: \nMalformed Request!"
 		status = false
+		ReportLoginStatus(player_id, status, message)
 		network.disconnect_peer(player_id)
+		return
+	for i in get_tree().get_nodes_in_group("players"):
+		if i.PlayerData.Username == username:
+			status = false
+			message = "Connection Rejected:\nUser already logged in!"
+			ReportLoginStatus(player_id, status, message)
+			return
 	if AuthenticatePlayer(username, password, player_id, uuid):
 		status = true
 	ReportLoginStatus(player_id, status, message)
@@ -541,6 +550,9 @@ func SyncClientMap(pid:int, mapname:String):
 		if playernode.ClientState != DataRepository.CLIENT_STATE_LIST.CLIENT_INGAME:
 			return
 	rpc_id(pid, "ClientRPC_RecieveMapSync", mapname)
+	
+func SetClientWarping(client:int):
+	rpc_id(client, "ClientRPC_SetWarpingTrue")
 
 #map sync end
 

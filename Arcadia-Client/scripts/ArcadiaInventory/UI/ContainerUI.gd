@@ -11,9 +11,13 @@ func _on_close_requested():
 	InventoryPredicate.ClientPredicate_GenerateInventoryRequest(InventoryPredicate.REQUESTTYPE.INVENTORY_CLOSE)
 	gui_release_focus()
 	
+func AdjustSize(newsize):
+	self.size = newsize
+	
 func CreateUI():
 	if not current_inv_panel:
 		var inv_panel_res = load("res://scripts/ArcadiaInventory/UI/Scenes/InventoryBox.tscn")
 		current_inv_panel = inv_panel_res.instantiate()
+		current_inv_panel.emit_size.connect(Callable(self, "AdjustSize"))
 		current_inv_panel.inv_id = inv_id
 		$ColorRect.add_child(current_inv_panel)

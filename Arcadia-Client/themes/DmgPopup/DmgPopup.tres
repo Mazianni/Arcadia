@@ -1,0 +1,20 @@
+[gd_resource type="Theme" load_steps=6 format=3 uid="uid://2csvqi5c3scg"]
+
+[ext_resource type="FontFile" uid="uid://v12ky2oersqn" path="res://fonts/titillium-web/TitilliumWeb-Regular.ttf" id="1_4l54x"]
+[ext_resource type="FontFile" uid="uid://c6e5pcw0f4xh1" path="res://fonts/titillium-web/TitilliumWeb-Bold.ttf" id="2_nt5ws"]
+[ext_resource type="FontFile" uid="uid://cxgrxxgipxf1" path="res://fonts/titillium-web/TitilliumWeb-BoldItalic.ttf" id="3_lmsgf"]
+[ext_resource type="FontFile" uid="uid://da22l5ytmi0hn" path="res://fonts/titillium-web/TitilliumWeb-Italic.ttf" id="4_sodjs"]
+[ext_resource type="FontFile" uid="uid://y783c6ovqukc" path="res://fonts/titillium-web/TitilliumWeb-Light.ttf" id="5_eccsl"]
+
+[resource]
+Label/colors/font_outline_color = Color(0.117647, 0.117647, 0.117647, 1)
+Label/colors/font_shadow_color = Color(0, 0, 0, 0.603922)
+Label/constants/shadow_outline_size = 3
+Label/font_sizes/font_size = 24
+Label/fonts/font = ExtResource("1_4l54x")
+RichTextLabel/colors/font_shadow_color = Color(0, 0, 0, 1)
+RichTextLabel/fonts/bold_font = ExtResource("2_nt5ws")
+RichTextLabel/fonts/bold_italics_font = ExtResource("3_lmsgf")
+RichTextLabel/fonts/italics_font = ExtResource("4_sodjs")
+RichTextLabel/fonts/mono_font = ExtResource("5_eccsl")
+RichTextLabel/fonts/normal_font = ExtResource("1_4l54x")

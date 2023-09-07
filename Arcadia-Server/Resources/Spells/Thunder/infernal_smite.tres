@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AbilityBase" load_steps=2 format=3 uid="uid://bdi4cxc3m5yqv"]
+
+[ext_resource type="Script" path="res://Scripts/classes/abilities/ability.gd" id="1_0qmne"]
+
+[resource]
+script = ExtResource("1_0qmne")
+ability_name = "Infernal Smite"
+endurance_cost = 0
+point_cost = 10
+texture = "thunder/thunder2.tres"
+requires_spells = Array[String]([])
+flags = []
+mastery = false
+position_in_tree = Vector2(100, 100)

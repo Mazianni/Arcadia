@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://dyex3n8lb2jm0"]
+
+[ext_resource type="Texture2D" uid="uid://1j2f5rm8hofp" path="res://sprites/mapobjects/snowy_decorative.png" id="1_uhifi"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u5ipk"]
+atlas = ExtResource("1_uhifi")
+region = Rect2(768, 624, 64, 144)
+
+[node name="SnowTree1" type="Sprite2D"]
+texture = SubResource("AtlasTexture_u5ipk")

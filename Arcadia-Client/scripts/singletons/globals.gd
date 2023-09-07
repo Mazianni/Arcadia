@@ -7,6 +7,12 @@ var player_spawn = preload("res://scenes/PlayerTemplate.tscn")
 
 enum RANK_FLAGS {NONE, MANAGE_TICKETS, IS_STAFF}
 enum TICKET_FLAGS {TICKET_OPEN, TICKET_STAFF_ASSIGNED, TICKET_CLOSED}
+enum SPELL_TYPE_FLAGS{SPELL_OFFENSIVE, SPELL_DEFENSIVE}
+enum SPELL_EFFECT_TYPE{SPELL_TRACKER, SPELL_AOE, SPELL_SPECIAL}
+enum CLIENT_STATE_LIST {CLIENT_UNAUTHENTICATED, CLIENT_PREGAME, CLIENT_INGAME}
+enum SERVER_CONNECTION_STATE {DISCONNECTED, CONNECTED}
+enum CURRENT_SCENE {SCENE_LOGIN, SCENE_SELECTION, SCENE_CREATION, SCENE_PLAYING}
+enum MESSAGE_CATEGORY {IC, OOC, LOOC, ADMIN, ETC}
 
 var MouseOnUi = false
 var CharacterList : Dictionary = {}
@@ -26,7 +32,6 @@ var DirectionsList : Dictionary = {
 }
 var ability_trees : Dictionary
 var known_spells : Array
-
 var uuid_generator = preload("res://uuid.gd")
 var uuid
 var persistent_uuid
@@ -35,20 +40,12 @@ var client_state
 var serverconn
 var currentscene
 var inventory_uuids : Dictionary
-
 var is_client_admin = false #you may think you're very clever by setting this to true. you're not.
-
 var config_file
 var client_version = "0.1a"
-
-enum CLIENT_STATE_LIST {CLIENT_UNAUTHENTICATED, CLIENT_PREGAME, CLIENT_INGAME}
-enum SERVER_CONNECTION_STATE {DISCONNECTED, CONNECTED}
-enum CURRENT_SCENE {SCENE_LOGIN, SCENE_SELECTION, SCENE_CREATION, SCENE_PLAYING}
-enum MESSAGE_CATEGORY {IC, OOC, LOOC, ADMIN, ETC}
-
 var measurement_units : String = "Imperial"
-
 var selected_player : Node
+var warping : bool = false
 
 signal character_list_refresh_requested
 signal show_viewport(show)
@@ -67,7 +64,12 @@ func _ready():
 func SetSelectedPlayer(node):
 	selected_player = node
 	player_selected.emit(node)
-	
+	if selected_player:
+		selected_player.set_material(null)
+	if node == null:
+		CombatHandler.ClientCombatHandler_UpdateSelectedPlayer("")
+	else:
+		CombatHandler.ClientCombatHandler_UpdateSelectedPlayer(selected_player.name)
 	
 func SetClientState(new_state):
 	client_state = new_state
@@ -86,6 +88,7 @@ func SetClientState(new_state):
 			get_tree().get_root().get_node("RootNode").ShowBackground(false)
 			show_viewport.emit(true)
 			create_main_player_obj.emit()
+			CombatHandler.ClientCombatHandler_RequestSelfSpells()
 		CLIENT_STATE_LIST.CLIENT_UNAUTHENTICATED:
 			Gui.ChangeGUIScene("LoginScreen")				
 			maphandler.ClearScenes()

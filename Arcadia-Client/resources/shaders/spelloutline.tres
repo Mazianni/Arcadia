@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://ccpig7wrnflnc"]
+
+[ext_resource type="Shader" path="res://resources/shaders/spelloutline.gdshader" id="1_bmtwn"]
+[ext_resource type="Texture2D" uid="uid://ered4vab5v3j" path="res://sprites/spell_trees/framemask.png" id="2_0xy8w"]
+
+[resource]
+shader = ExtResource("1_bmtwn")
+shader_parameter/mask_texture = ExtResource("2_0xy8w")

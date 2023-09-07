@@ -14,6 +14,8 @@ var current_stats : Dictionary = {
 }
 
 var unlocked_abilities : Array[AbilityBase]
+var cooldowns : Array
+var gcd : bool = false
 var health : int = 0
 var max_health : int = 0
 var health_regen : int = 0
@@ -28,16 +30,18 @@ var shield_regen : int = 0
 
 var next_tick : float = 0
 
+var selected_player : String
+
 signal load_success(pid, map)
 signal load_failed(pid)
 signal creation_successful
 signal collider_created(pid, map)
 signal inventories_created()
 
-signal damage_applied(amount, type)
-signal heal_applied(amount)
+signal damage_applied(source, amount, type)
+signal heal_applied(source, amount, type)
 signal effect_applied(effect_flag)
-signal knocked_out()
+signal knocked_out(node)
 
 func _ready():
 	connect("tree_exiting", Callable(self, "OnDeleted"))
@@ -46,13 +50,14 @@ func _ready():
 	collider_created.connect(Callable(DataRepository.Server, "ReturnCharacterLoaded"))
 	load_success.connect(Callable(self, "OnLoadSuccessful"))
 	LoadJSON(self.name)
+	damage_applied.connect(Callable(CombatHandler, "ServerCombatHandler_SendCreateDmgPopup"))
+	heal_applied.connect(Callable(CombatHandler, "ServerCombatHandler_SendCreateDmgPopup"))
 
 func _process(delta):
-	if Time.get_unix_time_from_system() <= next_tick:
-		return
-	TickResources()
-	next_tick = Time.get_unix_time_from_system() + DataRepository.default_tick_rate
-		
+	if Time.get_unix_time_from_system() >= next_tick:
+		TickResources()
+		TickEffects()
+		next_tick = Time.get_unix_time_from_system() + DataRepository.default_tick_rate
 
 func OnDeleted():
 	if DataRepository.CurrentState == DataRepository.SERVER_STATE.SERVER_SHUTTING_DOWN:
@@ -129,10 +134,21 @@ func WriteJSON(character_name):
 	var save_dir = DataRepository.saves_directory + "/" + str(ActiveController.PlayerData.Username)
 	var save_file = save_dir+"/"+str(character_name)+"/"+str(character_name)+".tres"
 	var inventory_save_dir = save_dir+"/"+str(character_name)+"/InventorySaves/"
+	var effect_dict : Dictionary
+	for i in CharacterData.active_effects.keys():
+		if i.ephemeral:
+			continue
+		effect_dict[i] = {
+			"expires":CharacterData.active_effects[i]["timeleft"]
+		}
+		return
 	CharacterData.LastPosition = CurrentPosition
 	CharacterData.MainInventory.owner = null
 	CharacterData.EquipmentInventory.owner = null
 	CharacterData.CoinInventory.owner = null
+	CharacterData.active_effects = {
+		
+	}
 	CharacterData.WriteSave(save_file)
 	
 func CreateCollider():
@@ -170,3 +186,72 @@ func TickResources():
 	var next_mana = mana + mana_regen
 	health = clamp(next_hp, 0, max_health)
 	mana = clamp(next_mana, 0, max_mana)
+	
+func UnsetCooldown(spell):
+	if spell in cooldowns:
+		cooldowns.erase(spell)
+		
+func TickEffects():
+	for i in CharacterData.active_effects.keys():
+		if CharacterData.active_effects[i]["timer"] >= Time.get_unix_time_from_system():
+			RemoveEffect(i, 1)
+		var effect : EffectBase = AbilityHolder.all_effects[i]
+		effect.TickEffect(self)
+	
+func AddEffect(effect_name:String, amount:int, aux_dict:={}):
+	var effect : EffectBase = AbilityHolder.all_effects[effect_name]
+	if effect_name in CharacterData.active_effects.keys():
+		if effect.refresh_on_stack:
+			CharacterData.active_effects[effect_name]["timer"] = Time.get_unix_time_from_system() + effect.effect_length
+		CharacterData.active_effects[effect_name]["amount"] += clamp(CharacterData.active_effects[effect_name]["amount"],0, effect.max_stacks)
+		if aux_dict.size():
+			effect.HandleAddAuxData(self, CharacterData.active_effects[effect_name]["aux"], aux_dict)
+	else:
+		CharacterData.active_effects[effect_name] = {
+			"timer":Time.get_unix_time_from_system()+effect.effect_length, 
+			"amount":amount,
+			"ephemeral": effect.ephemeral,
+			"aux":effect.HandleAddAuxData(self, {}, aux_dict)
+			}
+		effect.OnApplication(self)
+	
+func RemoveEffect(effect_name:String, amount):
+	var effect : EffectBase = AbilityHolder.all_effects[effect_name]
+	if effect_name in CharacterData.active_effects.keys():
+		if CharacterData.active_effects[effect_name]["amount"] > 1:
+			CharacterData.active_effects[effect_name]["amount"] -= clamp(CharacterData.active_effects[effect_name]["amount"], 0, effect.max_stacks)
+			effect.HandleRemoveAuxData(self, CharacterData.active_effects[effect_name]["aux"],{})
+			if effect.tick_on_stack_falloff:
+				effect.TickEffect(self)
+			if CharacterData.active_effects[effect_name]["amount"] <= 0:
+				CharacterData.active_effects.erase(effect_name)
+				effect.OnExpiration(self)
+				return
+				
+func ApplyDamage(damage:int, type:="normal"):
+	damage_applied.emit(self, damage, type)
+	var dmg = damage
+	if shield > 0:
+		if shield-damage < 0:
+			dmg = damage-shield
+			shield = 0
+		else:
+			shield = shield-damage
+			dmg = 0
+	if dmg:
+		health -= dmg
+		health = clamp(health, 0, max_health)
+	if health == 0:
+		knocked_out.emit(self)
+	
+func ApplyHeal(amount:int):
+	var clamped_health = 0
+	var new_health = health + amount
+	if health + amount > max_health:
+		clamped_health = max_health - health
+	health = clamp(new_health, 0, max_health)
+	if clamped_health:
+		heal_applied.emit(self, clamped_health, "heal")
+	else:
+		heal_applied.emit(self, amount, "heal")	
+			

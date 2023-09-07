@@ -59,14 +59,12 @@ func UpdateTree(spells):
 				new_spell.position = Globals.ability_trees[i][s]["spells"][f]["position_in_tree"]
 				if new_spell.name in Globals.known_spells:
 					new_spell.unlocked = true
-				new_spell.UpdateUnlocked()
 				new_spell.right_clicked.connect(Callable(self, "SetLastClickedNode"))
 				new_spell.spell_data = Globals.ability_trees[i][s]["spells"][f].duplicate(true)
 					
 	for c in spelltrees:
 		var tree = c
 		var tree_children : Array = tree.GetContainerChildren()
-		print(tree_children)
 		for s in tree_children:
 			var spell = s
 			if spell.requires.size() > 0:
@@ -83,8 +81,10 @@ func UpdateTree(spells):
 						new_line.add_point(Vector2(spell.position.x,tree.ContainerGetNode(a).position.y/2))
 						new_line.add_point(Vector2(tree.ContainerGetNode(a).position.x, tree.ContainerGetNode(a).position.y/2))
 						new_line.add_point(tree.ContainerGetNode(a).position)
-						spell.line_leading_to = new_line
+						tree.ContainerGetNode(a).lines_leading_from.append(new_line)
 						tree.AddSpell(new_line)
+						tree.ContainerGetNode(a).UpdateUnlocked()
+						spell.UpdateUnlocked()
 					
 func ShowSpellTree(sname):
 	$MarginContainer.hide()
@@ -138,6 +138,7 @@ func SetLastClickedNode(node):
 
 func _on_popup_menu_id_pressed(id):
 	var spell_name = last_clicked_spell.name
+	CombatHandler.ClientCombatHandler_RequestSpellPurchase(spell_name)
 
 func _on_popup_menu_popup_hide():
 	$PopupMenu.clear()

@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://b54a7cmd70lwa"]
+
+[ext_resource type="Texture2D" uid="uid://tqod78wp281v" path="res://sprites/mapobjects/camp/Camp_Graves.png" id="1_2i3yo"]
+
+[resource]
+atlas = ExtResource("1_2i3yo")
+region = Rect2(0, 0, 128, 96)

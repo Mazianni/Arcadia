@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bfn4347bhmu4l"]
 
 [ext_resource type="Theme" uid="uid://bir7klqliay2t" path="res://themes/main_theme.tres" id="1_rpjd5"]
-[ext_resource type="PackedScene" uid="uid://dyfovqlkhuxp3" path="res://scenes/Hotbar/HotbarSlot.tscn" id="2_2s7mr"]
+[ext_resource type="Script" path="res://scripts/hotbar/hotbar.gd" id="2_68jl1"]
 
 [node name="Hotbar" type="Control"]
 layout_mode = 3
@@ -13,6 +13,7 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_rpjd5")
+script = ExtResource("2_68jl1")
 
 [node name="Panel" type="Panel" parent="."]
 custom_minimum_size = Vector2(350, 50)
@@ -43,30 +44,3 @@ offset_bottom = 17.0
 grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
-
-[node name="HotbarSlot" parent="Panel/Normal" instance=ExtResource("2_2s7mr")]
-layout_mode = 2
-
-[node name="HotbarSlot2" parent="Panel/Normal" instance=ExtResource("2_2s7mr")]
-layout_mode = 2
-
-[node name="HotbarSlot3" parent="Panel/Normal" instance=ExtResource("2_2s7mr")]
-layout_mode = 2
-
-[node name="HotbarSlot4" parent="Panel/Normal" instance=ExtResource("2_2s7mr")]
-layout_mode = 2
-
-[node name="HotbarSlot5" parent="Panel/Normal" instance=ExtResource("2_2s7mr")]
-layout_mode = 2
-
-[node name="HotbarSlot6" parent="Panel/Normal" instance=ExtResource("2_2s7mr")]
-layout_mode = 2
-
-[node name="HotbarSlot7" parent="Panel/Normal" instance=ExtResource("2_2s7mr")]
-layout_mode = 2
-
-[node name="HotbarSlot8" parent="Panel/Normal" instance=ExtResource("2_2s7mr")]
-layout_mode = 2
-
-[node name="HotbarSlot9" parent="Panel/Normal" instance=ExtResource("2_2s7mr")]
-layout_mode = 2

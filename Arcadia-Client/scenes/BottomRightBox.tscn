@@ -16,6 +16,7 @@ cache/0/16/0/scale = 1.0
 cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
 
 [node name="FadeInAndOutMsg" type="Control"]
+modulate = Color(1, 1, 1, 0)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,10 +32,6 @@ script = ExtResource("2")
 wait_time = 3.018
 autostart = true
 
-[node name="DeleteTimer" type="Timer" parent="."]
-wait_time = 4.0
-autostart = true
-
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 0
 offset_right = 209.0
@@ -45,4 +42,3 @@ layout_mode = 2
 theme_override_fonts/font = SubResource("1")
 
 [connection signal="timeout" from="FadeoutTimer" to="." method="_on_Timer_timeout"]
-[connection signal="timeout" from="DeleteTimer" to="." method="_on_DeleteTimer_timeout"]

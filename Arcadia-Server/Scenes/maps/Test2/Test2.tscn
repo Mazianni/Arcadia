@@ -1,0 +1,56 @@
+[gd_scene load_steps=9 format=3 uid="uid://wnhncxb8adbk"]
+
+[ext_resource type="Script" path="res://Scenes/maps/Test2/test2.gd" id="1_n45ye"]
+[ext_resource type="Texture2D" uid="uid://dp6mwnwjb5xvd" path="res://Scenes/MainLev_autotiling.png" id="2_7htkc"]
+[ext_resource type="PackedScene" uid="uid://c3ncm6eelhstr" path="res://Scenes/MapObjects/Warper.tscn" id="3_fh61p"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lnxkp"]
+texture = ExtResource("2_7htkc")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4pvdr"]
+texture = ExtResource("2_7htkc")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tsv6x"]
+texture = ExtResource("2_7htkc")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_276qr"]
+texture = ExtResource("2_7htkc")
+
+[sub_resource type="TileSet" id="1"]
+resource_local_to_scene = true
+sources/0 = SubResource("TileSetAtlasSource_lnxkp")
+sources/1 = SubResource("TileSetAtlasSource_4pvdr")
+sources/2 = SubResource("TileSetAtlasSource_tsv6x")
+sources/3 = SubResource("TileSetAtlasSource_276qr")
+
+[node name="Map" type="SubViewport"]
+script = ExtResource("1_n45ye")
+
+[node name="PrimarySort" type="Node2D" parent="."]
+
+[node name="TilemapContainer" type="Node2D" parent="PrimarySort"]
+
+[node name="TileMap" type="TileMap" parent="PrimarySort/TilemapContainer"]
+position = Vector2(-9, 34)
+tile_set = SubResource("1")
+format = 2
+
+[node name="ObjectSortContainer" type="Node2D" parent="PrimarySort"]
+
+[node name="Foliage" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
+
+[node name="Objects" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
+
+[node name="Warpers" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
+
+[node name="Warper" parent="PrimarySort/ObjectSortContainer/Warpers" instance=ExtResource("3_fh61p")]
+position = Vector2(100, 300)
+to_position = Vector2(500, 500)
+warp_to = "Test"
+parent_map = "Test2"
+
+[node name="Structures" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
+
+[node name="Players" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
+
+[node name="Projectiles" type="Node2D" parent="PrimarySort/ObjectSortContainer"]

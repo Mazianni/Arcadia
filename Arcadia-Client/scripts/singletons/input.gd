@@ -20,6 +20,9 @@ func _on_focus_changed(control:Control) -> void:
 func on_movement():
 	if focused:
 		return
+	
+	if Input.is_action_pressed("deselect"):
+		Globals.SetSelectedPlayer(null)
 		
 	request_velocity = Vector2.ZERO
 	

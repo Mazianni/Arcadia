@@ -1,12 +1,14 @@
-[gd_scene load_steps=6 format=3 uid="uid://bl5km8jpcltet"]
+[gd_scene load_steps=7 format=3 uid="uid://bl5km8jpcltet"]
 
 [ext_resource type="Theme" uid="uid://bir7klqliay2t" path="res://themes/main_theme.tres" id="1_a4vqk"]
 [ext_resource type="Script" path="res://scripts/menus/esc/esc_menu.gd" id="2_rlv7x"]
 [ext_resource type="FontFile" uid="uid://v12ky2oersqn" path="res://fonts/titillium-web/TitilliumWeb-Regular.ttf" id="2_sbgyt"]
 [ext_resource type="Texture2D" uid="uid://ds80krxe8ahb2" path="res://fonts/fontawesome-free-6.4.0-desktop/svgs/solid/gears.svg" id="3_pcxgl"]
 [ext_resource type="Texture2D" uid="uid://bxiwgsnjpu0ll" path="res://fonts/fontawesome-free-6.4.0-desktop/svgs/solid/eject.svg" id="4_86wbu"]
+[ext_resource type="Theme" uid="uid://bg36ipi7o7es5" path="res://themes/SpellScreen/SpellLabelThemeUnlocked.tres" id="6_fqo80"]
 
 [node name="EscMenu" type="Window"]
+title = "Options"
 initial_position = 1
 size = Vector2i(150, 200)
 theme = ExtResource("1_a4vqk")
@@ -21,23 +23,26 @@ grow_vertical = 2
 mouse_filter = 1
 color = Color(0.160784, 0.152941, 0.152941, 1)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="ColorRect"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/VBoxContainer2"]
+layout_mode = 2
 alignment = 1
 
-[node name="Settings Button" type="Button" parent="ColorRect/VBoxContainer"]
+[node name="Settings Button" type="Button" parent="ColorRect/VBoxContainer2/VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_sbgyt")
 text = "Settings"
 icon = ExtResource("3_pcxgl")
 expand_icon = true
 
-[node name="ReturnToSelectionButton" type="Button" parent="ColorRect/VBoxContainer"]
+[node name="ReturnToSelectionButton" type="Button" parent="ColorRect/VBoxContainer2/VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_sbgyt")
 theme_override_font_sizes/font_size = 12
@@ -46,7 +51,19 @@ Character Selection"
 icon = ExtResource("4_86wbu")
 expand_icon = true
 
+[node name="Container" type="Container" parent="ColorRect/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="ColorRect/VBoxContainer2"]
+layout_mode = 2
+theme = ExtResource("6_fqo80")
+theme_override_constants/line_spacing = 0
+theme_override_font_sizes/font_size = 16
+text = "v0.1a"
+vertical_alignment = 1
+
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
-[connection signal="pressed" from="ColorRect/VBoxContainer/Settings Button" to="." method="_on_settings_button_pressed"]
-[connection signal="pressed" from="ColorRect/VBoxContainer/ReturnToSelectionButton" to="." method="_on_return_to_selection_button_pressed"]
+[connection signal="pressed" from="ColorRect/VBoxContainer2/VBoxContainer/Settings Button" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="ColorRect/VBoxContainer2/VBoxContainer/ReturnToSelectionButton" to="." method="_on_return_to_selection_button_pressed"]

@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://dfalxu537gr7l"]
+
+[ext_resource type="Shader" path="res://resources/shaders/starfield.gdshader" id="1_heuoc"]
+
+[resource]
+shader = ExtResource("1_heuoc")
+shader_parameter/mouse = null
+shader_parameter/time = null
+shader_parameter/speed2 = 0.2

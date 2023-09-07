@@ -25,6 +25,8 @@ func SubsystemShutdown(node_name:String):
 	SaveAllPlayerData(true)
 	
 func CreatePlayerContainer(player_id, uuid):
+	if DataRepository.Server.has_node(str(player_id)):
+		return
 	var new_player_container = player_container_scene.instantiate()
 	new_player_container.name = str(player_id)
 	new_player_container.associated_uuid = uuid
@@ -130,7 +132,10 @@ func CreateNewCharacter(uuid, species_name, character_name, age, hair_color, ski
 	var save_dir = DataRepository.saves_directory + "/" + str(Helpers.PID2Username((pid)))
 	var save_file = save_dir+"/"+str(uuid)+"/"+str(uuid)+".tres"
 	var dir_check = DirAccess.open(save_dir)
-	if not dir_check.dir_exists(str(uuid)):
+	if not dir_check or not dir_check.dir_exists(str(uuid)):
+		var new_dir = DirAccess.open(DataRepository.saves_directory)
+		new_dir.make_dir(str(Helpers.PID2Username((pid))))
+		dir_check = DirAccess.open(save_dir)
 		dir_check.make_dir(str(uuid))
 	CharacterData.WriteSave(save_file)
 	Logging.log_notice("New character by name of "+str(character_name)+" created successfully.")

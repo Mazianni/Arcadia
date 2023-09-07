@@ -37,3 +37,11 @@ func GetPlayerState():
 		ControllingCharacter.CurrentPosition = get_global_position()
 		var pstate : Dictionary = {"T":"","P": get_global_position(), "M":ControllingCharacter.CurrentMap, "D":direction, "MV":moving}
 		return pstate
+
+
+func _on_hitbox_area_entered(area):
+	print("shit3")
+
+
+func _on_hitbox_body_entered(body):
+	print("shit4")
