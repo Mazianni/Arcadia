@@ -7,7 +7,7 @@ func UnlockAbility(player:ActiveCharacter):
 
 func UseAbility(casting_character:ActiveCharacter, origin_node:Node2D, target:Node2D):
 	var new_projectile = projectile_res.instantiate()
-	var map = DataRepository.mapmanager.get_node(origin_node.CurrentMap)
+	var map = DataRepository.mapmanager.GetMap(origin_node.CurrentMap)
 	map.get_node("PrimarySort/ObjectSortContainer/Projectiles").add_child(new_projectile)
 	new_projectile.position = origin_node.get_global_position()
 	new_projectile.Cast(origin_node, target)

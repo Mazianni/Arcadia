@@ -1,13 +1,13 @@
 [gd_scene load_steps=10 format=3 uid="uid://bhtytjpixxt12"]
 
-[ext_resource type="PackedScene" uid="uid://ddw6v7dlf6isa" path="res://scenes/Trees/Tree_Green_A.tscn" id="2"]
-[ext_resource type="TileSet" uid="uid://cx3tfxi2mugna" path="res://resources/newtieset.tres" id="2_7nlce"]
-[ext_resource type="PackedScene" uid="uid://j5k7kq6kigui" path="res://scenes/Trees/Tree_Green_B.tscn" id="3"]
-[ext_resource type="Material" uid="uid://djppt5w0solpc" path="res://resources/particles/new_particle_process_material.tres" id="3_4s6kt"]
-[ext_resource type="PackedScene" path="res://scenes/Trees/Tree_Green_C.tscn" id="4"]
-[ext_resource type="Script" path="res://scripts/player/playerspawner.gd" id="5"]
-[ext_resource type="Material" uid="uid://clemvahfl4681" path="res://resources/shaders/sky.tres" id="6_2le77"]
-[ext_resource type="PackedScene" uid="uid://coholi8in7rg2" path="res://scenes/MapObjects/Warper.tscn" id="8_11gto"]
+[ext_resource type="Script" path="res://scripts/player/playerspawner.gd" id="1_do1fl"]
+[ext_resource type="Material" uid="uid://clemvahfl4681" path="res://resources/shaders/sky.tres" id="2_nu2bv"]
+[ext_resource type="Material" uid="uid://djppt5w0solpc" path="res://resources/particles/new_particle_process_material.tres" id="3_xpj3d"]
+[ext_resource type="TileSet" uid="uid://cx3tfxi2mugna" path="res://resources/newtieset.tres" id="4_wpddm"]
+[ext_resource type="PackedScene" uid="uid://ddw6v7dlf6isa" path="res://scripts/ArcadiaInventory/scenes/Trees/Tree_Green_A.tscn" id="5_rollb"]
+[ext_resource type="PackedScene" uid="uid://j5k7kq6kigui" path="res://scripts/ArcadiaInventory/scenes/Trees/Tree_Green_B.tscn" id="6_re4hr"]
+[ext_resource type="PackedScene" path="res://scripts/ArcadiaInventory/scenes/Trees/Tree_Green_C.tscn" id="7_svd6b"]
+[ext_resource type="PackedScene" uid="uid://coholi8in7rg2" path="res://scripts/ArcadiaInventory/scenes/MapObjects/Warper.tscn" id="8_oshet"]
 
 [sub_resource type="Environment" id="Environment_ggvjo"]
 background_mode = 3
@@ -19,8 +19,8 @@ glow_hdr_threshold = 0.0
 glow_hdr_scale = 2.4
 glow_hdr_luminance_cap = 15.25
 
-[node name="Map" type="Node2D"]
-script = ExtResource("5")
+[node name="Test" type="Node2D"]
+script = ExtResource("1_do1fl")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_ggvjo")
@@ -33,7 +33,7 @@ environment = SubResource("Environment_ggvjo")
 layer = -1
 
 [node name="ColorRect" type="ColorRect" parent="WorldEnvironment/CanvasLayer"]
-material = ExtResource("6_2le77")
+material = ExtResource("2_nu2bv")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -45,7 +45,7 @@ grow_vertical = 2
 [node name="GPUParticles2D" type="GPUParticles2D" parent="WorldEnvironment/CanvasLayer"]
 position = Vector2(600, 300)
 amount = 3000
-process_material = ExtResource("3_4s6kt")
+process_material = ExtResource("3_xpj3d")
 lifetime = 1.1
 trail_enabled = true
 trail_lifetime = 0.28
@@ -59,7 +59,7 @@ texture_filter = 1
 
 [node name="TileMap" type="TileMap" parent="PrimarySort/TilemapContainer"]
 texture_filter = 1
-tile_set = ExtResource("2_7nlce")
+tile_set = ExtResource("4_wpddm")
 cell_quadrant_size = 32
 format = 2
 layer_0/name = "Base"
@@ -76,74 +76,86 @@ layer_1/tile_data = PackedInt32Array(589827, 3866626, 30, 524291, 3866626, 27, 4
 
 [node name="Foliage" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
-[node name="Node2D4" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("2")]
+[node name="Node2D4" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("5_rollb")]
 position = Vector2(208, 346)
 
-[node name="Node2D10" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("2")]
+[node name="Node2D10" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("5_rollb")]
 position = Vector2(675, 345)
 
-[node name="Node2D8" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("2")]
+[node name="Node2D8" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("5_rollb")]
 position = Vector2(555, 194)
 
-[node name="Node2D9" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("2")]
+[node name="Node2D9" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("5_rollb")]
 position = Vector2(265, 472)
 
-[node name="Node2D17" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("2")]
+[node name="Node2D17" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("5_rollb")]
 position = Vector2(237, 421)
 
-[node name="Node2D16" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("2")]
+[node name="Node2D16" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("5_rollb")]
 position = Vector2(651, 277)
 
-[node name="Node2D5" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("3")]
+[node name="Node2D5" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("6_re4hr")]
 position = Vector2(480, 187)
 
-[node name="Node2D14" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("3")]
+[node name="Node2D14" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("6_re4hr")]
 position = Vector2(662, 412)
 
-[node name="Node2D15" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("3")]
+[node name="Node2D15" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("6_re4hr")]
 position = Vector2(663, 455)
 
-[node name="Node2D" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("2")]
+[node name="Node2D" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("5_rollb")]
 position = Vector2(328, 166)
 
-[node name="Node2D3" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("4")]
+[node name="Node2D3" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("7_svd6b")]
 position = Vector2(592, 245)
 
-[node name="Node2D7" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("4")]
+[node name="Node2D7" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("7_svd6b")]
 position = Vector2(274, 213)
 
-[node name="Node2D2" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("3")]
+[node name="Node2D2" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("6_re4hr")]
 position = Vector2(231, 246)
 
-[node name="Node2D12" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("3")]
+[node name="Node2D12" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("6_re4hr")]
 position = Vector2(233, 293)
 
-[node name="Node2D13" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("3")]
+[node name="Node2D13" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("6_re4hr")]
 position = Vector2(626, 487)
 
-[node name="Node2D6" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("3")]
+[node name="Node2D6" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("6_re4hr")]
 position = Vector2(408, 181)
 
-[node name="Node2D11" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("3")]
+[node name="Node2D11" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("6_re4hr")]
 position = Vector2(334, 193)
 
-[node name="Node2D18" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("3")]
+[node name="Node2D18" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("6_re4hr")]
 position = Vector2(319, 493)
 
-[node name="Node2D19" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("3")]
+[node name="Node2D19" parent="PrimarySort/ObjectSortContainer/Foliage" instance=ExtResource("6_re4hr")]
 position = Vector2(596, 511)
 
 [node name="Objects" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
+[node name="G" type="MultiplayerSpawner" parent="PrimarySort/ObjectSortContainer/Objects"]
+_spawnable_scenes = PackedStringArray("res://scenes/1GroundItem2D.tscn")
+spawn_path = NodePath("..")
+
 [node name="Warpers" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
-[node name="Warper" parent="PrimarySort/ObjectSortContainer/Warpers" instance=ExtResource("8_11gto")]
+[node name="Warper" parent="PrimarySort/ObjectSortContainer/Warpers" instance=ExtResource("8_oshet")]
 position = Vector2(100, 300)
 
 [node name="Structures" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
 [node name="Players" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="PrimarySort/ObjectSortContainer/Players"]
+_spawnable_scenes = PackedStringArray("res://scenes/PlayerTemplate.tscn", "res://scenes/SyncTest.tscn")
+spawn_path = NodePath("..")
+
 [node name="Projectiles" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
+
+[node name="ProjectileSpawner" type="MultiplayerSpawner" parent="PrimarySort/ObjectSortContainer/Projectiles"]
+_spawnable_scenes = PackedStringArray("res://scenes/Projectiles/Thunder Strike/projectile.tscn")
+spawn_path = NodePath("..")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]

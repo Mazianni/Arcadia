@@ -1,0 +1,11 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://ubr66643ed0w"]
+
+[ext_resource type="FontFile" uid="uid://bmj83q0c8lwno" path="res://fonts/aAbsoluteEmpire.otf" id="1_ruyby"]
+
+[resource]
+default_font_size = 35
+RichTextLabel/colors/font_shadow_color = Color(0, 0, 0, 1)
+RichTextLabel/constants/shadow_offset_x = 4
+RichTextLabel/constants/shadow_offset_y = 4
+RichTextLabel/constants/shadow_outline_size = 6
+RichTextLabel/fonts/normal_font = ExtResource("1_ruyby")

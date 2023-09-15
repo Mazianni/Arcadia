@@ -41,6 +41,10 @@ format = 2
 
 [node name="Objects" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
+[node name="G" type="MultiplayerSpawner" parent="PrimarySort/ObjectSortContainer/Objects"]
+_spawnable_scenes = PackedStringArray("res://Scripts/ArcadiaInventory/Item/Ground/GroundItem2D.tscn")
+spawn_path = NodePath("..")
+
 [node name="Warpers" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
 [node name="Warper" parent="PrimarySort/ObjectSortContainer/Warpers" instance=ExtResource("3_fh61p")]
@@ -53,4 +57,20 @@ parent_map = "Test2"
 
 [node name="Players" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="PrimarySort/ObjectSortContainer/Players"]
+_spawnable_scenes = PackedStringArray("res://Scenes/Instances/player/PlayerCollider.tscn", "res://Scenes/SyncTest.tscn")
+spawn_path = NodePath("..")
+
 [node name="Projectiles" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
+
+[node name="ProjectileSpawner" type="MultiplayerSpawner" parent="PrimarySort/ObjectSortContainer/Projectiles"]
+_spawnable_scenes = PackedStringArray("res://Scenes/Instances/projectiles/projectile.tscn")
+spawn_path = NodePath("..")
+
+[node name="Area2D" type="Area2D" parent="."]
+monitorable = false
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Area2D"]
+polygon = PackedVector2Array(49, 25, 116, 11, 1002, -10, 1233, -9, 1203, 449, 1187, 649, 815, 695, 38, 672, -103, 619, -82, 143)
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

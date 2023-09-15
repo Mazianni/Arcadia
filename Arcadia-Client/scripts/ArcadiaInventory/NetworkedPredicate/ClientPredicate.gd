@@ -140,23 +140,23 @@ func ClientPredicate_RequestInventoryContents(uuid:String):
 func ClientPredicate_RequestSelfInventoryUUIDs():
 	rpc_id(1, "ServerPredicate_RequestSelfInventoryUUIDs")
 
-@rpc("any_peer") func ClientPredicate_RecieveInventoryResponse(request_id : String, response : bool):
+@rpc("authority") func ClientPredicate_RecieveInventoryResponse(request_id : String, response : bool):
 	ClientPredicate_ResolveInventoryRequest(request_id, response)
 
-@rpc("any_peer") func ClientPredicate_RecieveUUIDSync(dict: Dictionary):
+@rpc("authority") func ClientPredicate_RecieveUUIDSync(dict: Dictionary):
 	InventoryDataRepository.SyncUUIDDictionaries(dict)
 	
-@rpc("any_peer") func ClientPredicate_RecieveItemSkeletons(dict: Dictionary):
+@rpc("authority") func ClientPredicate_RecieveItemSkeletons(dict: Dictionary):
 	ItemSkeletonRepository.item_skeletons.merge(dict, true)
 	
-@rpc("any_peer") func ClientPredicate_RecieveInventoryContentsSync(uuid:String, dict : Dictionary):
+@rpc("authority") func ClientPredicate_RecieveInventoryContentsSync(uuid:String, dict : Dictionary):
 	var inv : InventoryBase = InventoryDataRepository.GetInventoryByUUID(uuid)
 	inventory_recieved.emit(uuid, dict)
 	
-@rpc("any_peer") func ClientPredicate_RecieveSelfInventoryUUIDs(dict : Dictionary):
+@rpc("authority") func ClientPredicate_RecieveSelfInventoryUUIDs(dict : Dictionary):
 	Globals.inventory_uuids = dict.duplicate(true)
 	
-@rpc("any_peer") func ClientPredicate_CloseUI(inv_id : String):
+@rpc("authority") func ClientPredicate_CloseUI(inv_id : String):
 	var inv_uis = get_tree().get_nodes_in_group("inv_uis")
 	for i in inv_uis:
 		var node : InventoryUI = i

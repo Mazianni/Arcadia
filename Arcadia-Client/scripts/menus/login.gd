@@ -33,26 +33,24 @@ func _on_LoginButton_pressed():
 		DisableInputs()
 		var username = username_input.get_text()
 		var password = userpassword_input.get_text()
-		print("Attempting to Login...")
 		Gui.CreateFloatingMessage("Attempting to connect to server...", "neutral")
-		Server.ConnectToServer()
-		Server.multiplayer.connection_failed.connect(_OnConnectionFailed)
-		Server.multiplayer.server_disconnected.connect(_OnDisconnected)
-		await Server.multiplayer.connected_to_server
-		Server.Login(username, password, Globals.uuid, Globals.persistent_uuid)
+		Authentication.InitAuth()
+		Authentication.multiplayer.connection_failed.connect(_OnConnectionFailed)
+		Authentication.multiplayer.server_disconnected.connect(_OnDisconnected)
+		await Authentication.multiplayer_api.connected_to_server
+		Authentication.Login(username, password, Globals.uuid, Globals.persistent_uuid)
 		username = ""
 		password = ""
 		
 func _OnConnectionFailed():
 	Gui.CreateFloatingMessage("Failed to connect to server.", "bad")
-	Server.multiplayer.connection_failed.disconnect(_OnConnectionFailed)
-	Server.multiplayer.connection_failed.disconnect(_OnConnectionFailed)
+	Authentication.multiplayer.connection_failed.disconnect(_OnConnectionFailed)
+	Authentication.multiplayer.connection_failed.disconnect(_OnConnectionFailed)
 	EnableInputs()
 	
 func _OnDisconnected():
-	Server.multiplayer.server_disconnected.disconnect(_OnDisconnected)
-	Server.multiplayer.connection_failed.disconnect(_OnConnectionFailed)
-	print("disconnected")
+	Authentication.multiplayer.server_disconnected.disconnect(_OnDisconnected)
+	Authentication.multiplayer.connection_failed.disconnect(_OnConnectionFailed)
 	EnableInputs()
 	
 func DisableInputs():
@@ -89,8 +87,8 @@ func _on_Confirm_pressed():
 	var username = create_username_input.get_text()
 	var password = create_userpassword_input.get_text()
 	DisableInputs()
-	Server.ConnectToServer()
-	Server.CreateAccount(username, password)
+	Authentication.InitAuth()
+	Authentication.CreateAccount(username, password)
 	username = ""
 	password = ""
 

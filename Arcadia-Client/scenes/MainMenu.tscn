@@ -1,11 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://bo1w0hck26ii1"]
+[gd_scene load_steps=6 format=3 uid="uid://bo1w0hck26ii1"]
 
 [ext_resource type="Script" path="res://scripts/onload.gd" id="1"]
-[ext_resource type="PackedScene" uid="uid://cw43m144jpqgr" path="res://scenes/Maphandler/Maphandler.tscn" id="2_3wnlu"]
 [ext_resource type="AudioStream" uid="uid://n8yvnoax543q" path="res://sounds/kenney_rpgaudio/Audio/cloth4.ogg" id="2_rm0ua"]
 [ext_resource type="AudioStream" uid="uid://djoihrfwojghx" path="res://sounds/kenney_rpgaudio/Audio/bookOpen.ogg" id="3_d1np3"]
 [ext_resource type="AudioStream" uid="uid://cyu1f4p35abbj" path="res://sounds/kenney_rpgaudio/Audio/bookClose.ogg" id="4_8je4t"]
-[ext_resource type="PackedScene" uid="uid://bl5km8jpcltet" path="res://scenes/Menus/EscMenu.tscn" id="12_55ujl"]
+[ext_resource type="PackedScene" uid="uid://bl5km8jpcltet" path="res://scripts/ArcadiaInventory/scenes/Menus/EscMenu.tscn" id="12_55ujl"]
 
 [node name="RootNode" type="Node"]
 script = ExtResource("1")
@@ -27,9 +26,6 @@ volume_db = -16.7
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
 volume_db = -25.005
 bus = &"Music"
-
-[node name="Maphandler" parent="." instance=ExtResource("2_3wnlu")]
-unique_name_in_owner = true
 
 [node name="BackgroundHolder" type="Node2D" parent="."]
 

@@ -29,8 +29,21 @@ class_name MainServer extends Node
 @rpc("any_peer") func ClientRPC_RecieveMapSync(mapname:String): pass
 @rpc("any_peer") func ClientRPC_BindNetworkedInventories(inventory): pass
 @rpc("any_peer") func ClientRPC_SetWarpingTrue(): pass
+@rpc("any_peer") func ClientRPC_NotifyPlayerAreaEntered(pid, text, subtext): pass
+@rpc("authority") func ClientRPC_RecieveLoginToken(token): pass
+@rpc("authority") func ClientRPC_SendLoginToken(): pass
+@rpc("any_peer") func ServRPC_ReturnRequestedCharacterList(): pass
+@rpc("any_peer") func ServRPC_CreateExistingCharacter(cuuid): pass
+@rpc("any_peer") func ServRPC_RequestNewCharacter(species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height): pass
+@rpc("any_peer") func ServRPC_DeleteCharacter(char_name): pass
+@rpc("any_peer") func ServRPC_BuildRaceList(): pass
+@rpc("any_peer") func ServRPC_Login(username, password, uuid, puuid): pass
+@rpc("any_peer") func ServRPC_CreateAccount(username, password): pass
+@rpc("any_peer") func ServRPC_RecievePersistentUUID(puuid): pass
+@rpc("any_peer") func ServRPC_RecieveVersion(clientversion): pass
 	
 var network : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
+
 var port = 5000
 var max_players = 300
 
@@ -68,6 +81,7 @@ func _notification(notif):
 	
 func StartServer():
 	network.create_server(port, max_players)
+	Authentication.InitAuth()
 	multiplayer.multiplayer_peer = network
 	Logging.log_notice("[SERVER] Network connection open on port "+str(port))
 	if OS.has_feature("editor"):
@@ -77,19 +91,17 @@ func StartServer():
 	network.connect("peer_disconnected", Callable(self, "_Peer_Disconnected"))
 	
 func _Peer_Connected(player_id):
-	Logging.log_notice("User "+str(player_id)+" Connected from IP "+str(network.get_peer(player_id).get_remote_address()))
-	rpc_id(player_id, "SendVersion")
+	Logging.log_notice("[GAME] User "+str(player_id)+" Connected from IP "+str(network.get_peer(player_id).get_remote_address()))
+	rpc_id(player_id, "ClientRPC_SendLoginToken")
 	
 func _Peer_Disconnected(player_id):
-	Logging.log_notice("User "+str(player_id)+" Disconnected")
+	Logging.log_notice("[GAME] User "+str(player_id)+" Disconnected")
 	if DataRepository.PlayerMgmt.has_node(str(player_id)):
 		var player_node : PlayerContainer = DataRepository.PlayerMgmt.get_node(str(player_id))
 		if player_node.CurrentActiveCharacter:
 			player_node.CurrentActiveCharacter.WriteJSON(player_node.CurrentActiveCharacter.CharacterData.uuid)
 		await get_tree().create_timer(0.1).timeout
-		if player_state_collection.has(player_node.CurrentActiveCharacter.name):
-			player_state_collection.erase(player_node.CurrentActiveCharacter.name)
-		DataRepository.remove_pid_assoc(player_id)
+		#DataRepository.remove_pid_assoc(player_id)
 		if DataRepository.CurrentState == DataRepository.SERVER_STATE.SERVER_SHUTTING_DOWN:
 			return #server is shutting down, don't dispose of nodes until all saves are completed.
 		else:
@@ -123,56 +135,7 @@ func GeneratePlayerStates(uuid, state):
 	
 #player state / synch end
 
-#character handling start
 
-@rpc("any_peer") func ServRPC_ReturnRequestedCharacterList():
-	SendPlayerCharacterList(multiplayer.get_remote_sender_id())
-	
-func SendPlayerCharacterList(player_id):
-	var CharacterList : Dictionary
-	var retryload = true
-	if DataRepository.PlayerMgmt.has_node(str(player_id)):
-		var check_node : PlayerContainer = DataRepository.PlayerMgmt.get_node(str(player_id))
-		if check_node.HasLoaded:
-			CharacterList = DataRepository.PlayerMgmt.get_node(str(player_id)).PlayerData.character_dict.duplicate(true)
-			rpc_id(player_id, "RecieveCharacterList", CharacterList)
-			Logging.log_notice("Sending character list of "+str(player_id)+".")
-		else:
-			DeferredSendCharacterListCallback(check_node)
-			CharacterList = DataRepository.PlayerMgmt.get_node(str(player_id)).PlayerData.character_dict.duplicate(true)
-			rpc_id(player_id, "RecieveCharacterList", CharacterList)
-			Logging.log_notice("Deferred sending character list of "+str(player_id)+".")
-
-func DeferredSendCharacterListCallback(node : PlayerContainer):
-	await node.loaded
-	return true
-		
-@rpc("any_peer") func ServRPC_CreateExistingCharacter(cuuid):
-	var player_id = multiplayer.get_remote_sender_id()
-	if DataRepository.PlayerMgmt.has_node(str(player_id)): #IMPLEMENT blocking code based on server state
-			var playernode : PlayerContainer = DataRepository.PlayerMgmt.get_node(str(player_id))
-			playernode.CreateActiveCharacter(cuuid, player_id)
-			
-@rpc("any_peer") func ServRPC_RequestNewCharacter(species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height):
-	var player_id = multiplayer.get_remote_sender_id()
-	var cuuid = uuid_generator.v4()
-	if DataRepository.PlayerMgmt.has_node(str(player_id)):
-			DataRepository.PlayerMgmt.CreateNewCharacter(cuuid, species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height, player_id)
-			
-func ReturnNewCharacterCreated(pid:int, result:bool, message:String):
-	rpc_id(pid, "ClientRPC_ReturnNewCharacterCreated", result, message)
-			
-@rpc("any_peer") func ServRPC_DeleteCharacter(char_name):
-	var player_id = multiplayer.get_remote_sender_id()
-	if DataRepository.PlayerMgmt.has_node(str(player_id)):
-		DataRepository.PlayerMgmt.get_node(str(player_id)).DeleteCharacter(char_name)
-		
-func ReturnCharacterLoaded(pid, worldname):
-	rpc_id(pid, "LoadWorld", worldname)
-	
-func ReturnCharacterLoadFailed(pid):
-	rpc_id(pid, "ClientRPC_ReturnCharacterLoadFailed")
-#character handling end
 
 #client state reporting
 
@@ -186,167 +149,7 @@ func SetClientState(client_state, player_id): #forcefully sets a client's state.
 
 #end client state reporting
 
-#character creation handling start
 
-@rpc("any_peer") func ServRPC_BuildRaceList():
-	var player_id = multiplayer.get_remote_sender_id()
-	var racedict : Dictionary = {}
-	var racesubdict : Dictionary = {}
-	for i in DataRepository.races.keys():
-		var racecheck : SpeciesBase = DataRepository.races[i]
-		print(str(racecheck.race_name))
-		if racecheck.requires_approval == true:
-			if not CheckPlayerApprovedForRace(DataRepository.pid_to_username[str(player_id)]["username"], racecheck.race_name):
-				continue
-		racesubdict = {
-		"Name" : racecheck.race_name,
-		"Icon" : racecheck.race_icon,
-		"Short Description" : racecheck.race_description_short,
-		"Long Description" : racecheck.race_description_extended,
-		"ValidSkin" : racecheck.default_skin_colors.duplicate(true),
-		"ValidEars" : racecheck.default_ear_styles,
-		"ValidTails" : racecheck.default_tail_styles,
-		"ValidAccessoryOne" : racecheck.default_accessory_one_styles,
-		"ValidSpawns" : racecheck.valid_spawns,
-		"Heightminmax" : racecheck.heightminmax.duplicate(true),
-		}
-		racedict[i] = racesubdict
-	rpc_id(player_id, "RecieveRaceList", racedict)
-	Logging.log_notice("Sending race list to "+str(player_id))
-	
-func CheckPlayerApprovedForRace(username, race):
-	var approved = false
-	if username in DataRepository.approved_users_for_races:
-		if race in DataRepository.approved_users_for_races[username]["races"]:
-			approved = true
-	return approved
-	
-#character creation handling end
-
-#login start
-
-@rpc("any_peer") func ServRPC_Login(username, password, uuid, puuid):
-	var player_id = multiplayer.get_remote_sender_id()
-	var message
-	Logging.log_notice("[AUTH] Login attempt from PID" + str(player_id) + " UUID " + str(uuid))
-	var status = false
-	match DataRepository.CurrentState:
-		DataRepository.SERVER_STATE.SERVER_LOADING:
-			message = "Server not yet ready. Connection refused."
-			status = false
-		DataRepository.SERVER_STATE.SERVER_SHUTTING_DOWN:
-			message = "Server shutting down. Connection refused."
-			status = false
-	var bancheck = DataRepository.Admin.CheckBanned(username, puuid, str(network.get_peer(player_id).get_remote_address()))
-	if bancheck:
-		match bancheck:
-			FAILED:
-				message = "Connection Rejected: \nBanned User/IP"
-				Logging.log_notice("[AUTH] Connection from PID" + str(player_id) + " failed: Banned user.")
-			ERR_PARSE_ERROR:
-				Logging.log_error("[AUTH] Login attempt from PID" + str(player_id) + " failed: Malformed login information.")
-				message = "Connection Rejected: \nMalformed Request!"
-		status = false
-		ReportLoginStatus(player_id, status, message)
-		network.disconnect_peer(player_id)
-		return
-	for i in get_tree().get_nodes_in_group("players"):
-		if i.PlayerData.Username == username:
-			status = false
-			message = "Connection Rejected:\nUser already logged in!"
-			ReportLoginStatus(player_id, status, message)
-			return
-	if AuthenticatePlayer(username, password, player_id, uuid):
-		status = true
-	ReportLoginStatus(player_id, status, message)
-				
-func ReportLoginStatus(player_id, status, message):
-	rpc_id(player_id, "ReturnLogin", status, message)
-	if(status == false):
-		rpc_id(player_id, "Disconnect", message)
-		network.disconnect_peer(player_id)
-
-func AuthenticatePlayer(username, password, player_id, player_uuid):
-	var token
-	Logging.log_notice("[AUTH] Authentication request recieved from "+str(player_id))
-	var gateway_id = multiplayer.get_remote_sender_id()
-	var result = false
-	Logging.log_notice("[AUTH] Starting authentication for "+str(player_id))
-	var dbcheckuser = "'"+username+"'"
-	if not OS.has_feature("editor"):
-		if not DataRepository.GetDataFromDB("playerdata", "username="+dbcheckuser, ["hash", "salt"]):
-			Logging.log_warning("[AUTH] Invalid username from " +str(player_id))
-			result = false
-		elif not VerifyPassword(username, password):
-			Logging.log_warning("[AUTH] Incorrect password from "+str(player_id))
-			result = false
-		else:
-			Logging.log_notice("[AUTH] Authentication successful for "+str(player_id))
-			result = true
-			DataRepository.pid_to_username[str(player_id)] = {"username": str(username), "uuid": str(player_uuid)}
-			DataRepository.PlayerMgmt.CreatePlayerContainer(player_id, player_uuid)
-			DataRepository.PlayerMgmt.get_node(str(player_id)).PlayerData.last_login = Time.get_unix_time_from_system()
-	else:
-		Logging.log_notice("[AUTH] Running in editor. Authentication not done for "+str(player_id))
-		result = true
-		DataRepository.pid_to_username[str(player_id)] = {"username": str(username), "uuid": str(player_uuid)}
-		DataRepository.PlayerMgmt.CreatePlayerContainer(player_id, player_uuid)
-		DataRepository.PlayerMgmt.get_node(str(player_id)).PlayerData.last_login = Time.get_unix_time_from_system()	
-	Logging.log_notice("[AUTH] Sending authentication results to user " + str(player_id))
-	return result
-	
-@rpc("any_peer") func ServRPC_CreateAccount(username, password):
-	var gateway_id = multiplayer.get_remote_sender_id()
-	var result
-	var message
-	var dbcheckuser = "'"+username+"'"
-	var can_create = true
-	match DataRepository.CurrentState:
-		DataRepository.SERVER_STATE.SERVER_LOADING:
-			message = "Server not yet ready. Connection refused."
-			result = false
-			can_create = false
-		DataRepository.SERVER_STATE.SERVER_SHUTTING_DOWN:
-			message = "Server shutting down. Connection refused."
-			result = false
-			can_create = false
-	if can_create:
-		if DataRepository.GetDataFromDB("playerdata", "username="+dbcheckuser, ["username"]):
-			Logging.log_warning("[AUTH] Username already in use.")
-			result = false
-			message = "Username already in use."
-		else:
-			result = true
-			message = "Account created successfully."
-			randomize()
-			var salt = str(randi())
-			var pepper = password+salt
-			var hashed = pepper.sha256_text()
-			if DataRepository.WriteNewUserToDB(username, hashed, salt):
-				Logging.log_notice("[AUTH] New user "+str(username)+" written to database!")
-			else:
-				Logging.log_error("[AUTH] Failed to write new user to database!")		
-	rpc_id(gateway_id, "CreateAccountResults", result, message)
-	
-func VerifyPassword(username, password):
-	var dbusername = "'"+username+"'"
-	var selectedpw : Array = DataRepository.GetDataFromDB("playerdata", "username = "+dbusername, ["hash","salt"])
-	var hashed = selectedpw[0]["hash"]
-	var salt = selectedpw[0]["salt"]
-	var testingpw = password+salt
-	if testingpw.sha256_text() == hashed:
-		return true
-	else:
-		return false
-	
-func RequestPersistentUUID(player_id):
-	rpc_id(player_id, "SendPersistentUUID")
-
-@rpc("any_peer") func ServRPC_RecievePersistentUUID(puuid):
-	if DataRepository.PlayerMgmt.has_node(str(multiplayer.get_remote_sender_id())):
-		DataRepository.PlayerMgmt.get_node(str(multiplayer.get_remote_sender_id())).PlayerData.persistent_uuid = puuid
-
-#login end
 
 #movement request start
 
@@ -356,6 +159,12 @@ func RequestPersistentUUID(player_id):
 		if DataRepository.PlayerMgmt.get_node(str(playerid)).CurrentActiveCharacter:
 			var pid_collider = DataRepository.PlayerMgmt.get_node(str(playerid)).CurrentActiveCharacter.CurrentCollider
 			pid_collider.UpdateVector(vector, direction)
+			
+@rpc("any_peer") func ServRPC_RequestDash():
+	var playerid = multiplayer.get_remote_sender_id()
+	if DataRepository.PlayerMgmt.has_node(str(playerid)):
+		if DataRepository.PlayerMgmt.get_node(str(playerid)).CurrentActiveCharacter:
+			DataRepository.PlayerMgmt.get_node(str(playerid)).CurrentActiveCharacter.SetDash()
 
 #movement request end
 
@@ -411,19 +220,6 @@ func SendLocalChat(msg:Dictionary, originator, playerid):
 func SendSingleChat(msg:Dictionary, playerid):
 	rpc_id(int(playerid), "RecieveChat", msg)
 #chat end
-
-#version checking
-@rpc("any_peer") func ServRPC_RecieveVersion(clientversion):
-	var playerid = multiplayer.get_remote_sender_id()
-	CheckClientVersion(playerid, clientversion)
-
-func CheckClientVersion(player_id, clientversion):
-	if clientversion != DataRepository.serverversion:
-		Logging.log_warning("[CLIENT] Client version for PID "+ str(player_id)+ " does not match server version. Recieved:" + str(clientversion) + " Required:"+ str(DataRepository.serverversion))
-		rpc_id(player_id, "Disconnect", "Connection Rejected: Client Version Invalid! \n Current: "+str(clientversion)+"\n Required: "+ str(DataRepository.serverversion))
-		network.disconnect_peer(player_id)
-		
-#version checking end
 
 #permissions
 
@@ -563,4 +359,21 @@ func BindClientInventory(pid, inventory):
 
 #inventory handling and sync end
 
+#area entered handling
 
+func NotifyPlayerAreaEntered(pid, text, subtext):
+	rpc_id(pid, "ClientRPC_NotifyPlayerAreaEntered", text, subtext)
+
+#end area entered handling
+
+@rpc("any_peer") func ServRPC_RecieveLoginToken(token):
+	HandleLoginToken(multiplayer.get_remote_sender_id(), token)
+	
+func HandleLoginToken(pid, token):
+	
+	if Authentication.valid_tokens.has(token) && token != "":
+		for i in get_tree().get_nodes_in_group("players"):
+			if i.PlayerData.Username == Authentication.valid_tokens[token]["user"]:
+				DataRepository.pid_to_username[str(pid)] = {"username":Authentication.valid_tokens[token]["user"]}
+				DataRepository.remove_pid_assoc(i.name)
+				i.set_name(StringName(str(pid)))

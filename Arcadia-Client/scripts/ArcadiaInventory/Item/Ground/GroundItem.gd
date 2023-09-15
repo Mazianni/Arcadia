@@ -1,15 +1,12 @@
-
 class_name GroundItem extends Node2D
+
 var uuid : String
 var held_item : Dictionary
+@export var sync_item : PackedByteArray
 var CurrentMap : String
 var CurrentMapRef : MapBase
 
 @onready var click_catcher : Control = $ClickCatcher
-
-func _ready():
-	$Sprite2D.texture = load(held_item["texture"])
-	#click_catcher.size = $Sprite2D.texture.size
 	
 func pick_up():
 	CurrentMapRef.ground_items.erase(self)
@@ -25,3 +22,8 @@ func _on_click_catcher_gui_input(event):
 				"map":CurrentMap
 			}
 			InventoryPredicate.ClientPredicate_GenerateInventoryRequest(PredicateBase.REQUESTTYPE.INVENTORY_PICKUP, aux_dict)
+
+func _on_multiplayer_synchronizer_synchronized():
+	if sync_item.size():
+		held_item = bytes_to_var(sync_item)
+		$Sprite2D.texture = load(held_item["texture"])

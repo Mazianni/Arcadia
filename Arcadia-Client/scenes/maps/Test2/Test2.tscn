@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://bedk80k4mbhy6"]
 
-[ext_resource type="Script" path="res://scripts/player/playerspawner.gd" id="1_ahe8t"]
-[ext_resource type="PackedScene" uid="uid://coholi8in7rg2" path="res://scenes/MapObjects/Warper.tscn" id="3_c5bwk"]
-[ext_resource type="TileSet" uid="uid://cx3tfxi2mugna" path="res://resources/newtieset.tres" id="4_30ye3"]
+[ext_resource type="Script" path="res://scripts/player/playerspawner.gd" id="1_a1h22"]
+[ext_resource type="TileSet" uid="uid://cx3tfxi2mugna" path="res://resources/newtieset.tres" id="2_hkxvh"]
+[ext_resource type="PackedScene" uid="uid://coholi8in7rg2" path="res://scripts/ArcadiaInventory/scenes/MapObjects/Warper.tscn" id="3_xsb2n"]
 
 [sub_resource type="Environment" id="Environment_ggvjo"]
 background_mode = 3
@@ -14,8 +14,8 @@ glow_hdr_threshold = 0.0
 glow_hdr_scale = 2.4
 glow_hdr_luminance_cap = 15.25
 
-[node name="Map" type="Node2D"]
-script = ExtResource("1_ahe8t")
+[node name="Test2" type="Node2D"]
+script = ExtResource("1_a1h22")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_ggvjo")
@@ -27,7 +27,7 @@ texture_filter = 1
 
 [node name="TileMap" type="TileMap" parent="PrimarySort/TilemapContainer"]
 texture_filter = 1
-tile_set = ExtResource("4_30ye3")
+tile_set = ExtResource("2_hkxvh")
 cell_quadrant_size = 32
 format = 2
 layer_0/name = "Base"
@@ -46,15 +46,27 @@ layer_1/tile_data = PackedInt32Array(589827, 3866626, 30, 524291, 3866626, 27, 4
 
 [node name="Objects" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
+[node name="G" type="MultiplayerSpawner" parent="PrimarySort/ObjectSortContainer/Objects"]
+_spawnable_scenes = PackedStringArray("res://scenes/1GroundItem2D.tscn")
+spawn_path = NodePath("..")
+
 [node name="Warpers" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
-[node name="Warper" parent="PrimarySort/ObjectSortContainer/Warpers" instance=ExtResource("3_c5bwk")]
+[node name="Warper" parent="PrimarySort/ObjectSortContainer/Warpers" instance=ExtResource("3_xsb2n")]
 position = Vector2(100, 300)
 
 [node name="Structures" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
 [node name="Players" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
 
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="PrimarySort/ObjectSortContainer/Players"]
+_spawnable_scenes = PackedStringArray("res://scenes/PlayerTemplate.tscn", "res://scenes/SyncTest.tscn")
+spawn_path = NodePath("..")
+
 [node name="Projectiles" type="Node2D" parent="PrimarySort/ObjectSortContainer"]
+
+[node name="ProjectileSpawner" type="MultiplayerSpawner" parent="PrimarySort/ObjectSortContainer/Projectiles"]
+_spawnable_scenes = PackedStringArray("res://scenes/Projectiles/Thunder Strike/projectile.tscn")
+spawn_path = NodePath("..")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]

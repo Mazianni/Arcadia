@@ -62,16 +62,13 @@ var previewspriteshairpath = "res://sprites/player/hair"
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	Server.GetRaceList()
+	Authentication.GetRaceList()
 	await get_tree().create_timer(0.1).timeout
 	var defaultlist = Globals.RaceList.keys()
 	GenerateRaces()
 	
 func GenerateRaces():
 	for i in Globals.RaceList.keys():
-		print(i)
-		print(Globals.RaceList[i]["Long Description"])
-		print(Globals.RaceList[i]["Icon"])
 		var newraceinstance = SubraceScene.instantiate()
 		newraceinstance.name = i
 		newraceinstance.racename = i 
@@ -219,7 +216,7 @@ func _on_NameInput_text_entered(new_text):
 	UpdateDoll()
 
 func _on_CreateConfirmButton_pressed():
-	Server.RequestNewCharacter(SelectedRace, CharacterName, SelectedAge, HairColor.to_html(), SkinColor, SelectedHair, SelectedEars, SelectedTail, SelectedAccessoryOne, SelectedBodytype, SelectedHeight)
+	Authentication.RequestNewCharacter(SelectedRace, CharacterName, SelectedAge, HairColor.to_html(), SkinColor, SelectedHair, SelectedEars, SelectedTail, SelectedAccessoryOne, SelectedBodytype, SelectedHeight)
 
 func _on_HeightInput_value_changed(value): #internally this stays metric. i hate. imperial units.
 	var output = value

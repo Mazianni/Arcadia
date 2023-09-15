@@ -81,8 +81,14 @@ func HandleCommands(input:Dictionary, player_id:int):
 func GetCurrentPlayerList():
 	var return_array : Array = []
 	for I in get_tree().get_nodes_in_group("players"):
-		return_array.append(I.PlayerData.Username)
+		return_array.append(I.CharacterData.Name)
 	return return_array
+	
+func GetCurrentCharactersList():
+	var return_array : Array = []
+	for I in get_tree().get_nodes_in_group("active_characters"):
+		return_array.append(I.PlayerData.Username)
+	return return_array	
 	
 func GetPlayersInRange(origin, given_distance:int):
 	var return_array : Array = []

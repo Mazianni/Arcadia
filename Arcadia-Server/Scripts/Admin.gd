@@ -1,6 +1,6 @@
 class_name AdminManager extends SubsystemBase
 
-enum RANK_FLAGS {NONE, MANAGE_TICKETS, IS_STAFF, PLAYER_NOTES, ALL}
+enum RANK_FLAGS {NONE, MANAGE_TICKETS, IS_STAFF, PLAYER_NOTES,TELEPORT, ALL}
 enum TICKET_FLAGS {TICKET_OPEN, TICKET_STAFF_ASSIGNED, TICKET_CLOSED}
 
 @onready var admin_directory = "user://" + "admin"
@@ -310,7 +310,7 @@ func AddUserToTicket(username:String, ticket_number:String):
 	Server.SendSingleChat(ChatHandler.FormatSimpleMessage("You've been added to ticket #"+str(ticket_number)))
 			
 func ClaimTicket(username:String, ticket_number:String):
-	if Server.has_node(Helpers.Username2PID(username)):
+	if DataRepository.PlayerMgmt.has_node((Helpers.Username2PID(username))):
 		var user = Server.get_node(Helpers.Username2PID(username))
 		if HasRank(user):
 			if CheckPermissions(RANK_FLAGS.MANAGE_TICKETS, user):

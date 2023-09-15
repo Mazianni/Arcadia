@@ -30,6 +30,8 @@ ItemSkeletonRepository="*res://Scripts/ArcadiaInventory/Singleton/ItemSkeletonRe
 BetterTerrain="*res://addons/better-terrain/BetterTerrain.gd"
 CombatHandler="*res://Scripts/singletons/CombatHandler.gd"
 AbilityHolder="*res://Scripts/singletons/AbilityHolder.gd"
+AdminPredicate="*res://Scripts/singletons/AdminPredicate_Server.gd"
+Authentication="*res://Scripts/singletons/Authentication.gd"
 
 [debug]
 
@@ -81,6 +83,7 @@ inventory_filter={
 
 [physics]
 
+common/physics_jitter_fix=0.0
 2d/default_linear_damp=0.0
 2d/default_angular_damp=0.0
 common/physics_fps=60

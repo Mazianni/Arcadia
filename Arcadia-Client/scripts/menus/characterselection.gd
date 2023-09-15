@@ -6,15 +6,18 @@ var CharacterCreationScreenResource = preload("res://scenes/CharacterCreation.ts
 @onready var barcointainer = $NinePatchRect/CenterContainer/GridContainer
 
 func _ready():
-	Server.connect("character_list_recieved", Callable(self, "RenderSlots"))
+	Authentication.connect("character_list_recieved", Callable(self, "RenderSlots"))
 	Globals.character_list_refresh_requested.connect(Callable(self, "RefreshCharacterList"))
+	if not Authentication.multiplayer_api.has_multiplayer_peer():
+		Authentication.InitAuth()
+		Authentication.RequestCharacterList()
 	if Globals.CharacterList.size() == 0:
-		Server.RequestCharacterList()
+		Authentication.RequestCharacterList()
 	else:
 		RenderSlots()
 		
 func _exit_tree():
-	Server.disconnect("character_list_recieved", Callable(self, "RenderSlots"))
+	Authentication.disconnect("character_list_recieved", Callable(self, "RenderSlots"))
 	Globals.character_list_refresh_requested.disconnect(Callable(self, "RefreshCharacterList"))	
 
 func RenderSlots():
@@ -55,13 +58,13 @@ func SelectCharacter(uuid, is_new):
 	if is_new:
 		Gui.ChangeGUIScene("CharacterCreation")
 	else:
-		Server.SelectCharacter(uuid)
+		Authentication.SelectCharacter(uuid)
 		Globals.character_uuid = uuid
 		
 func DeleteCharacter(uuid):
-	Server.DeleteCharacter(uuid)
+	Authentication.DeleteCharacter(uuid)
 	
 func RefreshCharacterList():
-	Server.RequestCharacterList()
+	Authentication.RequestCharacterList()
 	RenderSlots()
 

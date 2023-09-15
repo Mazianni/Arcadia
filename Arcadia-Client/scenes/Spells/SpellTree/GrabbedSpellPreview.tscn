@@ -1,12 +1,48 @@
-[gd_scene format=3 uid="uid://brswv02rgv8qh"]
+[gd_scene load_steps=3 format=3 uid="uid://brswv02rgv8qh"]
 
-[node name="GrabbedSpellPreview" type="TextureRect"]
-modulate = Color(0.65098, 0.65098, 0.65098, 0.517647)
+[ext_resource type="Material" uid="uid://ccpig7wrnflnc" path="res://resources/shaders/spelloutline.tres" id="1_l4dob"]
+[ext_resource type="Texture2D" uid="uid://cwcj4m426kd4x" path="res://sprites/spell_trees/frame2.png" id="2_annh3"]
+
+[node name="GrabbedSpellPreview" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CanvasGroup" type="CanvasGroup" parent="."]
+scale = Vector2(1.5, 1.5)
+
+[node name="TextureRect2" type="TextureRect" parent="CanvasGroup"]
+modulate = Color(0.27451, 0.27451, 0.27451, 1)
+texture_filter = 1
+material = ExtResource("1_l4dob")
 custom_minimum_size = Vector2(32, 32)
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+expand_mode = 2
+
+[node name="TextureRect3" type="TextureRect" parent="CanvasGroup"]
+texture_filter = 1
+custom_minimum_size = Vector2(32, 32)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("2_annh3")
+expand_mode = 2

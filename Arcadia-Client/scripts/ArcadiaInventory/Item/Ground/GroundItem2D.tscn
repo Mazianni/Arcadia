@@ -1,6 +1,16 @@
-[gd_scene load_steps=2 format=3 uid="uid://cfu1isdrr36wn"]
+[gd_scene load_steps=3 format=3 uid="uid://cfu1isdrr36wn"]
 
 [ext_resource type="Script" path="res://Scripts/ArcadiaInventory/Item/Ground/GroundItem.gd" id="1_myaga"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bvi71"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/sync = true
+properties/0/watch = false
+properties/1/path = NodePath(".:sync_item")
+properties/1/spawn = true
+properties/1/sync = true
+properties/1/watch = false
 
 [node name="GroundItem2D" type="Node2D"]
 script = ExtResource("1_myaga")
@@ -22,4 +32,10 @@ grow_horizontal = 2
 grow_vertical = 2
 tooltip_text = "Test"
 
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_interval = 5.0
+delta_interval = 5.0
+replication_config = SubResource("SceneReplicationConfig_bvi71")
+
 [connection signal="gui_input" from="ClickCatcher" to="." method="_on_click_catcher_gui_input"]
+[connection signal="synchronized" from="MultiplayerSynchronizer" to="." method="_on_multiplayer_synchronizer_synchronized"]

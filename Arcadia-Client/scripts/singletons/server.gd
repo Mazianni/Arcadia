@@ -30,6 +30,16 @@ extends Node
 @rpc("any_peer") func ServRPC_GetCurrentPlayers(): pass
 @rpc("any_peer") func ServRPC_RecieveClientState(client_state): pass
 @rpc("any_peer", "unreliable") func ServRPC_RequestWorldState(): pass
+@rpc("any_peer") func ServRPC_RequestDash(): pass
+@rpc("any_peer") func ServRPC_RecieveLoginToken(token): pass
+@rpc("any_peer") func RecieveRaceList(racelist : Dictionary): pass
+@rpc("any_peer") func RecieveCharacterList(characterlist): pass
+@rpc("any_peer") func CreateAccountResults(result, message): pass
+@rpc("any_peer") func ReturnLogin(status, message): pass
+@rpc("any_peer") func SendVersion(): pass
+@rpc("any_peer") func SendPersistentUUID(): pass
+@rpc("any_peer") func ClientRPC_ReturnNewCharacterCreated(): pass
+@rpc("authority") func ClientRPC_RecieveLoginToken(token): pass
 
 #BOILERPLATE END
 
@@ -45,9 +55,8 @@ var latency = 0
 var delta_latency = 0
 var client_clock = 0
 
-@onready var maphandler = get_tree().get_root().get_node("RootNode/Maphandler")
+var maphandler
 
-signal character_list_recieved
 signal permissions_recieved(permissions)
 signal tickets_recieved(tickets)
 signal ticket_update_recieved(ticket, ticket_number)
@@ -56,6 +65,7 @@ signal player_list_recieved(playerlist)
 signal player_notes_recieved(player_notes)
 signal admin_verified(verified)
 signal world_update_recieved
+signal area_entered(text, subtext)
  
 func _physics_process(delta):
 	client_clock += int(delta*1000) + delta_latency
@@ -69,26 +79,18 @@ func ConnectToServer():
 	network = ENetMultiplayerPeer.new()
 	network.create_client(ip, port)
 	multiplayer.multiplayer_peer = network
-	
-	
 	multiplayer.connection_failed.connect(_OnConnectionFailed)
 	multiplayer.connected_to_server.connect(_OnConnectionSucceeded)
 	multiplayer.server_disconnected.connect(_OnServerDisconnected)
 	
 #Connection signals
 	
-func _OnConnectionFailed():
-	print("Failed to Connect.")
-	
+func _OnConnectionFailed():	
 	multiplayer.connection_failed.disconnect(_OnConnectionFailed)
 	multiplayer.connected_to_server.disconnect(_OnConnectionSucceeded)
 	multiplayer.server_disconnected.disconnect(_OnServerDisconnected)
-	await get_tree().create_timer(1).timeout
-	#multiplayer.multiplayer_peer = null
-	#network = null
 		
 func _OnConnectionSucceeded():
-	print("Connection Succcessful.")
 	rpc_id(1, "ServRPC_FetchServerTime", Time.get_unix_time_from_system()*1000)
 	var timer = Timer.new()
 	timer.wait_time = 0.5
@@ -111,6 +113,11 @@ func _OnServerDisconnected(): #todo make this return to the login screen.
 		Gui.CreateFloatingMessage("Server disconnected! Please login again.", "bad")
 		Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_UNAUTHENTICATED)
 		maphandler.ClearScenes()
+		
+func _notification(notif):
+	if notif == NOTIFICATION_WM_CLOSE_REQUEST:
+		Authentication.EraseTokenOnExit()
+		get_tree().quit()
 	
 #End connection signals
 
@@ -123,7 +130,7 @@ func DetermineLatency():
 	if multiplayer.multiplayer_peer:
 		rpc_id(1, "ServRPC_DetermineLatency", Time.get_unix_time_from_system()*1000)
 	
-@rpc("any_peer") func ReturnLatency(client_time):
+@rpc("authority") func ReturnLatency(client_time):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	latency_array.append((Time.get_unix_time_from_system()*1000 - client_time) / 2)
@@ -140,16 +147,16 @@ func DetermineLatency():
 		latency = total_latency/latency_array.size()
 		latency_array.clear()
 		
-@rpc("any_peer", "unreliable") func RequestWorldState():
+@rpc("authority", "unreliable") func RequestWorldState():
 	rpc_id(1, "ServRPC_RequestWorldState")
 	
-@rpc("any_peer", "unreliable") func RecieveWorldState(state):
+@rpc("authority", "unreliable") func RecieveWorldState(state):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	maphandler.UpdateWorldState(state)
 	world_update_recieved.emit()
 	
-@rpc("any_peer") func ReturnServerTime(server_time, client_time):
+@rpc("authority") func ReturnServerTime(server_time, client_time):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	latency = (Time.get_unix_time_from_system() - client_time) / 2
@@ -159,131 +166,42 @@ func DetermineLatency():
 #end state/latency
 	
 #player spawning
-@rpc("any_peer") func SpawnNewPlayer(player_id, spawn_position):
+@rpc("authority") func SpawnNewPlayer(player_id, spawn_position):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	if Globals.client_state != Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
 		return
 	get_node("../RootNode/MapHandler/SubViewportContainer/SubViewport/GameRender2D").SpawnNewPlayer(player_id, spawn_position)
 
-@rpc("any_peer") func DespawnPlayer(player_id):
+@rpc("authority") func DespawnPlayer(player_id):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	if Globals.client_state != Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
 		return
 	#get_node("../RootNode/MapHandler/SubViewportContainer/SubViewport/GameRender2D").DespawnPlayer(player_id)
 #end player spawning
-
-#character creation handling start
-
-func GetRaceList():
-	rpc_id(1, "ServRPC_BuildRaceList")
 	
-@rpc("any_peer") func RecieveRaceList(racelist : Dictionary):
+@rpc("authority") func LoadWorld(worldname):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
-	Globals.RaceList = racelist.duplicate(true)
-	
-@rpc("any_peer") func ClientRPC_ReturnNewCharacterCreated(status, message):
-	if(status):
-		Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_PREGAME) #dump them to the character selection menu
-	var msgcolor : String = "neutral"
-	match status:
-		true:
-			msgcolor = "good"
-		false:
-			msgcolor = "bad"
-	Gui.CreateFloatingMessage(message, msgcolor)
-
-#character creation handling end
-
-#character selection
-
-func RequestCharacterList():
-	rpc_id(1, "ServRPC_ReturnRequestedCharacterList")
-
-@rpc("any_peer") func RecieveCharacterList(characterlist):
-	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
-		return
-	Globals.CharacterList = characterlist
-	emit_signal("character_list_recieved")
-		
-func SelectCharacter(charname):
-	rpc_id(1, "ServRPC_CreateExistingCharacter", charname)
-	
-func RequestNewCharacter(species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height):
-	rpc_id(1, "ServRPC_RequestNewCharacter", species_name, character_name, age, hair_color, skin_color, hair_style, ear_style, tail_style, accessory_one_style, gender, height)
-	
-func DeleteCharacter(char_name):
-	rpc_id(1, "ServRPC_DeleteCharacter", char_name)
-	
-#end character selection
-	
-@rpc("any_peer") func LoadWorld(worldname):
-	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
-		return
-	print("sdadas")
 	maphandler.ChangeMap(worldname)
 
 	
-@rpc("any_peer") func ClientRPC_ReturnCharacterLoadFailed():
+@rpc("authority") func ClientRPC_ReturnCharacterLoadFailed():
 	Gui.CreateFloatingMessage("The server reported an error loading your character. \nPlease try again or inform a developer.", "bad")
 	
 	
-@rpc("any_peer") func RecieveClientStateSync(client_state):
+@rpc("authority") func RecieveClientStateSync(client_state):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	Globals.SetClientState(client_state)
 
 #client state reporting
 
-@rpc("any_peer") func ReportClientState(client_state):
+@rpc("authority") func ReportClientState(client_state):
 	rpc_id(1, "ServRPC_RecieveClientState", client_state)
 
 #end client state reporting
-
-#login
-
-func Login(username, password, uuid, puuid):
-	await get_tree().create_timer(1).timeout
-	if multiplayer.multiplayer_peer:
-		rpc_id(1,"ServRPC_Login", username, password, uuid, Globals.persistent_uuid)
-
-func CreateAccount(username, password):
-	Server.ConnectToServer()
-	await get_tree().create_timer(0.1).timeout
-	rpc_id(1,"ServRPC_CreateAccount", username, password)
-	
-@rpc("any_peer") func CreateAccountResults(result, message):
-	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
-		return
-	if(result == false):
-		Disconnect()
-	if result == true:
-		get_node("../RootNode/GUI/LoginScreen")._on_Back_pressed()
-		Gui.CreateFloatingMessage("New account created. Please login.", "good")
-	else:
-		Gui.CreateFloatingMessage(str(message), "bad")
-		get_node("../RootNode/GUI/LoginScreen").EnableInputs()
-	network.disconnect("connection_failed", Callable(self, "_OnConnectionFailed"))
-	network.disconnect("connection_succeeded", Callable(self, "_OnConnectionSucceeded"))
-
-@rpc("any_peer") func ReturnLogin(status, message):
-	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
-		return
-	if status == false:
-		if message:
-			Gui.CreateFloatingMessage(str(message), "bad")
-		else:
-			Gui.CreateFloatingMessage("Incorrect username or password.", "bad")
-		get_node("../RootNode/GUI/LoginScreen").EnableInputs()
-		network.disconnect("connection_failed", Callable(self, "_OnConnectionFailed"))
-		network.disconnect("connection_succeeded", Callable(self, "_OnConnectionSucceeded"))
-	else:
-		Gui.CreateFloatingMessage("Login successful.", "good")
-		Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_PREGAME)
-		
-#end login
 
 #movement request start
 
@@ -291,6 +209,9 @@ func RequestMovement(vector, direction):
 	if not Globals.client_state == Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
 		return
 	rpc_id(1, "ServRPC_RequestColliderMovement", vector, direction)
+	
+func RequestDash():
+	rpc_id(1, "ServRPC_RequestDash")
 
 #movement request end
 
@@ -299,7 +220,7 @@ func RequestMovement(vector, direction):
 func SendChat(msg):
 	rpc_id(1, "ServRPC_RecieveChat", msg)
 	
-@rpc("any_peer") func RecieveChat(msg):
+@rpc("authority") func RecieveChat(msg):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	if Globals.client_state != Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
@@ -308,25 +229,12 @@ func SendChat(msg):
 
 #chat functions end
 
-@rpc("any_peer") func Disconnect(reason : String = ""):
+@rpc("authority") func Disconnect(reason : String = ""):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_UNAUTHENTICATED)
 	if(reason):
 		Gui.CreateFloatingMessage(reason, "bad")
-		
-#version checking start
-@rpc("any_peer") func SendVersion():
-	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
-		return
-	rpc_id(1, "ServRPC_RecieveVersion", Globals.client_version)
-	print(Globals.client_version)
-	
-@rpc("any_peer") func SendPersistentUUID():
-	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
-		return
-	rpc_id(1, "ServRPC_RecievePersistentUUID", Globals.persistent_uuid)
-#version checking end
 
 #permissions start
 func GetClientPermissions():
@@ -345,17 +253,17 @@ func GetTickets(for_staff:bool = false):
 func GetUpdateOnTicket(ticket_number:String):
 	rpc_id(1, "ServRPC_UpdateSoloTicket", ticket_number)
 	
-@rpc("any_peer") func RecieveTicketsAdmin(ticket_dict:Dictionary):
+@rpc("authority") func RecieveTicketsAdmin(ticket_dict:Dictionary):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	emit_signal("admin_tickets_recieved", ticket_dict)
 	
-@rpc("any_peer") func RecieveTickets(ticket_dict:Dictionary, all_tickets:bool = false):
+@rpc("authority") func RecieveTickets(ticket_dict:Dictionary, all_tickets:bool = false):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	emit_signal("tickets_recieved", ticket_dict)
 	
-@rpc("any_peer") func ClientRPC_UpdateTicket(ticket_number:String, ticket_dict:Dictionary):
+@rpc("authority") func ClientRPC_UpdateTicket(ticket_number:String, ticket_dict:Dictionary):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	emit_signal("ticket_update_recieved",ticket_number, ticket_dict)
@@ -390,7 +298,7 @@ func RemovePlayerNote(username:String, note_number:String):
 func EditPlayerNote(username:String, note_number:String, new_note:String):
 	rpc_id(1, "ServRPC_EditPlayerNote", username, note_number, new_note)
 
-@rpc("any_peer") func RecievePlayerNotes(note_dict: Dictionary):
+@rpc("authority") func RecievePlayerNotes(note_dict: Dictionary):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	emit_signal("player_notes_recieved", note_dict)
@@ -402,7 +310,7 @@ func EditPlayerNote(username:String, note_number:String, new_note:String):
 func GetPlayerList():
 	rpc_id(1, "ServRPC_GetCurrentPlayers")
 	
-@rpc("any_peer") func RecieveCurrentPlayers(player_list):
+@rpc("authority") func RecieveCurrentPlayers(player_list):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	emit_signal("player_list_recieved", player_list)
@@ -410,7 +318,7 @@ func GetPlayerList():
 func IsClientAdmin():
 	rpc_id(1, "ServRPC_IsClientAdmin")
 	
-@rpc("any_peer") func VerifyClientIsAdmin(decision:bool):
+@rpc("authority") func VerifyClientIsAdmin(decision:bool):
 	if not Helpers.IsServer(multiplayer.get_remote_sender_id()):
 		return
 	if decision:
@@ -421,28 +329,30 @@ func IsClientAdmin():
 
 #map sync start
 
-@rpc("any_peer") func ClientRPC_RecieveMapSync(mapname:String):
+@rpc("authority") func ClientRPC_RecieveMapSync(mapname:String):
 	maphandler.ChangeMap(mapname)
 	
-@rpc("any_peer") func ClientRPC_SetWarpingTrue():
-	Globals.warping = true
-	var camera : Camera2D = get_tree().get_first_node_in_group("main_camera")
+@rpc("authority") func ClientRPC_SetWarpingTrue():
 	maphandler.TriggerTransition()
-	camera.position_smoothing_enabled = false
-	get_tree().create_timer(0.1).timeout.connect(Callable(self, "UnsetWarpingTrue"))
 	
-func UnsetWarpingTrue():
-	Globals.warping = false
-	var camera : Camera2D = get_tree().get_first_node_in_group("main_camera")
-	camera.position_smoothing_enabled = true
 	
 #map sync end
 
 #inventory sync / manipulation start
 
-@rpc("any_peer") func ClientRPC_BindNetworkedInventories(inventory):
+@rpc("authority") func ClientRPC_BindNetworkedInventories(inventory):
 	InventoryManager.BindNetworkInventory(inventory)
 
 #inventory sync / manipulation  end
+
+#area entered handling
+
+@rpc("authority") func ClientRPC_NotifyPlayerAreaEntered(text, subtext):
+	area_entered.emit(text, subtext)
+
+#end area entered handling
+
+@rpc("authority") func ClientRPC_SendLoginToken():
+	rpc_id(1, "ServRPC_RecieveLoginToken", Globals.authorized_token)
 
 

@@ -49,3 +49,11 @@ func GenerateMapProjectiles():
 	for i in get_node("PrimarySort/ObjectSortContainer/Projectiles").get_children():
 		return_dict[i.uuid] = i.GetMapProjectileData()
 	return return_dict
+	
+func NotifyPlayerAreaEntered(player, text, subtext, requesting_body):
+	if player.name in DataRepository.mapmanager.RecentWarps:
+		await get_tree().create_timer(0.1).timeout
+		if requesting_body.overlaps_body(player):
+			for i in get_tree().get_nodes_in_group("PlayerCollider"):
+				if player.name == i.name:
+					DataRepository.Server.NotifyPlayerAreaEntered(player.ControllingCharacter.ActiveController.associated_pid, text, subtext)

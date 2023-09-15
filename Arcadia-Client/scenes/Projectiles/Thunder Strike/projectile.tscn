@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://briiokecg3lbl"]
+[gd_scene load_steps=6 format=3 uid="uid://briiokecg3lbl"]
 
 [ext_resource type="Script" path="res://scripts/projectiles/projectile.gd" id="1_xkmxl"]
 [ext_resource type="Texture2D" uid="uid://ci83spnlvmh1r" path="res://sprites/particles/01_Simple/feather_circle.png" id="2_cqwcd"]
@@ -8,6 +8,24 @@ offsets = PackedFloat32Array(0, 0.520076, 1)
 colors = PackedColorArray(0, 0, 0, 0.027451, 0.288724, 0.63945, 3.85046e-07, 1, 1, 1, 1, 0.117647)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_cugjq"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_gam2s"]
+properties/0/path = NodePath(".:starting")
+properties/0/spawn = true
+properties/0/sync = true
+properties/0/watch = false
+properties/1/path = NodePath(".:ending")
+properties/1/spawn = true
+properties/1/sync = true
+properties/1/watch = false
+properties/2/path = NodePath(".:position")
+properties/2/spawn = true
+properties/2/sync = true
+properties/2/watch = false
+properties/3/path = NodePath(".:rotation")
+properties/3/spawn = true
+properties/3/sync = true
+properties/3/watch = false
 
 [node name="projectile" type="RigidBody2D"]
 gravity_scale = 0.0
@@ -60,5 +78,8 @@ autostart = true
 points = PackedVector2Array(0, -50, 0, 0)
 width = 1.0
 default_color = Color(0.745098, 0, 0.266667, 1)
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_gam2s")
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

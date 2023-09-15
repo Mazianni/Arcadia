@@ -4,7 +4,7 @@ class_name MapBase extends Node2D
 	
 var ground_items : Array = []
 
-func AddPlayerNodeToMap(player_node : PlayerObject, position : Vector2):
+func AddPlayerNodeToMap(player_node : PlayerObject):
 	get_node("PrimarySort/ObjectSortContainer/Players").add_child(player_node)
 	
 func SpawnNewPlayer(player_id, spawn_position, is_main):

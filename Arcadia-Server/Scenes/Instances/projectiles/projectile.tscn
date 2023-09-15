@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://briiokecg3lbl"]
+[gd_scene load_steps=6 format=3 uid="uid://briiokecg3lbl"]
 
 [ext_resource type="Script" path="res://Scripts/classes/projectile/projectile.gd" id="1_vskq8"]
 [ext_resource type="Texture2D" uid="uid://ct78tnmi4bj56" path="res://sprites/particles/01_Simple/feather_circle.png" id="2_o1ql8"]
@@ -9,6 +9,24 @@ radius = 29.44
 [sub_resource type="Gradient" id="Gradient_y1bkv"]
 offsets = PackedFloat32Array(0, 0.520076, 1)
 colors = PackedColorArray(0, 0, 0, 1, 0.288724, 0.63945, 3.85046e-07, 1, 1, 1, 1, 1)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ookch"]
+properties/0/path = NodePath(".:starting")
+properties/0/spawn = true
+properties/0/sync = true
+properties/0/watch = false
+properties/1/path = NodePath(".:ending")
+properties/1/spawn = true
+properties/1/sync = true
+properties/1/watch = false
+properties/2/path = NodePath(".:position")
+properties/2/spawn = true
+properties/2/sync = true
+properties/2/watch = false
+properties/3/path = NodePath(".:rotation")
+properties/3/spawn = true
+properties/3/sync = true
+properties/3/watch = false
 
 [node name="projectile" type="RigidBody2D"]
 gravity_scale = 0.0
@@ -38,6 +56,9 @@ shape = SubResource("CircleShape2D_cugjq")
 wait_time = 10.0
 one_shot = true
 autostart = true
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_ookch")
 
 [connection signal="body_entered" from="Hitbox" to="." method="_on_hitbox_body_entered"]
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

@@ -9,6 +9,7 @@ extends Control
 @onready var InventoryPanelResource = load("res://scenes/Inventory/InventoryPanel.tscn")
 @onready var SpellPanelResource = load("res://scenes/Spells/SpellScreen.tscn")
 @onready var ContainerUIResource = load("res://scripts/ArcadiaInventory/UI/Scenes/ContainerUI.tscn")
+@onready var RegionTextBarResource = load("res://scenes/TextBars/RegionTextBar.tscn")
 @onready var MarkupDialog = $RPDialog/MarkupDialog
 @onready var SubviewRegion = $SubviewRegion
 @onready var dialog_container = $DialogContainer
@@ -25,6 +26,7 @@ func _ready():
 	ChatManager.SetCurrentChatTab($ChatboxContainer/Chatbox/ChatSelect/ChatSelectTabs.get_current_tab_control())
 	Server.IsClientAdmin()
 	Server.connect("admin_verified", Callable(self, "OnAdminVerification"))
+	Server.area_entered.connect(Callable(self, "ShowRegion"))
 	CombatHandler.resources_recieved.connect(Callable(self, "UpdateStatusBars"))
 	
 func _input(event):
@@ -126,5 +128,11 @@ func UpdateStatusBars(dict : Dictionary):
 		if i == Globals.character_uuid:
 			my_dict = dict[i].duplicate(true)
 	health_bar.UpdateBar(my_dict["HP"])
+	
+func ShowRegion(text, subtext):
+	var new_txt = RegionTextBarResource.instantiate()
+	$SubviewRegion.add_child(new_txt)
+	new_txt.CreateText(text, subtext)
+	
 
 	

@@ -5,6 +5,10 @@ var rot_power : int = 0.5
 var uuid : String
 var ability_name : String
 var caster : Node
+var pinned_to_caster : bool = false 
+
+@export var starting : bool = true
+@export var ending : bool = false
 
 func _ready():
 	uuid = DataRepository.uuid_generator.v4()
@@ -19,8 +23,10 @@ func GetMapProjectileData():
 	return return_dict
 
 func _physics_process(delta):
+	if pinned_to_caster:
+		position = caster.get_global_position()
 	
-	if target && is_instance_valid(target):
+	if target && is_instance_valid(target) && not starting:
 		#rotation = lerp(rotation, get_angle_to(target.get_global_position()), 0.5)
 		rotation = lerp(rotation,get_global_position().angle_to_point(target.get_global_position()), 0.1)
 		apply_central_force(Vector2(cos(rotation), sin(rotation))*200)
@@ -42,7 +48,11 @@ func _on_body_entered(body):
 func _on_timer_timeout():
 	end_projectile()
 	
+func start_projectile():
+	starting = false
+	
 func end_projectile():
+	ending = true
 	linear_velocity = Vector2.ZERO
 	angular_velocity = 0
 	var tween = create_tween()

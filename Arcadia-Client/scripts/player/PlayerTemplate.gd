@@ -4,6 +4,14 @@ var camera_scene = preload("res://scenes/MainCamera.tscn")
 
 var effects : Dictionary
 var effect_timers : Dictionary
+@export var direction : Vector2
+@export var moving : bool
+@export var dashing : bool = false
+@export var running : bool = false
+
+func _ready():
+	if name == Globals.character_uuid:
+		SpawnCamera()
 
 func MovePlayer(location, do_tween : bool = true):
 	if do_tween:
@@ -14,6 +22,13 @@ func MovePlayer(location, do_tween : bool = true):
 func SpawnCamera():
 	var camera : Node = camera_scene.instantiate()
 	add_child(camera)
+	
+func _process(delta):
+	UpdateSprite(moving)
+	if dashing:
+		$dashsmoke.emitting = true
+	elif $dashsmoke.emitting && not dashing:
+		$dashsmoke.emitting = false
 	
 func UpdateEffects():
 	for i in effects.keys():
@@ -34,7 +49,7 @@ func RemoveStack(stack:String):
 		effects.erase(stack)
 		effect_timers[stack].queue_free()
 
-func UpdateSprite(direction, moving):
+func UpdateSprite(moving):
 
 	if moving:
 		$Sprite2D.hide()

@@ -17,7 +17,7 @@ func _ready():
 	connect("tree_exiting", Callable(self, "OnDeleted"))
 	await get_tree().create_timer(0.1).timeout # wait for a little while for username to populate.
 	LoadSaveData()
-	loaded.connect(Callable(DataRepository.Server, "SendPlayerCharacterList"))
+	loaded.connect(Callable(Authentication, "SendPlayerCharacterList"))
 	
 func _process(delta):
 	DataPopulatedCallback()

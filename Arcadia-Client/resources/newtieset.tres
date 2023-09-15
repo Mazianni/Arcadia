@@ -2,14 +2,14 @@
 
 [ext_resource type="Texture2D" uid="uid://da7gxthcymm82" path="res://sprites/tilemap/extra_tileset/grasslands_mainlev.png" id="1_c1y67"]
 [ext_resource type="Texture2D" uid="uid://dri3rudn3i1e5" path="res://sprites/tilemap/extra_tileset/icelands_mainlev.png" id="2_rsa8u"]
-[ext_resource type="PackedScene" uid="uid://p40jxbq4vvns" path="res://scenes/Decorative/Snowy/SnowTree1.tscn" id="3_7k0gy"]
-[ext_resource type="PackedScene" uid="uid://te7drlg1ff3l" path="res://scenes/Decorative/Snowy/SnowyTreeStump2.tscn" id="4_t6ptk"]
-[ext_resource type="PackedScene" uid="uid://xh6swi1j23r5" path="res://scenes/Decorative/Snowy/SnowTree2.tscn" id="4_xn47j"]
-[ext_resource type="PackedScene" uid="uid://cmr72psvhyxfi" path="res://scenes/Decorative/Castle/Torch1.tscn" id="5_fajam"]
-[ext_resource type="PackedScene" uid="uid://cx5ybuesskxbt" path="res://scenes/Decorative/Snowy/SnowTree3.tscn" id="5_j8tpp"]
-[ext_resource type="PackedScene" uid="uid://ckc5707ao2u8" path="res://scenes/Decorative/Snowy/SnowTree4.tscn" id="6_f8j7n"]
-[ext_resource type="PackedScene" uid="uid://dyex3n8lb2jm0" path="res://scenes/Decorative/Snowy/SnowTree5.tscn" id="7_k0f8f"]
-[ext_resource type="PackedScene" uid="uid://dat4grmeqe8jp" path="res://scenes/Decorative/Snowy/SnowyTreeStump.tscn" id="9_r26xn"]
+[ext_resource type="PackedScene" uid="uid://p40jxbq4vvns" path="res://scripts/ArcadiaInventory/scenes/Decorative/Snowy/SnowTree1.tscn" id="3_7k0gy"]
+[ext_resource type="PackedScene" uid="uid://te7drlg1ff3l" path="res://scripts/ArcadiaInventory/scenes/Decorative/Snowy/SnowyTreeStump2.tscn" id="4_t6ptk"]
+[ext_resource type="PackedScene" uid="uid://xh6swi1j23r5" path="res://scripts/ArcadiaInventory/scenes/Decorative/Snowy/SnowTree2.tscn" id="4_xn47j"]
+[ext_resource type="PackedScene" uid="uid://cmr72psvhyxfi" path="res://scripts/ArcadiaInventory/scenes/Decorative/Castle/Torch1.tscn" id="5_fajam"]
+[ext_resource type="PackedScene" uid="uid://cx5ybuesskxbt" path="res://scripts/ArcadiaInventory/scenes/Decorative/Snowy/SnowTree3.tscn" id="5_j8tpp"]
+[ext_resource type="PackedScene" uid="uid://ckc5707ao2u8" path="res://scripts/ArcadiaInventory/scenes/Decorative/Snowy/SnowTree4.tscn" id="6_f8j7n"]
+[ext_resource type="PackedScene" uid="uid://dyex3n8lb2jm0" path="res://scripts/ArcadiaInventory/scenes/Decorative/Snowy/SnowTree5.tscn" id="7_k0f8f"]
+[ext_resource type="PackedScene" uid="uid://dat4grmeqe8jp" path="res://scripts/ArcadiaInventory/scenes/Decorative/Snowy/SnowyTreeStump.tscn" id="9_r26xn"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_eaat6"]
 texture = ExtResource("1_c1y67")

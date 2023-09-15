@@ -5,6 +5,8 @@ func RenderPopup(damage, type, critical:=false):
 	var linger_time = 1
 	var extra_rand = 0
 	var font_color = Color.WHITE.to_html()
+	if not damage:
+		damage = 0
 	if damage < 4000:
 		scale = Vector2(1.2, 1.2)
 		extra_rand = 3

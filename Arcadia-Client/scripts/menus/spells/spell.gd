@@ -11,7 +11,7 @@ var spell_data : Dictionary
 signal right_clicked(this_node)
 
 func SetSelf(spellname, icon):
-	$TextureRect2.texture = icon
+	$CanvasGroup/TextureRect2.texture = icon
 	$VBoxContainer/Label.text = spellname
 	
 func UpdateUnlocked():
@@ -19,13 +19,13 @@ func UpdateUnlocked():
 		if lines_leading_from.size():
 			for i in lines_leading_from:
 				i.default_color = Color.GREEN
-		$TextureRect2.modulate = Color(1,1,1,1)
+		$CanvasGroup.modulate = Color(1,1,1,1)
 		$VBoxContainer/Label.modulate = Color(1,1,1,1) 
 	else:
 		if lines_leading_from.size():
 			for i in lines_leading_from:
 				i.default_color = Color.GREEN
-		$TextureRect2.modulate = Color(0.22,0.22,0.22,1)
+		$CanvasGroup.modulate = Color(0.5,0.5,0.5,1)
 		$VBoxContainer/Label.modulate = Color(0.5,0.5,0.5,1)
 		
 func _on_gui_input(event):
@@ -56,6 +56,16 @@ func _get_drag_data(at_position):
 	
 func make_preview(spell_data):
 	var preview = spellpreviewres.instantiate()
-	preview.texture = load("res://sprites/spell_trees/"+spell_data["texture"])
+	preview.get_node("CanvasGroup/TextureRect2").texture = load("res://sprites/spell_trees/"+spell_data["texture"])
 	preview.z_index = 999
 	return preview
+
+func _on_texture_rect_2_mouse_entered():
+	if not unlocked:
+		var tween = create_tween()
+		tween.tween_property($CanvasGroup, "modulate", Color(0.75,0.75,0.75,1),0.5)
+
+func _on_texture_rect_2_mouse_exited():
+	if not unlocked:
+		var tween = create_tween()
+		tween.tween_property($CanvasGroup, "modulate", Color(0.55,0.55,0.55,1),0.5)

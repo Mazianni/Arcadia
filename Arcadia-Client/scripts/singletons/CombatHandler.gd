@@ -43,7 +43,7 @@ func ClientCombatHandler_UpdateSelectedPlayer(player):
 func ClientCombatHandler_RequestEffects(array : Array):
 	rpc_id(1, "ServerCombatHandler_RecieveEffectRequest", array)
 	
-@rpc("any_peer") func ClientCombatHandler_RecieveSpellPurchaseResult(spell:String, result:bool):
+@rpc("authority") func ClientCombatHandler_RecieveSpellPurchaseResult(spell:String, result:bool):
 	if result == false:
 		return
 	for i in get_tree().get_nodes_in_group("spells"):
@@ -51,25 +51,25 @@ func ClientCombatHandler_RequestEffects(array : Array):
 			i.unlocked = true
 			i.UpdateUnlocked()
 	
-@rpc("any_peer") func ClientCombatHandler_RecieveSelfSpells(spells:Array):
+@rpc("authority") func ClientCombatHandler_RecieveSelfSpells(spells:Array):
 	spells_recieved.emit(spells)
 	Globals.known_spells = spells.duplicate(true)
 	
-@rpc("any_peer") func ClientCombatHandler_RecieveSpellTrees(trees:Dictionary):
+@rpc("authority") func ClientCombatHandler_RecieveSpellTrees(trees:Dictionary):
 	trees_recieved.emit(trees)
 	Globals.ability_trees = trees.duplicate(true)
 	
-@rpc("any_peer") func ClientCombatHandler_RecieveResources(dict : Dictionary):
+@rpc("authority") func ClientCombatHandler_RecieveResources(dict : Dictionary):
 	resources_recieved.emit(dict)
 	
-@rpc("any_peer") func ClientCombatHandler_RecieveAbilityActivateResult(slot, result, time):
+@rpc("authority") func ClientCombatHandler_RecieveAbilityActivateResult(slot, result, time):
 	if result:
 		var slots = get_tree().get_nodes_in_group("hotbar_slots")
 		for i in slots:
 			if i.bound_action == slot:
 				i.SetTimer(time)
 				
-@rpc("any_peer") func ClientCombatHandler_RecieveEffects(effects:Dictionary):
+@rpc("authority") func ClientCombatHandler_RecieveEffects(effects:Dictionary):
 	for p in effects.keys():
 		var player
 		for i in get_tree().get_nodes_in_group("players"):
@@ -78,15 +78,17 @@ func ClientCombatHandler_RequestEffects(array : Array):
 		player.effects = effects[p].duplicate(true)
 		player.UpdateEffects()
 		
-@rpc("any_peer") func ClientCombatHandler_CreateDmgPopup(player:String, amount:int, type:String):
+@rpc("authority") func ClientCombatHandler_CreateDmgPopup(player:String, amount:int, type:String):
 	var dmg_node
 	for i in get_tree().get_nodes_in_group("players"):
 		if i.name == player:
 			dmg_node = i
 	var popup = dmgpopupres.instantiate()
 	popup.position = dmg_node.get_global_position()
+	popup.position.x -= popup.size.x/2
 	Server.maphandler.current_map_reference.add_child(popup)
+
 	popup.RenderPopup(amount, type)
 	
-@rpc("any_peer") func ClientCombatHandler_SendHotbar():
+@rpc("authority") func ClientCombatHandler_SendHotbar():
 	rpc_id(1, "ServerCombatHandler_UpdateClientHotbar", hotbar.CreateHotbarDict())

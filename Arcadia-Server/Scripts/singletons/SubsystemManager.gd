@@ -3,7 +3,7 @@ extends Node
 var SubsystemInitOrder : Dictionary = {
 	"Admin" = {"requires_creation":true, "resource":load("res://Scenes/Instances/Admin.tscn")},
 	"PlayerManager" = {"requires_creation":true, "resource":load("res://Scenes/Instances/PlayerManager.tscn")},
-	"MapManager" = {"requires_creation":false, "resource":null},
+	"Maphandler" = {"requires_creation":false, "resource":null},
 	"StateProcessing" = {"requires_creation":false, "resource":null},
 } #init order is defined by placement in this dict.
 

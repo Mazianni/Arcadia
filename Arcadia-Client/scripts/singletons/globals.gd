@@ -1,6 +1,6 @@
 extends Node
 
-@onready var maphandler = get_tree().get_root().get_node("RootNode/Maphandler")
+var maphandler
 
 var player_spawn = preload("res://scenes/PlayerTemplate.tscn")
 
@@ -46,6 +46,7 @@ var client_version = "0.1a"
 var measurement_units : String = "Imperial"
 var selected_player : Node
 var warping : bool = false
+var authorized_token : String
 
 signal character_list_refresh_requested
 signal show_viewport(show)

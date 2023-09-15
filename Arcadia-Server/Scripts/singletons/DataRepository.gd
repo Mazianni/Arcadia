@@ -65,7 +65,7 @@ func ConnectSubsystem(nodename:String, node:Node):
 		"Admin":
 			Admin = node
 			Logging.log_notice("[DATA REPOSITORY] Subsystem "+node.name+" connected to ADMIN.")
-		"MapManager":
+		"Maphandler":
 			mapmanager = node
 			Logging.log_notice("[DATA REPOSITORY] Subsystem "+node.name+" connected to MAPMANAGER.")
 		"StateProcessing":

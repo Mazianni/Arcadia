@@ -3,6 +3,7 @@ extends AbilityBase
 
 func UseAbility(casting_character:ActiveCharacter, origin_node:Node2D, target:Node2D):
 	casting_character.ApplyDamage(100, "normal")
+	casting_character.SetDash()
 	var timer = Timer.new()
 	CombatHandler.add_child(timer)
 	timer.one_shot = true

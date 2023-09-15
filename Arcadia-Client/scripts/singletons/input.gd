@@ -24,6 +24,9 @@ func on_movement():
 	if Input.is_action_pressed("deselect"):
 		Globals.SetSelectedPlayer(null)
 		
+	if Input.is_action_pressed("dash"):
+		Server.RequestDash()
+		
 	request_velocity = Vector2.ZERO
 	
 	if Globals.MouseOnUi:

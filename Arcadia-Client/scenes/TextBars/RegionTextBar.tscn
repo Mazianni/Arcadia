@@ -1,0 +1,45 @@
+[gd_scene load_steps=4 format=3 uid="uid://bhdd7pqk7ajfd"]
+
+[ext_resource type="Theme" uid="uid://ubr66643ed0w" path="res://themes/TextBars/RegionTextBar.tres" id="1_0nlou"]
+[ext_resource type="Script" path="res://scripts/TextBars/RegionTextBar.gd" id="1_dnji0"]
+[ext_resource type="Theme" uid="uid://dn15dgevlp6iw" path="res://themes/TextBars/RegionSubTextBar.tres" id="2_fpl70"]
+
+[node name="RegionTextBar" type="Control"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dnji0")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control2" type="Control" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+theme = ExtResource("1_0nlou")
+bbcode_enabled = true
+text = "[center]The Arcadian Expanse"
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 39)
+layout_mode = 2
+theme = ExtResource("2_fpl70")
+bbcode_enabled = true
+text = "[center]Home of Primordial Creation"
+
+[node name="Control" type="Control" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3

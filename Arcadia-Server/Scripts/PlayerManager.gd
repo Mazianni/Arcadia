@@ -36,7 +36,7 @@ func CreatePlayerContainer(player_id, uuid):
 	
 func FillPlayerContainer(player_container, player_id, uuid):
 	player_container.PlayerData.Username = DataRepository.pid_to_username[str(player_id)]["username"]
-	DataRepository.Server.RequestPersistentUUID(player_id)
+	Authentication.RequestPersistentUUID(player_id)
 	
 func SaveAllPlayerData(request_disconnect : bool):
 	Logging.log_notice("[PLAYER MANAGER] Saving all player data...")

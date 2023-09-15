@@ -21,7 +21,7 @@ func LoadMaps():
 	if MapsToLoad.size():
 		for i in MapsToLoad.keys():
 			var new_instance = MapsToLoad[i].instantiate()
-			self.add_child(new_instance)
+			$SubViewportContainer/SubViewport.add_child(new_instance)
 			new_instance.name = new_instance.map_name
 			NumLoaded += 1	
 			Logging.log_notice("[MAP] Map "+ new_instance.map_name+ " Loaded. "+str(NumLoaded)+"/"+str(MapsToLoad.size()))
@@ -34,7 +34,7 @@ func LoadMaps():
 
 func MovePlayerToMapStandalone(playerNode : PlayerCollider, NewMap, position): #used when spawning a new player collider.
 	Logging.log_notice("Moving player to map "+str(NewMap)+".")
-	get_node(NewMap).AddPlayerChild(playerNode)
+	$SubViewportContainer/SubViewport.get_node(NewMap).AddPlayerChild(playerNode)
 	playerNode.CurrentMap = NewMap
 	playerNode.ControllingCharacter.CurrentMap = NewMap
 	playerNode.ControllingCharacter.CurrentPosition = position
@@ -47,25 +47,28 @@ func MovePlayerToMap(playerNode, OldMap, NewMap, position): #used when transitio
 	await get_tree().create_timer(0.1).timeout
 	playerNode.position = position
 	RecentWarps.append(playerNode.name)
-	get_node(OldMap).RemovePlayerChild(playerNode)
-	get_node(NewMap).AddPlayerChild(playerNode)
+	$SubViewportContainer/SubViewport.get_node(OldMap).RemovePlayerChild(playerNode)
+	$SubViewportContainer/SubViewport.get_node(NewMap).AddPlayerChild(playerNode)
 	playerNode.CurrentMap = NewMap
 	playerNode.ControllingCharacter.CurrentMap = NewMap
 	playerNode.ControllingCharacter.CurrentPosition = position
 	DataRepository.Server.SyncClientMap(playerNode.ControllingCharacter.ActiveController.associated_pid, NewMap)
 	get_tree().create_timer(0.05).timeout.connect(Callable(self, "RemoveNodeFromRecentWarps").bind(playerNode.name))
 
+func GetMap(mapname):
+	return $SubViewportContainer/SubViewport.get_node(mapname)
+
 func RemoveNodeFromRecentWarps(node_name):
 	RecentWarps.erase(node_name)
 
 func GenerateMapGroundItemDict(map_name : String):
-	var map : MapBase = get_node(map_name)
+	var map : MapBase = $SubViewportContainer/SubViewport.get_node(map_name)
 	return map.GenerateGroundItemDict()
 	
 func GenerateMapObjects(map_name : String):
-	var map : MapBase = get_node(map_name)
+	var map : MapBase = $SubViewportContainer/SubViewport.get_node(map_name)
 	return map.GenerateMapObjects()
 	
 func GenerateMapProjectiles(map_name : String):
-	var map : MapBase = get_node(map_name)
+	var map : MapBase = $SubViewportContainer/SubViewport.get_node(map_name)
 	return map.GenerateMapProjectiles()

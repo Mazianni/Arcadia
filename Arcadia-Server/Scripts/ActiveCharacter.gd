@@ -45,9 +45,9 @@ signal knocked_out(node)
 
 func _ready():
 	connect("tree_exiting", Callable(self, "OnDeleted"))
-	load_failed.connect(Callable(DataRepository.Server,"ReturnCharacterLoadFailed"))
+	load_failed.connect(Callable(Authentication,"ReturnCharacterLoadFailed"))
 	load_failed.connect(Callable(self,"OnLoadFailed"))
-	collider_created.connect(Callable(DataRepository.Server, "ReturnCharacterLoaded"))
+	collider_created.connect(Callable(Authentication, "ReturnCharacterLoaded"))
 	load_success.connect(Callable(self, "OnLoadSuccessful"))
 	LoadJSON(self.name)
 	damage_applied.connect(Callable(CombatHandler, "ServerCombatHandler_SendCreateDmgPopup"))
@@ -77,7 +77,7 @@ func OnLoadSuccessful(pid, map):
 	var inventory_save_dir = save_dir+"/"+str(CharacterData.uuid)+"/InventorySaves/"
 	CreateCollider()
 	load_failed.disconnect(Callable(self,"OnLoadFailed"))
-	load_failed.disconnect(Callable(DataRepository.Server,"ReturnCharacterLoadFailed"))
+	load_failed.disconnect(Callable(Authentication,"ReturnCharacterLoadFailed"))
 	load_success.disconnect(Callable(self, "OnLoadSuccessful"))
 	CalculateStats()
 	
@@ -162,7 +162,7 @@ func CreateCollider():
 		CurrentMap = CharacterData.LastMap
 		CurrentCollider.position = cached_position
 	collider_created.emit(ActiveController.associated_pid, CurrentMap)
-	collider_created.disconnect(Callable(DataRepository.Server, "ReturnCharacterLoaded"))
+	collider_created.disconnect(Callable(Authentication, "ReturnCharacterLoaded"))
 
 func CalculateStats():
 	for i in current_stats.keys(): 
@@ -255,3 +255,11 @@ func ApplyHeal(amount:int):
 	else:
 		heal_applied.emit(self, amount, "heal")	
 			
+func SetDash():
+	if "Dash" in cooldowns:
+		return
+	if not cooldowns.has("Dash"):
+		cooldowns.append("Dash")
+	get_tree().create_timer(1).timeout.connect(Callable(self, "UnsetCooldown").bind("Dash"))
+	if CurrentCollider:
+		CurrentCollider.SetDash()

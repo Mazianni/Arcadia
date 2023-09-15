@@ -1,9 +1,9 @@
-[gd_scene load_steps=32 format=2]
+[gd_scene load_steps=32 format=3]
 
-[ext_resource path="res://scenes/MainLev_autotiling.png" type="Texture2D" id=1]
-[ext_resource path="res://scenes/Trees/Tree_Green_A.tscn" type="PackedScene" id=2]
-[ext_resource path="res://scenes/Trees/Tree_Green_B.tscn" type="PackedScene" id=3]
-[ext_resource path="res://scenes/Trees/Tree_Green_C.tscn" type="PackedScene" id=4]
+[ext_resource type="Texture2D" uid="uid://o0b8xfftf3ly" path="res://scripts/ArcadiaInventory/scenes/MainLev_autotiling.png" id="1"]
+[ext_resource type="PackedScene" uid="uid://ddw6v7dlf6isa" path="res://scripts/ArcadiaInventory/scenes/Trees/Tree_Green_A.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://j5k7kq6kigui" path="res://scripts/ArcadiaInventory/scenes/Trees/Tree_Green_B.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scripts/ArcadiaInventory/scenes/Trees/Tree_Green_C.tscn" id="4"]
 
 [sub_resource type="ConvexPolygonShape2D" id=2]
 points = PackedVector2Array( 0, 32, 0, 32, 32, 0, 32, 0, 32, 0, 32, 0 )

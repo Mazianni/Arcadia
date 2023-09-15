@@ -27,23 +27,28 @@ script = ExtResource("3")
 [node name="StatusBars" type="Control" parent="."]
 layout_mode = 1
 anchor_left = 0.000868056
-anchor_right = 0.664063
-anchor_bottom = 0.12963
+anchor_top = 0.881173
+anchor_right = 0.180556
+anchor_bottom = 0.996914
 grow_horizontal = 2
 mouse_filter = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="CenterContainer" type="CenterContainer" parent="StatusBars"]
+[node name="CenterContainer" type="VBoxContainer" parent="StatusBars"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = -2.0
+offset_right = -122.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
 [node name="ResourceBar" parent="StatusBars/CenterContainer" instance=ExtResource("10_nkqgd")]
+custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
+size_flags_horizontal = 4
 
 [node name="SubviewRegion" type="Control" parent="."]
 layout_mode = 1

@@ -1,5 +1,4 @@
 [gd_scene format=3 uid="uid://c6rnuwy0q51kj"]
 
 [node name="Camera2D" type="Camera2D" groups=["main_camera"]]
-position_smoothing_enabled = true
-position_smoothing_speed = 15.0
+position_smoothing_speed = 100.0

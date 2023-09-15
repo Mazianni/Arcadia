@@ -13,6 +13,10 @@ var MapObjectResourceDictionary : Dictionary = {
 var MapProjectileResourceDictionary : Dictionary = {
 	"Thunder Strike":preload("res://scenes/Projectiles/Thunder Strike/projectile.tscn")
 }
+var MapDict : Dictionary = {
+	"Test" : preload("res://scenes/maps/Test/Test.tscn"),
+	"Test2" : preload("res://scenes/maps/Test2/Test2.tscn")
+}
 
 signal map_loaded
 signal map_load_failed
@@ -20,10 +24,10 @@ signal map_changed_to(node)
 
 @onready var mainviewportcontainer : SubViewportContainer = $SubViewportContainer
 @onready var mainviewport : SubViewport = $SubViewportContainer/SubViewport
-@onready var main_node : Node = mainviewport
+@onready var main_node : Node = self
 
 func _ready():
-	Server.world_update_recieved.connect(Callable(self,"ProcessWorldUpdate"))
+	#Server.world_update_recieved.connect(Callable(self,"ProcessWorldUpdate"))
 	map_loaded.connect(Callable(self, "MapLoadedFirstTime"))
 	Globals.show_viewport.connect(Callable(self, "ToggleViewport"))
 	Globals.create_main_player_obj.connect(Callable(self, "CreatePlayerNode"))
@@ -48,80 +52,85 @@ func UpdateWorldState(world_state):
 		last_world_state = world_state["T"]
 		world_state_buffer.append(world_state)
 		
-func _physics_process(delta):
-	if Globals.client_state != Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
-		return
-	Server.RequestWorldState()
+#func _physics_process(delta):
+#	if Globals.client_state != Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
+#		return
+#	Server.RequestWorldState()
 
-func ProcessWorldUpdate():
-	var map_node : MapBase
-	if Globals.client_state != Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
-		return
-	if current_map_reference.name != current_map: #map name not set yet - invalid condition.
-		current_map_reference.name = current_map
-	if current_map == null:
-		return
-	interpolation_offset = interpolation_offset_base + Server.latency
-	var render_time = (Time.get_unix_time_from_system() * 1000) - interpolation_offset
-	if world_state_buffer.size() > 1:
-		while world_state_buffer.size() > 2 and render_time > world_state_buffer[2]["T"]:
-			world_state_buffer.remove_at(0)
-		if world_state_buffer.size() > 4:
-			world_state_buffer.remove_at(0)
-		if world_state_buffer.size() > 2:
-			map_node = main_node.get_node(str(current_map))
-			var interpolation_factor = float(render_time - world_state_buffer[1]["T"]) / float(world_state_buffer[2]["T"] - world_state_buffer[1]["T"])
-			for player in world_state_buffer[2]["PN"].keys():
-				if str(player) == "T":
-					continue
-				if not world_state_buffer[1]["PN"].has(player):
-					continue
-				if world_state_buffer[1]["PN"][player]["M"] != current_map:
-					continue
-				if main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/").has_node(str(player)):
-					#var newpos = lerp(main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).get_global_position(),world_state_buffer[2]["PN"][player]["P"], interpolation_factor)
-					var newpos = lerp(world_state_buffer[1]["PN"][player]["P"],world_state_buffer[2]["PN"][player]["P"], interpolation_factor)
-					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).MovePlayer(newpos)
-					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).UpdateSprite(world_state_buffer[1]["PN"][player]["D"],world_state_buffer[1]["PN"][player]["MV"])
-				else:
-					if player == Globals.character_uuid:
-						main_node.get_node(str(current_map)).AddPlayerNodeToMap(MainPlayerObject, world_state_buffer[2]["PN"][player]["P"])
-					else:
-						main_node.get_node(str(current_map)).SpawnNewPlayer(player, world_state_buffer[2]["PN"][player]["P"], false)
-			for ground_item in world_state_buffer[2]["GN"].keys():
-				if main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Objects/").has_node(str(ground_item)):
-					var newpos = lerp(world_state_buffer[1]["GN"][ground_item]["P"],world_state_buffer[2]["GN"][ground_item]["P"], interpolation_factor)
-					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Objects/"+str(ground_item)).position = newpos
-				else:
-					main_node.get_node(str(current_map)).AddGroundItem(world_state_buffer[2]["GN"][ground_item]["D"], ground_item, world_state_buffer[2]["GN"][ground_item]["P"])
-			for old_ground_item in main_node.get_node(str(current_map)).ground_items:
-				if is_instance_valid(old_ground_item):
-					if old_ground_item.uuid not in world_state_buffer[1]["GN"].keys():
-						old_ground_item.free()
-			for i in current_map_reference.GetMapPlayers():
-				if not i.name in world_state_buffer[2]["PN"].keys():
-					current_map_reference.DespawnPlayer(i.name)
-		elif render_time > world_state_buffer[1].T:
-			var extrapolation_factor = float(render_time - world_state_buffer[0]["T"]) / float(world_state_buffer[1]["T"] - world_state_buffer[0]["T"]) - 1.00
-			for player in world_state_buffer[1]["PN"].keys():
-				if str(player) == "T":
-					continue
-				if not world_state_buffer[0]["PN"].has(player):
-					continue
-				if world_state_buffer[0]["PN"][player]["M"] != current_map:
-					continue
-				map_node = main_node.get_node(str(current_map))
-				if main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players").has_node(str(player)):
-					var position_delta = (world_state_buffer[1]["PN"][player]["P"] - world_state_buffer[0]["PN"][player]["P"])
-					var new_position = world_state_buffer[1]["PN"][player]["P"] + (position_delta * extrapolation_factor)
-					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).MovePlayer(new_position)
-					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).UpdateSprite(world_state_buffer[1]["PN"][player]["D"], world_state_buffer[1]["PN"][player]["MV"])
-		HandleMapObjects(world_state_buffer[1])
-		HandleMapProjectiles(world_state_buffer[1])
+#func ProcessWorldUpdate():
+#	return
+#	var map_node : MapBase
+#	if Globals.client_state != Globals.CLIENT_STATE_LIST.CLIENT_INGAME:
+#		return
+#	if current_map_reference.name != current_map: #map name not set yet - invalid condition.
+#		current_map_reference.name = current_map
+#	if current_map == null:
+#		return
+#	interpolation_offset = interpolation_offset_base + Server.latency
+#	var render_time = (Time.get_unix_time_from_system() * 1000) - interpolation_offset
+#	if world_state_buffer.size() > 1:
+#		while world_state_buffer.size() > 2 and render_time > world_state_buffer[2]["T"]:
+#			world_state_buffer.remove_at(0)
+#		if world_state_buffer.size() > 4:
+#			world_state_buffer.remove_at(0)
+#		if world_state_buffer.size() > 2:
+#			map_node = main_node.get_node(str(current_map))
+#			var interpolation_factor = float(render_time - world_state_buffer[1]["T"]) / float(world_state_buffer[2]["T"] - world_state_buffer[1]["T"])
+#			for player in world_state_buffer[2]["PN"].keys():
+#				if str(player) == "T":
+#					continue
+#				if not world_state_buffer[1]["PN"].has(player):
+#					continue
+#				if world_state_buffer[1]["PN"][player]["M"] != current_map:
+#					continue
+#				if main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/").has_node(str(player)):
+#					#var newpos = lerp(main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).get_global_position(),world_state_buffer[2]["PN"][player]["P"], interpolation_factor)
+#					var newpos = lerp(world_state_buffer[1]["PN"][player]["P"],world_state_buffer[2]["PN"][player]["P"], interpolation_factor)
+#					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).MovePlayer(newpos)
+#					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).UpdateSprite(world_state_buffer[1]["PN"][player]["MV"])
+#				else:
+#					if player == Globals.character_uuid:
+#						main_node.get_node(str(current_map)).AddPlayerNodeToMap(MainPlayerObject, world_state_buffer[2]["PN"][player]["P"])
+#					else:
+#						main_node.get_node(str(current_map)).SpawnNewPlayer(player, world_state_buffer[2]["PN"][player]["P"], false)
+#			for ground_item in world_state_buffer[2]["GN"].keys():
+#				if main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Objects/").has_node(str(ground_item)):
+#					var newpos = lerp(world_state_buffer[1]["GN"][ground_item]["P"],world_state_buffer[2]["GN"][ground_item]["P"], interpolation_factor)
+#					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Objects/"+str(ground_item)).position = newpos
+#				else:
+#					main_node.get_node(str(current_map)).AddGroundItem(world_state_buffer[2]["GN"][ground_item]["D"], ground_item, world_state_buffer[2]["GN"][ground_item]["P"])
+#			for old_ground_item in main_node.get_node(str(current_map)).ground_items:
+#				if is_instance_valid(old_ground_item):
+#					if old_ground_item.uuid not in world_state_buffer[1]["GN"].keys():
+#						old_ground_item.free()
+#			for i in current_map_reference.GetMapPlayers():
+#				if not i.name in world_state_buffer[2]["PN"].keys():
+#					current_map_reference.DespawnPlayer(i.name)
+#		elif render_time > world_state_buffer[1].T:
+#			var extrapolation_factor = float(render_time - world_state_buffer[0]["T"]) / float(world_state_buffer[1]["T"] - world_state_buffer[0]["T"]) - 1.00
+#			for player in world_state_buffer[1]["PN"].keys():
+#				if str(player) == "T":
+#					continue
+#				if not world_state_buffer[0]["PN"].has(player):
+#					continue
+#				if world_state_buffer[0]["PN"][player]["M"] != current_map:
+#					continue
+#				map_node = main_node.get_node(str(current_map))
+#				if main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players").has_node(str(player)):
+#					var position_delta = (world_state_buffer[1]["PN"][player]["P"] - world_state_buffer[0]["PN"][player]["P"])
+#					var new_position = world_state_buffer[1]["PN"][player]["P"] + (position_delta * extrapolation_factor)
+#					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).MovePlayer(new_position)
+#					main_node.get_node(str(current_map)+"/PrimarySort/ObjectSortContainer/Players/"+str(player)).UpdateSprite(world_state_buffer[1]["PN"][player]["D"], world_state_buffer[1]["PN"][player]["MV"])
+#		HandleMapObjects(world_state_buffer[1])
+#		HandleMapProjectiles(world_state_buffer[1])
 		
 func ChangeMap(mapname):
 	var path = "res://scenes/maps/"
-	var newmapres = load(path+str(mapname)+"/"+str(mapname)+".tscn")
+	var newmapres
+	if MapDict.has(mapname):
+		newmapres = MapDict[mapname]
+	else:
+		newmapres = load(path+str(mapname)+"/"+str(mapname)+".tscn")
 	if not newmapres:
 		Gui.CreateFloatingMessage("There was an error loading the map for your character. Please report this to a developer.", "bad")
 		Globals.SetClientState(Globals.CLIENT_STATE_LIST.CLIENT_PREGAME)
@@ -131,7 +140,7 @@ func ChangeMap(mapname):
 	newmapinstance.name = mapname
 	if current_map_reference:
 		current_map_reference.get_node("PrimarySort/ObjectSortContainer/Players").remove_child(MainPlayerObject)
-		newmapinstance.AddPlayerNodeToMap(MainPlayerObject, world_state_buffer[1]["PN"][Globals.character_uuid]["P"])
+		newmapinstance.AddPlayerNodeToMap(MainPlayerObject)
 	mainviewport.add_child(newmapinstance)
 	if current_map_reference:
 		current_map_reference.queue_free()
